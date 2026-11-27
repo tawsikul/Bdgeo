@@ -639,7 +639,8 @@ const Store = (() => {
   const mapUser = p => ({ id: p.id, role: p.role, name: p.name, email: p.email, phone: p.phone, institution: p.institution, klass: p.klass, category: p.category, region: p.region, regNo: p.reg_no, createdAt: p.created_at, selected: p.selected || [] });
   const mapAttempt = a => ({ id: a.id, examId: a.exam_id, userId: a.user_id, startedAt: a.started_at, deadline: a.deadline, submittedAt: a.submitted_at, answers: a.answers || [], score: a.score, secs: a.secs });
   const mapMsg = m => ({ id: m.id, userId: m.user_id, title: m.title, body: m.body, kind: m.kind, at: m.at });
-  const mapMail = m => ({ id: m.id, to: m.to_email, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at });
+  const mapMail = m => ({ id: m.id, to: m.to_email, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at, sentAt: m.sent_at, error: m.error });
+  const mailRow = m => ({ id: m.id, to_email: m.to, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at });
   async function fetchAll(table, cols) {
     const out = [];
     for (let from = 0; ; from += 1000) {
@@ -844,10 +845,35 @@ const Store = (() => {
       if (CLOUD) {
         await Promise.all(picked.map(p => sb.from('profiles').update({ selected: p.selected }).eq('id', p.u.id).then(ok)));
         ok(await sb.from('messages').insert(msgs.map(m => ({ id: m.id, user_id: m.userId, title: m.title, body: m.body, kind: m.kind, at: m.at }))));
-        ok(await sb.from('emails').insert(mails.map(m => ({ id: m.id, to_email: m.to, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at }))));
+        ok(await sb.from('emails').insert(mails.map(mailRow)));
       }
       picked.forEach(p => { p.u.selected = p.selected; }); db.messages.push(...msgs); db.emails.push(...mails);
       save(); return picked.length;
+    },
+    /* put one email per person in the queue; {name} in the text becomes that person's name */
+    async queueMail(users, subject, body) {
+      const at = new Date().toISOString();
+      const mails = users.filter(u => u.email).map(u => ({ id: uid('x'), to: u.email, name: u.name, subject, body: body.replace(/\{name\}/g, u.name), at, status: CLOUD ? 'queued' : 'preview' }));
+      if (CLOUD) for (let i = 0; i < mails.length; i += 400) ok(await sb.from('emails').insert(mails.slice(i, i + 400).map(mailRow)));
+      db.emails.push(...mails); save(); return mails.length;
+    },
+    /* ask the server to send everything that is waiting, a batch at a time */
+    async sendQueued() {
+      if (!CLOUD) return { preview: true, sent: 0, failed: 0, waiting: 0 };
+      let sent = 0, failed = 0, waiting = 0, error = '', limit = false;
+      for (let round = 0; round < 12; round++) {
+        let r; try { r = await sb.functions.invoke('send-emails', { body: {} }); } catch (e) { r = { error: e }; }
+        if (r.error) { error = 'The email sender could not be reached. The emails are saved and can be sent later from the Emails tab.'; break; }
+        const d = r.data || {}; sent += d.sent || 0; failed += d.failed || 0; waiting = d.waiting || 0; limit = !!d.limit;
+        if (d.error) { error = d.error; break; }
+        if (!d.sent || !waiting || d.limit) break;
+      }
+      try { db.emails = (await fetchAll('emails', ['id'])).map(mapMail); } catch (e) { /* the list refreshes on the next load */ }
+      return { sent, failed, waiting, error, limit };
+    },
+    async retryFailed() {
+      if (CLOUD) ok(await sb.from('emails').update({ status: 'queued', error: null }).eq('status', 'failed'));
+      db.emails.forEach(m => { if (m.status === 'failed') { m.status = 'queued'; m.error = null; } });
     },
     async unselect(ids, round) {
       for (const id of ids) {
@@ -1844,7 +1870,7 @@ function selectDialog(ids, after) {
     title: `Mark ${plural(ids.length, 'student')} as selected`, submit: 'Mark as selected',
     intro: 'Each student gets a notice in their account and an email.',
     fields: [{ key: 'round', label: 'Selected for', type: 'select', options: ROUNDS.slice(1) }, { key: 'note', label: 'Message (optional)', type: 'textarea', help: 'Leave this empty to send the standard congratulations message.' }],
-  }).then(async v => { if (!v) return; let n; try { n = await Store.select(ids, v.round, v.note); } catch (e) { return toast(e.message, 'bad'); } toast(n ? `${plural(n, 'student')} marked. Notices added and emails queued.` : 'Those students were already selected for that round.', n ? 'good' : ''); after(); });
+  }).then(async v => { if (!v) return; let n; try { n = await Store.select(ids, v.round, v.note); } catch (e) { return toast(e.message, 'bad'); } toast(n ? `${plural(n, 'student')} marked as selected. A notice is in each account.` : 'Those students were already selected for that round.', n ? 'good' : ''); after(); if (n) sendAndTell(); });
 }
 function personDialog(p, after) {
   const tries = Store.all('attempts').filter(a => a.userId === p.id && a.submittedAt);
@@ -1960,13 +1986,15 @@ function noticeTemplates(main, panel) {
   main.appendChild(box);
 }
 ADMIN['admin-notices'] = main => { const noticePanel = crudPanel({
-  table: 'notices', title: 'Notices', addLabel: 'Add a notice', hint: 'Notices show on the public Notices page straight away. Pinned notices stay at the top.',
+  table: 'notices', title: 'Notices', addLabel: 'Add a notice', hint: 'Notices show on the public Notices page straight away. Pinned notices stay at the top. Use the envelope button to also email a notice to students.',
   fields: [{ key: 'title', label: 'Title', required: true }, { key: 'body', label: 'Notice text', type: 'textarea', rows: 6, required: true }, { key: 'tag', label: 'Label (optional)', placeholder: 'For example: Regional round' },
     { key: 'date', label: 'Date shown', type: 'datetime', required: true }, { key: 'pinned', label: 'Pin to the top', type: 'checkbox' }],
   defaults: () => ({ date: nowIso(), pinned: false }),
   sort: (a, b) => new Date(b.date) - new Date(a.date),
   row: n => `<h3>${esc(n.title)} ${n.pinned ? '<span class="chip chip-soon">Pinned</span>' : ''} ${sampleChip(n)}</h3><p>${fmtDate(n.date)}${n.tag ? ', ' + esc(n.tag) : ''}</p>`,
-}); noticeTemplates(main, noticePanel); main.appendChild(noticePanel); };
+  extra: n => `<button type="button" class="mini" data-mailn="${n.id}" aria-label="Email this notice" title="Email this notice">${icon('mail', 18)}</button>`,
+}); noticePanel.addEventListener('click', e => { const b = e.target.closest('[data-mailn]'); if (b) emailNoticeDialog(Store.get('notices', b.dataset.mailn)); });
+  noticeTemplates(main, noticePanel); main.appendChild(noticePanel); };
 ADMIN['admin-resources'] = main => main.appendChild(crudPanel({
   table: 'resources', title: 'Resources', addLabel: 'Add a resource', hint: 'Paste a link to each file or video, for example a Google Drive or YouTube link.',
   fields: [{ key: 'title', label: 'Title', required: true }, { key: 'desc', label: 'Short description', type: 'textarea', rows: 3 }, { key: 'cat', label: 'Topic', type: 'select', options: RES_CATS },
@@ -2083,12 +2111,61 @@ ADMIN['admin-results'] = main => {
 };
 
 /* ---------- emails and site details ---------- */
+/* say in plain words what a send did */
+function mailSummary(r) {
+  if (r.preview) return '';
+  if (r.error && !r.sent) return r.error;
+  let t = `${plural(r.sent, 'email')} sent`;
+  if (r.failed) t += `, ${r.failed} failed`;
+  if (r.waiting) t += `, ${r.waiting} still waiting`;
+  if (r.limit) t += '. Today\'s sending limit is used up, so send the rest tomorrow from the Emails tab';
+  return t + '.';
+}
+async function sendAndTell() { const r = await Store.sendQueued(), t = mailSummary(r); if (t) toast(t, r.error && !r.sent ? 'bad' : 'good'); return r; }
+const MAIL_STATE = { queued: ['Waiting', 'chip-soon'], sent: ['Sent', 'chip-live'], failed: ['Failed', 'chip-sample'], preview: ['Not sent', 'chip-done'] };
 ADMIN['admin-emails'] = main => {
-  const mails = Store.all('emails').slice().sort((a, b) => new Date(b.at) - new Date(a.at));
-  main.innerHTML = `<section class="panel"><h2>Emails</h2><p class="note">${CLOUD ? 'Emails are saved here but not sent yet. Sending starts once an email service is connected.' : 'In this preview, emails are only listed here. They are sent for real once an email service is connected.'}</p>
-    <div>${mails.map(m => `<div class="rowi"><button type="button" class="plink grow" data-mail="${m.id}"><h3>${esc(m.subject)}</h3><p>To ${esc(m.name)} (${esc(m.to)}), ${fmtDateTime(m.at)}</p></button><span class="chip chip-done">Not sent</span></div>`).join('') || '<p class="empty">No emails yet. Mark a participant as selected and the email appears here.</p>'}</div></section>`;
-  main.addEventListener('click', e => { const b = e.target.closest('[data-mail]'); if (!b) return; const m = Store.get('emails', b.dataset.mail); openDialog({ title: m.subject, html: `<p class="muted">To ${esc(m.name)} (${esc(m.to)})</p><p style="white-space:pre-line">${esc(m.body)}</p><div class="dlg-actions"><button type="button" class="btn btn-ocean btn-sm" data-close>Close</button></div>` }); });
+  const draw = () => {
+    const mails = Store.all('emails').slice().sort((a, b) => new Date(b.at) - new Date(a.at));
+    const n = k => mails.filter(m => m.status === k).length, waiting = n('queued'), failed = n('failed');
+    main.innerHTML = `<section class="panel"><div class="panel-head"><h2>Emails</h2>${CLOUD && waiting ? `<button type="button" class="btn btn-ocean btn-sm" id="m-send">${icon('mail', 18)} Send ${waiting} waiting</button>` : ''}</div>
+      ${CLOUD ? `<p class="muted">Selection emails and notice emails are listed here. ${n('sent')} sent, ${waiting} waiting, ${failed} failed. The free email plan sends up to 300 a day.</p>${failed ? '<div><button type="button" class="btn btn-quiet btn-sm" id="m-retry">Try the failed ones again</button></div>' : ''}`
+        : '<p class="note">In this preview, emails are only listed here. On the live site they are sent for real.</p>'}
+      <div>${mails.slice(0, 300).map(m => { const st = MAIL_STATE[m.status] || MAIL_STATE.preview; return `<div class="rowi"><button type="button" class="plink grow" data-mail="${m.id}"><h3>${esc(m.subject)}</h3><p>To ${esc(m.name)} (${esc(m.to)}), ${fmtDateTime(m.at)}</p></button><span class="chip ${st[1]}">${st[0]}</span></div>`; }).join('') || '<p class="empty">No emails yet. Mark a participant as selected, or email a notice, and it appears here.</p>'}</div>
+      ${mails.length > 300 ? `<p class="muted">Showing the newest 300 of ${mails.length}.</p>` : ''}</section>`;
+    const sb1 = $('#m-send', main); if (sb1) sb1.onclick = () => busy(sb1, async () => { await sendAndTell(); draw(); });
+    const rt = $('#m-retry', main); if (rt) rt.onclick = () => busy(rt, async () => { await Store.retryFailed(); await sendAndTell(); draw(); });
+  };
+  main.addEventListener('click', e => {
+    const b = e.target.closest('[data-mail]'); if (!b) return; const m = Store.get('emails', b.dataset.mail);
+    openDialog({ title: m.subject, html: `<p class="muted">To ${esc(m.name)} (${esc(m.to)})</p><p style="white-space:pre-line">${esc(m.body)}</p>${m.error ? `<p class="err">Why it failed: ${esc(m.error)}</p>` : ''}<div class="dlg-actions"><button type="button" class="btn btn-ocean btn-sm" data-close>Close</button></div>` });
+  });
+  draw();
 };
+/* who a notice can be emailed to, with head counts */
+function audienceOptions() {
+  const ps = Store.participants(), opts = [['all', `All participants (${ps.length})`]];
+  ['Junior', 'Secondary', 'Higher secondary'].forEach(c => { const k = ps.filter(p => p.category === c).length; if (k) opts.push(['cat:' + c, `${c} category (${k})`]); });
+  DIVISIONS.forEach(d => { const k = ps.filter(p => p.region === d).length; if (k) opts.push(['reg:' + d, `${d} region (${k})`]); });
+  ROUNDS.forEach(r => { const k = ps.filter(p => (p.selected || []).some(x => x.round === r)).length; if (k) opts.push(['sel:' + r, `Selected for the ${r} (${k})`]); });
+  return opts;
+}
+function audience(key) {
+  const ps = Store.participants(), v = key.slice(4);
+  if (key.startsWith('cat:')) return ps.filter(p => p.category === v);
+  if (key.startsWith('reg:')) return ps.filter(p => p.region === v);
+  if (key.startsWith('sel:')) return ps.filter(p => (p.selected || []).some(x => x.round === v));
+  return ps;
+}
+async function emailNoticeDialog(n) {
+  const v = await formDialog({ title: 'Email this notice', submit: 'Send the emails', intro: 'Each person gets their own email. The free plan sends up to 300 a day; anything over that waits in the Emails tab for the next day.',
+    values: { to: 'all', subject: 'BGeO: ' + n.title, body: n.body },
+    fields: [{ key: 'to', label: 'Send to', type: 'select', options: audienceOptions() }, { key: 'subject', label: 'Email subject', required: true }, { key: 'body', label: 'Email text', type: 'textarea', rows: 8, required: true, help: 'Write {name} where the student\'s name should appear.' }] });
+  if (!v) return;
+  const people = audience(v.to);
+  if (!people.length) return toast('Nobody is in that group yet, so nothing was sent.', 'bad');
+  if (!(await confirmDialog(`Send this email to ${plural(people.length, 'person', 'people')}?`, 'Send'))) return;
+  busy(null, async () => { const k = await Store.queueMail(people, v.subject, v.body); const r = await sendAndTell(); if (r.preview) toast(`${plural(k, 'email')} listed in the Emails tab (preview)`, 'good'); });
+}
 ADMIN['admin-site'] = main => {
   const s = Store.db.settings, cf = [{ key: 'contactEmail', label: 'Contact email', type: 'email' }, { key: 'contactPhone', label: 'Contact phone', type: 'tel' }, { key: 'facebook', label: 'Facebook page link', type: 'url', placeholder: 'https://' }];
   const top = document.createElement('div'); top.className = 'stack'; top.style.gap = '16px';
