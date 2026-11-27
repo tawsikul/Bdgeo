@@ -151,10 +151,6 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .door-b{background:#fff;color:var(--ink);border-radius:var(--r-lg)}
 .door-c{background:var(--lagoon);color:var(--abyss);border-radius:var(--r-lg) 8px var(--r-lg) var(--r-lg)}
 .door .art{position:absolute;right:-14px;top:-14px;width:128px;height:128px}
-.podium{display:grid;gap:16px;grid-template-columns:auto 1fr;align-items:center;margin-top:44px;padding:22px 20px;border-radius:var(--r-lg);background:rgba(3,31,80,.55);border:1px solid rgba(255,255,255,.14)}
-.medal{width:84px;height:84px;border-radius:50%;display:grid;place-content:center;background:radial-gradient(circle at 35% 30%,#f4f7fb,#b9c6d8);color:var(--abyss);font:800 2.4rem/1 var(--display);box-shadow:0 0 0 6px rgba(255,255,255,.16)}
-.medal sup{font-size:.45em}
-.podium p{color:#d6e5fb;margin-top:6px}
 
 /* notices */
 .notice{display:grid;grid-template-columns:62px 1fr;gap:14px;padding:16px 0;border-top:1px solid var(--line)}
@@ -408,7 +404,7 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 .acct-grid{display:grid;gap:16px}
 .acct-main,.acct-side{display:grid;gap:16px;align-content:start;min-width:0}
 .acct-main > .sheet + .sheet,.acct-side > .sheet + .sheet{margin-top:0}
-@media(min-width:900px){.acct-grid{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);align-items:start}}
+@media(min-width:900px){.acct-grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);align-items:start}}
 .cardbox{display:grid;gap:12px}
 .inrow{display:flex;gap:8px;align-items:stretch}
 .inrow input{flex:1;min-width:0}
@@ -485,20 +481,57 @@ body.intro-reveal .hero-copy > :nth-child(1){animation-delay:.3s}
 body.intro-reveal .hero-copy > :nth-child(2){animation-delay:.45s}
 body.intro-reveal .hero-copy > :nth-child(3){animation-delay:.6s}
 @keyframes logoPop{from{opacity:0;transform:scale(.55) translateY(10px)}to{opacity:1;transform:none}}
-.sweep{position:fixed;inset:0;z-index:38;pointer-events:none;overflow:hidden}
-.sweep::before{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:60%;border-radius:0 50% 50% 0;background:linear-gradient(90deg,rgba(4,33,79,0),rgba(4,33,79,.92) 45%,rgba(11,61,143,.95));box-shadow:6px 0 0 var(--lime);transform:translateX(-120%);animation:sweep .6s cubic-bezier(.65,0,.3,1) both}
-@keyframes sweep{to{transform:translateX(190%)}}
-.aintro{position:fixed;inset:0;z-index:120;display:grid;place-content:center;background:radial-gradient(circle at 50% 40%,#0b3d8f,#020b24 75%);color:#fff;cursor:pointer;transition:opacity .4s}
+.intro.waiting .intro-skip{color:#fff;font-size:1rem;font-weight:600;animation:nudge 1.1s ease-in-out infinite}
+@keyframes nudge{50%{opacity:.45}}
+/* the tsunami between pages: foam first, then three bodies of water, each with a scalloped front */
+.tsu{position:fixed;inset:0;z-index:110;pointer-events:none;overflow:hidden}
+.tsu i{position:absolute;top:-4%;height:108%;left:0;width:185vw;transform:translateX(-200vw);animation:tsu .95s cubic-bezier(.5,.05,.4,1) both}
+.tsu i::after{content:"";position:absolute;top:0;bottom:0;left:calc(100% - 1px);width:64px;background:inherit;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='130' viewBox='0 0 64 130'%3E%3Cpath d='M0 0H8C74 8 74 122 8 130H0Z'/%3E%3C/svg%3E") repeat-y;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='130' viewBox='0 0 64 130'%3E%3Cpath d='M0 0H8C74 8 74 122 8 130H0Z'/%3E%3C/svg%3E") repeat-y}
+.tsu i::before{content:"";position:absolute;top:0;bottom:0;right:calc(100% - 1px);width:64px;background:inherit;transform:scaleX(-1);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='130' viewBox='0 0 64 130'%3E%3Cpath d='M0 0H8C74 8 74 122 8 130H0Z'/%3E%3C/svg%3E") 0 65px repeat-y;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='130' viewBox='0 0 64 130'%3E%3Cpath d='M0 0H8C74 8 74 122 8 130H0Z'/%3E%3C/svg%3E") 0 65px repeat-y}
+.tsu i:nth-child(1){background:#eaf7fb}
+.tsu i:nth-child(2){background:#5dc9d6;animation-delay:.05s}
+.tsu i:nth-child(2)::after{-webkit-mask-position:0 43px;mask-position:0 43px}
+.tsu i:nth-child(3){background:#2f6db8;animation-delay:.11s}
+.tsu i:nth-child(3)::after{-webkit-mask-position:0 87px;mask-position:0 87px}
+.tsu i:nth-child(4){background:#0b3d8f;animation-delay:.17s}
+.tsu i:nth-child(4)::after{-webkit-mask-position:0 21px;mask-position:0 21px}
+@keyframes tsu{to{transform:translateX(112vw)}}
+/* admin entry: the home page's own logo, then Admin slides in beside the last line */
+.aintro{position:fixed;inset:0;z-index:120;display:grid;place-content:center;background:#04214f;color:#fff;cursor:pointer;transition:opacity .4s}
 .aintro.bye{opacity:0}
-.aintro-in{display:grid;justify-items:center;gap:18px;padding:20px}
-.aintro canvas{width:min(46vw,220px);height:auto;aspect-ratio:1;transform:scale(.2);opacity:0;transition:transform .7s cubic-bezier(.2,1.5,.4,1),opacity .3s}
-.aintro.in canvas{transform:none;opacity:1}
-.aintro-name{display:grid;justify-items:center;gap:2px;opacity:0;transform:translateY(14px);transition:opacity .5s .25s,transform .5s .25s}
-.aintro.in .aintro-name{opacity:1;transform:none}
-.aintro-name span{font:600 1.05rem var(--body);color:#a9c0e4;letter-spacing:.02em}
-.aintro-row{display:flex;align-items:center;justify-content:center;font:800 clamp(2rem,9vw,3rem)/1.15 var(--display)}
-.aintro-a{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;color:var(--lime);transform:translateX(60px);margin-left:0;transition:max-width .6s cubic-bezier(.2,.8,.2,1),opacity .4s .1s,transform .6s cubic-bezier(.2,.8,.2,1),margin-left .6s}
-.aintro.admin .aintro-a{max-width:6em;opacity:1;transform:none;margin-left:.3em}
+.aintro-stage{position:relative;width:min(86vw,520px);aspect-ratio:1/.56;transform:scale(.6);opacity:0;transition:transform .7s cubic-bezier(.2,1.4,.4,1),opacity .35s}
+.aintro.in .aintro-stage{transform:none;opacity:1}
+.aintro-stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.aw{position:absolute;left:21.5%;top:37.5%;width:77.5%;aspect-ratio:960/399;background-size:100% 100%;background-repeat:no-repeat;filter:drop-shadow(0 0 2px #0c3c8c) drop-shadow(0 0 1px #0c3c8c)}
+.aw-top{clip-path:inset(0 0 29.8% 0)}
+.aw-bot{clip-path:inset(70.2% 0 0 0);transition:transform .65s cubic-bezier(.2,.8,.2,1)}
+.aintro.admin .aw-bot{transform:translateX(-17%)}
+.aw-admin{position:absolute;left:66%;top:79%;font:800 calc(min(86vw,520px) * .092)/1 var(--display);color:var(--lime);opacity:0;transform:translateX(70px);transition:transform .65s cubic-bezier(.2,.8,.2,1),opacity .35s .1s;white-space:nowrap}
+.aintro.admin .aw-admin{opacity:1;transform:none}
+
+/* participant dashboard: its own top bar and tabs, apart from the public site */
+#dash{--bar-h:56px;min-height:100vh}
+.dash-top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;height:56px;padding:0 14px;background:rgba(3,31,80,.96);border-bottom:1px solid rgba(255,255,255,.12)}
+.dash-top .brand img{height:40px}
+.dash-top b{font:700 1.05rem var(--body);letter-spacing:.01em;padding-left:12px;border-left:1px solid rgba(255,255,255,.25)}
+.dash-top .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
+@media(max-width:480px){.dash-top .btn span{display:none}.dash-top .btn{padding:0 11px}}
+.dash-tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:rgba(3,31,80,.6);border-bottom:1px solid rgba(255,255,255,.12);scrollbar-width:none}
+.dash-tabs::-webkit-scrollbar{display:none}
+.dash-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;text-decoration:none;font-weight:600;color:#d6e5fb;white-space:nowrap}
+.dash-tabs a:hover{background:rgba(255,255,255,.08)}
+.dash-tabs a[aria-current="page"]{background:var(--lime);color:var(--abyss)}
+@media(min-width:760px){.dash-tabs{justify-content:center}}
+#dash-view{padding:4px 0 64px;outline:none}
+#dash-view > div > .wrap > *{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+.dash-facts{display:grid;gap:10px;margin-bottom:16px}
+@media(min-width:700px){.dash-facts{grid-template-columns:repeat(3,1fr)}}
+.dash-facts a{display:grid;gap:2px;padding:14px 16px;border-radius:14px;background:rgba(3,31,80,.55);border:1px solid rgba(255,255,255,.16);text-decoration:none}
+.dash-facts a:hover{background:rgba(3,31,80,.75)}
+.dash-facts small{color:#a9c0e4;font-weight:600}
+.dash-facts b{font-size:1.12rem}
+.dash-facts span{color:#d6e5fb;font-size:.95rem}
+@media(min-width:760px){.doors.doors-2{grid-template-columns:1fr 1fr}}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none !important;transition:none !important}
@@ -509,6 +542,7 @@ body.intro-reveal .hero-copy > :nth-child(3){animation-delay:.6s}
 <body>
 <div class="sea" aria-hidden="true"><canvas id="contours"></canvas></div>
 <div id="site"></div>
+<div id="dash" hidden></div>
 <div id="admin" hidden></div>
 <div id="toasts" aria-live="polite"></div>
 <button type="button" class="north" id="north" aria-label="Back to the top" hidden><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 3.500l3 8.500h-6z" fill="#e8604c" stroke="none"/><path d="M12 20.500l-3-8.500h6z" fill="#04214f" stroke="none"/></svg></button>
@@ -1889,13 +1923,15 @@ const Sound = (() => {
     a.gain.setValueAtTime(0.0001, t0); a.gain.exponentialRampToValueAtTime(g, t0 + 0.008); a.gain.exponentialRampToValueAtTime(0.0001, t0 + t);
     o.connect(a); a.connect(master); o.start(t0); o.stop(t0 + t + 0.03);
   }
-  function wind({ t = 0.3, f = 500, f2 = 2200, g = 0.07 }) {
+  /* filtered noise: wind when it is band-passed, moving water when it is low-passed */
+  function wind({ t = 0.3, f = 500, f2 = 2200, g = 0.07, delay = 0, type = 'bandpass', peak = 0.35, fm = 0 }) {
     const n = Math.floor(ctx.sampleRate * t), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), a = ctx.createGain(), t0 = ctx.currentTime;
-    src.buffer = buf; bp.type = 'bandpass'; bp.Q.value = 0.9;
-    bp.frequency.setValueAtTime(f, t0); bp.frequency.exponentialRampToValueAtTime(f2, t0 + t);
-    a.gain.setValueAtTime(0.0001, t0); a.gain.exponentialRampToValueAtTime(g, t0 + t * 0.35); a.gain.exponentialRampToValueAtTime(0.0001, t0 + t);
+    const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), a = ctx.createGain(), t0 = ctx.currentTime + delay;
+    src.buffer = buf; bp.type = type; bp.Q.value = 0.9;
+    bp.frequency.setValueAtTime(f, t0);
+    if (fm) { bp.frequency.exponentialRampToValueAtTime(fm, t0 + t * peak); bp.frequency.exponentialRampToValueAtTime(f2, t0 + t); } else bp.frequency.exponentialRampToValueAtTime(f2, t0 + t);
+    a.gain.setValueAtTime(0.0001, t0); a.gain.exponentialRampToValueAtTime(g, t0 + t * peak); a.gain.exponentialRampToValueAtTime(0.0001, t0 + t);
     src.connect(bp); bp.connect(a); a.connect(master); src.start(t0);
   }
   const lib = {
@@ -1907,12 +1943,15 @@ const Sound = (() => {
     bad() { tone({ f: 190, f2: 120, t: 0.22, g: 0.2, type: 'triangle' }); },
     tick() { tone({ f: 1250, f2: 900, t: 0.035, g: 0.05, type: 'triangle' }); },
     win() { [523, 659, 784, 1047].forEach((f, i) => tone({ f, t: 0.3, g: 0.14, delay: i * 0.1 })); },
-    whoosh() { wind({ t: 2.5, f: 3200, f2: 260, g: 0.1 }); tone({ f: 110, f2: 48, t: 2.3, g: 0.12 }); },   // the long pull-back from the ground to space
+    /* the opening: wind builds as the land rushes past, then thins out as the camera climbs into space */
+    whoosh() { wind({ t: 1.7, f: 420, f2: 3000, g: 0.13, peak: 0.7 }); tone({ f: 62, f2: 150, t: 1.6, g: 0.14 }); wind({ t: 1.5, f: 2600, f2: 220, g: 0.1, delay: 1.45, peak: 0.2 }); tone({ f: 150, f2: 46, t: 1.4, g: 0.12, delay: 1.45 }); },
+    /* a tsunami: a deep surge that swells, breaks and hisses away */
+    wave() { wind({ t: 1.05, f: 140, fm: 1100, f2: 260, g: 0.3, type: 'lowpass', peak: 0.45 }); wind({ t: 0.7, f: 2400, f2: 5200, g: 0.05, delay: 0.38, peak: 0.25 }); tone({ f: 58, f2: 40, t: 0.9, g: 0.2 }); },
     land() { tone({ f: 659, t: 0.5, g: 0.1 }); tone({ f: 988, t: 0.7, g: 0.1, delay: 0.12 }); },
   };
   function play(name) { if (!on || !ctx) return; try { if (ctx.state === 'suspended') ctx.resume().catch(() => {}); lib[name] && lib[name](); } catch (e) { /* never let a sound break the page */ } }
   function toggle() { on = !on; try { localStorage.setItem('bgeo-sound', on ? 'on' : 'off'); } catch (e) {} if (on && ensure()) lib.pick(); return on; }
-  return { play, toggle, unlock: ensure, get on() { return on; } };
+  return { play, toggle, unlock: ensure, ready: () => !!ctx && ctx.state === 'running', get on() { return on; } };
 })();
 
 /* ---------- the data layer ----------
@@ -1973,7 +2012,7 @@ function seed() {
     P('Rafid Chowdhury', 12, 'Rangpur', 'Sample College, Rangpur', 'rafid@example.com'),
     P('Sadia Akter', 9, 'Mymensingh', 'Sample High School, Mymensingh', 'sadia@example.com'),
   ];
-  users.filter(u => u.role === 'participant').forEach((u, i) => { u.regNo = 'BGEO-' + String(i + 1).padStart(4, '0'); });
+  users.filter(u => u.role === 'participant').forEach((u, i) => { u.regNo = REG_PREFIX + String(i + 1).padStart(4, '0'); });
   const student = users[1];
   const practice = {
     id: 'practice1', title: 'Practice quiz: Earth basics', description: 'A warm-up on maps, rocks, rivers and the atmosphere.',
@@ -1989,7 +2028,7 @@ function seed() {
     return { id: uid('a'), examId: practice.id, userId: u.id, startedAt: dAt(-1, 10 + i), submittedAt: dAt(-1, 10 + i, 6), answers, score: answers.filter((a, qi) => a === practice.questions[qi].answer).length, secs: 300 + i * 37 };
   });
   return {
-    v: 4,
+    v: 5,
     settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', seq: users.length - 1 },
     users,
     notices: [
@@ -1998,7 +2037,7 @@ function seed() {
       { id: uid('n'), title: 'Practice quiz now live', body: 'A short practice quiz is open in the Online exams section. You can take it as many times as you like on your phone.\n\nThis is a sample notice.', date: dAt(-5, 11), tag: 'Online exam', pinned: false, sample: true },
     ],
     news: [
-      { id: uid('w'), title: 'Bangladesh finishes second at the first MY-GEO', body: 'Team Bangladesh finished second overall at the first Multinational Youth Geography Olympiad (MY-GEO) in Russia. All five team members came home with medals.\n\nThis is a sample news item. Replace it from the admin portal.', date: dAt(-6, 10), sample: true },
+      { id: uid('w'), title: 'Registration opens for the new season', body: 'Students from Class 6 to Class 12 can now register on this website.\n\nThis is a sample news item. Replace it from the admin portal.', date: dAt(-6, 10), sample: true },
       { id: uid('w'), title: 'Regional rounds planned in all eight divisions', body: 'This season every division will host its own Regional round, so students can sit the first test close to home.\n\nThis is a sample news item.', date: dAt(-9, 16), sample: true },
     ],
     resources: [
@@ -2047,6 +2086,9 @@ const SUPA = { url: 'https://wbnrpdphtktkugyzmlce.supabase.co', key: 'sb_publish
 const WANT_CLOUD = SUPA.url.indexOf('https://') === 0;
 const CLOUD = WANT_CLOUD && !!(window.supabase && window.supabase.createClient);
 const sb = CLOUD ? window.supabase.createClient(SUPA.url, SUPA.key) : null;
+/* ID numbers are digits only: the year, the number of the olympiad, then the student's own serial */
+const REG_PREFIX = '202701';
+const regSerial = no => { const d = String(no || '').replace(/\D/g, ''); return +(d.length > 6 ? d.slice(6) : d) || 0; };
 const KINDS = ['notices', 'resources', 'events', 'team', 'faq', 'results', 'news'];
 
 const Store = (() => {
@@ -2093,7 +2135,7 @@ const Store = (() => {
   async function refresh() {
     const sess = ok(await sb.auth.getSession()).session, authed = !!sess;
     const [settings, content, exams] = await Promise.all([sb.from('settings').select('data').eq('id', 1).maybeSingle().then(ok), fetchAll('content', ['kind', 'id']), fetchAll('exams', ['id'])]);
-    const fresh = { v: 4, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
+    const fresh = { v: 5, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
       users: [], notices: [], news: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [] };
     content.forEach(r => { if (KINDS.includes(r.kind)) fresh[r.kind].push({ ...r.data, id: r.id }); });
     let qs = [], keys = []; cardMail = null;
@@ -2129,7 +2171,7 @@ const Store = (() => {
     init() {
       if (CLOUD) return refresh();
       db = read(KEY);
-      if (!db || db.v !== 4) { db = seed(); save(); }
+      if (!db || db.v !== 5) { db = seed(); save(); }
       db.attendance = db.attendance || []; db.news = db.news || [];
       session = read(SKEY);
       if (session && !db.users.some(u => u.id === session)) session = null;
@@ -2172,7 +2214,7 @@ const Store = (() => {
       if (db.users.some(x => x.email.toLowerCase() === email)) return { error: 'An account with this email already exists. Log in instead.' };
       db.settings.seq += 1;
       const u = { id: uid('u'), role: 'participant', name: d.name.trim(), email, phone: d.phone.trim(), institution: d.institution.trim(), klass: +d.klass, category: categoryFor(d.klass), region: d.region,
-        regNo: 'BGEO-' + String(db.settings.seq).padStart(4, '0'), createdAt: new Date().toISOString(), pass: hashPw(d.password), selected: [] };
+        regNo: REG_PREFIX + String(db.settings.seq).padStart(4, '0'), createdAt: new Date().toISOString(), pass: hashPw(d.password), selected: [] };
       db.users.push(u);
       db.messages.push({ id: uid('m'), userId: u.id, title: 'Welcome to BGeO', body: 'Your registration is complete. Watch the Notices page for dates and venues.', at: new Date().toISOString(), kind: 'info' });
       session = u.id; write(SKEY, session); save(); return { user: u };
@@ -2304,16 +2346,19 @@ const Store = (() => {
     cardCode: u => 'BGEO1|' + u.regNo + '|' + String(u.id).slice(0, 8),
     findByCode(code) {
       const m = /^BGEO1\|([^|]+)\|([^|]+)$/.exec(String(code).trim()); if (!m) return null;
-      return db.users.find(u => u.role === 'participant' && u.regNo === m[1] && String(u.id).slice(0, 8) === m[2]) || null;
+      /* cards saved before the ID numbers changed still scan: the serial at the end is what has to match */
+      return db.users.find(u => u.role === 'participant' && String(u.id).slice(0, 8) === m[2] && (u.regNo === m[1] || regSerial(u.regNo) === regSerial(m[1]))) || null;
     },
     /* attendance: returns 'new' the first time, 'already' if that student was marked before */
     async markPresent(userId, session) {
-      if (db.attendance.some(a => a.userId === userId && a.session === session)) return 'already';
+      const has = () => db.attendance.some(a => a.userId === userId && a.session === session);
+      if (has()) return 'already';
       const u = me();
       if (CLOUD) {
         const r = await sb.from('attendance').insert({ user_id: userId, session, marked_by: u ? u.id : null });
-        if (r.error) { if (/duplicate/i.test(r.error.message || '')) { db.attendance.push({ id: uid('t'), userId, session, at: new Date().toISOString(), by: null }); return 'already'; } throw new Error(friendly(r.error)); }
+        if (r.error) { if (/duplicate/i.test(r.error.message || '')) { if (!has()) db.attendance.push({ id: uid('t'), userId, session, at: new Date().toISOString(), by: null }); return 'already'; } throw new Error(friendly(r.error)); }
       }
+      if (has()) return 'already';   // another scan of the same card finished while this one was being saved
       db.attendance.push({ id: uid('t'), userId, session, at: new Date().toISOString(), by: u ? u.id : null }); save(); return 'new';
     },
     async unmark(userId, session) {
@@ -2400,12 +2445,12 @@ const Store = (() => {
    A flat-colour planet in the logo's own greens and blues. A small map of land and
    water is painted once, then wrapped onto a sphere pixel by pixel as it turns. */
 const Globe = (() => {
-  const TW = 1024, TH = 512;
+  const TW = 1024, TH = 512, K = 2, MW = TW * K, MH = TH * K;   // the map is painted at twice its drawing size for clean edges
   let tex = null;
   function rng(seed) { return () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296); }
   function paintMap() {
-    const c = document.createElement('canvas'); c.width = TW; c.height = TH;
-    const g = c.getContext('2d', { willReadFrequently: true }), R = rng(11);
+    const c = document.createElement('canvas'); c.width = MW; c.height = MH;
+    const g = c.getContext('2d', { willReadFrequently: true }), R = rng(11); g.scale(K, K);
     g.fillStyle = '#9ad96f'; g.fillRect(0, 0, TW, TH);
     const wrap = draw => { for (const dx of [-TW, 0, TW]) { g.save(); g.translate(dx, 0); draw(); g.restore(); } };
     const blob = (cx, cy, rx, ry) => {
@@ -2426,26 +2471,26 @@ const Globe = (() => {
     };
     river(150, 58, 70, 22); river(520, 74, 90, 26); river(845, 50, 60, 20);
     for (let i = 0; i < 5; i++) fill(blob(R() * TW, 110 + R() * (TH - 220), 16 + R() * 20, 12 + R() * 14), '#5dc9d6');
-    tex = new Uint32Array(g.getImageData(0, 0, TW, TH).data.buffer);
+    tex = new Uint32Array(g.getImageData(0, 0, MW, MH).data.buffer);
   }
   /* one sphere of `size` pixels; paint(rot) redraws it turned by rot radians */
   function create(size) {
     const S = Math.max(32, size | 0), off = document.createElement('canvas'); off.width = off.height = S;
     const og = off.getContext('2d'), img = og.createImageData(S, S), out = new Uint32Array(img.data.buffer);
-    const n = S * S, row = new Int32Array(n), col = new Int16Array(n), r = S / 2;
+    const n = S * S, row = new Int32Array(n), col = new Int32Array(n), r = S / 2;
     const tilt = -0.42, roll = 0.38, ct = Math.cos(tilt), st = Math.sin(tilt), cr = Math.cos(roll), sr = Math.sin(roll);
     for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
       const i = y * S + x, nx = (x + 0.5 - r) / r, ny = (y + 0.5 - r) / r, d2 = nx * nx + ny * ny;
       if (d2 > 1) { row[i] = -1; continue; }
       const nz = Math.sqrt(1 - d2), x1 = nx * cr + ny * sr, y1 = -nx * sr + ny * cr, y2 = y1 * ct - nz * st, z2 = y1 * st + nz * ct;
       const lat = Math.asin(Math.max(-1, Math.min(1, -y2))), lon = Math.atan2(x1, z2);
-      row[i] = Math.min(TH - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * TH))) * TW;
-      col[i] = Math.floor((lon / 6.283185307 + 0.5) * TW) & (TW - 1);
+      row[i] = Math.min(MH - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * MH))) * MW;
+      col[i] = Math.floor((lon / 6.283185307 + 0.5) * MW) & (MW - 1);
     }
     function paint(rot) {
       if (!tex) paintMap();
-      const sh = Math.floor(rot / 6.283185307 * TW) & (TW - 1);
-      for (let i = 0; i < n; i++) { const ro = row[i]; out[i] = ro < 0 ? 0 : tex[ro + ((col[i] + sh) & (TW - 1))]; }
+      const sh = Math.floor(rot / 6.283185307 * MW) & (MW - 1);
+      for (let i = 0; i < n; i++) { const ro = row[i]; out[i] = ro < 0 ? 0 : tex[ro + ((col[i] + sh) & (MW - 1))]; }
       og.putImageData(img, 0, 0);
     }
     /* draw onto another canvas as a clean-edged disc with a soft shadow on one side */
@@ -2453,7 +2498,7 @@ const Globe = (() => {
       g.save(); g.beginPath(); g.arc(cx, cy, R - 0.5, 0, 6.2832); g.clip();
       g.drawImage(off, cx - R, cy - R, 2 * R, 2 * R);
       const sh = g.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.5, cx, cy, R * 1.05);
-      sh.addColorStop(0, 'rgba(4,33,79,0)'); sh.addColorStop(1, 'rgba(4,33,79,.3)');
+      sh.addColorStop(0, 'rgba(4,33,79,0)'); sh.addColorStop(1, 'rgba(4,33,79,.1)');
       g.fillStyle = sh; g.fillRect(cx - R, cy - R, 2 * R, 2 * R); g.restore();
     }
     return { paint, drawTo, size: S };
@@ -2484,7 +2529,7 @@ function mountHeroStage(stage) {
   function setup() {
     W = stage.clientWidth; if (!W) return;
     cv.width = Math.round(W * dpr); cv.height = Math.round(W * 0.56 * dpr); g = cv.getContext('2d');
-    globe = Globe.create(Math.min(380, Math.round(0.54 * W * dpr)));
+    globe = Globe.create(Math.min(520, Math.round(0.54 * W * dpr)));
     moat = null;
     if (img.complete && img.naturalWidth) buildMoat(); else img.addEventListener('load', () => { buildMoat(); frame(0); }, { once: true });
   }
@@ -2498,9 +2543,9 @@ function mountHeroStage(stage) {
   function frame(dt) {
     if (!g) return;
     /* after the opening animation, carry on from where its globe stopped and let the lettering's outline fade in */
-    if (HeroSync.rot !== null) { rot = HeroSync.rot; HeroSync.rot = null; speed = 2.4; moatA = 0; }
+    if (HeroSync.rot !== null) { rot = HeroSync.rot; HeroSync.rot = null; speed = HeroSync.speed || 2.4; moatA = 0; }
     moatA = Math.min(1, moatA + dt * 2.2);
-    speed += (0.16 - speed) * Math.min(1, dt * 1.6); rot += speed * dt;
+    speed += (0.16 - speed) * Math.min(1, dt * 1.1); rot += speed * dt;
     const s = W * dpr; globe.paint(rot);
     g.clearRect(0, 0, cv.width, cv.height);
     globe.drawTo(g, 0.2675 * s, 0.2722 * s, 0.27 * s);
@@ -2545,155 +2590,177 @@ function drawContours(cv) {
 }
 
 /* ---------- entry animations ----------
-   Opening the site: the camera starts close above a river delta and pulls back fast,
-   past the coastline, until the whole turning Earth is in view. The Earth then flies
-   to its place in the logo and the page appears. One tap skips it.
-   Opening the admin portal: the Earth spins up, turns bluer, and "Admin" slides in. */
+   Opening the site: the camera starts low over a jungle, at an angle. The ground then
+   rushes past as if the Earth were turning under it (jungle, river, farmland, beach,
+   open sea) while the camera climbs. From high above the sea the whole Earth comes
+   into view, spinning fast, and slows as it settles into its place in the logo.
+   Between pages: a tsunami washes across the screen.
+   Opening the admin portal: the logo appears, its Earth turns bluer, and "Admin" slides in. */
 const seenOnce = k => { try { return sessionStorage.getItem(k) === '1'; } catch (e) { return false; } };
 const markSeen = k => { try { sessionStorage.setItem(k, '1'); } catch (e) { /* storage may be blocked */ } };
-const HeroSync = { rot: null };   // lets the home page's globe pick up exactly where the intro's globe stopped
+const HeroSync = { rot: null, speed: 0 };   // lets the home page's globe pick up exactly where the intro's globe stopped
 
 function siteIntro() {
   if (reducedMotion() || seenOnce('bgeo-intro') || routeName() !== 'home') return null;
   markSeen('bgeo-intro');
-  const el = document.createElement('div'); el.className = 'intro'; el.innerHTML = '<canvas aria-hidden="true"></canvas><p class="intro-skip">Tap to skip</p>';
+  const el = document.createElement('div'); el.className = 'intro waiting'; el.innerHTML = '<canvas aria-hidden="true"></canvas><p class="intro-skip">Tap to start with sound</p>';
   document.body.appendChild(el); document.body.classList.add('intro-on');
-  const cv = el.firstChild, g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  let W = 0, H = 0, M = 0; const size = () => { W = window.innerWidth; H = window.innerHeight; M = Math.max(W, H) * 0.8; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); };
+  const cv = el.firstChild, g = cv.getContext('2d'), label = el.lastChild, dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  const layer = document.createElement('canvas'), lg = layer.getContext('2d');   // the ground is drawn here, then laid over the last frame to smear it at speed
+  let W = 0, H = 0, M = 0; const size = () => { W = window.innerWidth; H = window.innerHeight; M = Math.max(W, H); cv.width = layer.width = Math.round(W * dpr); cv.height = layer.height = Math.round(H * dpr); };
   size(); window.addEventListener('resize', size);
   const globe = Globe.create(Math.min(512, Math.round(Math.min(W, H) * dpr)));
-  let seed = 23; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const wobbly = (cx, cy, rx, ry, n = 40) => { const p = [R() * 6.283, R() * 6.283, R() * 6.283], pts = []; for (let i = 0; i < n; i++) { const t = i / n * 6.2832, k = 1 + 0.2 * Math.sin(2 * t + p[0]) + 0.12 * Math.sin(3 * t + p[1]) + 0.06 * Math.sin(5 * t + p[2]); pts.push([cx + Math.cos(t) * rx * k, cy + Math.sin(t) * ry * k]); } return pts; };
-  const path = (pts, close) => { g.beginPath(); pts.forEach((q, i) => (i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]))); if (close) g.closePath(); };
-  const meander = (x0, y0, x1, y1, amp, waves, ph) => { const pts = []; for (let i = 0; i <= 30; i++) { const t = i / 30, nx = -(y1 - y0), ny = x1 - x0, len = Math.hypot(nx, ny) || 1, w = Math.sin(t * waves * 6.2832 + ph) * amp * Math.sin(t * Math.PI * 0.9 + 0.15); pts.push([x0 + (x1 - x0) * t + nx / len * w, y0 + (y1 - y0) * t + ny / len * w]); } return pts; };
-  /* scene A, close to the ground: fields, a wide river and its branches */
-  const mainRiver = []; for (let i = 0; i <= 40; i++) { const y = -1.7 + i * 0.085; mainRiver.push([0.2 * Math.sin(y * 2.1 + 0.6) + 0.07 * Math.sin(y * 5.3), y]); }
-  const riverX = y => 0.2 * Math.sin(y * 2.1 + 0.6) + 0.07 * Math.sin(y * 5.3);
-  const branches = [[-0.5, 1, -1.25, 1.7, 0.06], [0.1, 1, 1.2, 1.6, 0.05], [0.55, -1, -1.3, 1.5, 0.045], [-1.1, -1, -1.6, -0.2, 0.04]].map(([y, side, ex, ey, w]) => ({ pts: meander(riverX(y), y, ex, ey, 0.09, 1.6, R() * 6), w }));
-  const GREENS = ['#8fd465', '#7ecb5f', '#a6de7c', '#6fc35c', '#9ad96f'], fields = [];
-  for (let i = -9; i <= 9; i++) for (let j = -9; j <= 9; j++) {
-    if (R() < 0.22) continue; const x = i * 0.19 + (R() - 0.5) * 0.03, y = j * 0.19 + (R() - 0.5) * 0.03;
-    fields.push([x, y, 0.15 + R() * 0.03, 0.15 + R() * 0.03, GREENS[Math.floor(R() * GREENS.length)]]);
+  let seed = 41; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const sin = Math.sin, clamp = x => Math.max(0, Math.min(1, x));
+
+  /* ---- the ground, in map units: jungle in the west, then farmland, a beach, and the sea ---- */
+  const jungleEdge = y => 4.6 + 0.35 * sin(1.3 * y + 0.4) + 0.15 * sin(3.1 * y);
+  const coast = y => 7.6 + 0.3 * sin(0.9 * y + 1.2) + 0.12 * sin(2.7 * y + 0.5);
+  const riverY = x => 0.5 * sin(0.9 * x + 0.3) + 0.18 * sin(2.3 * x + 1) - 0.04 * x + 0.25;
+  const riverW = x => 0.08 + 0.022 * (x + 3);
+  const CELL = 0.5, trees = new Map(), TREE = ['#1f7a3a', '#2a8c44', '#37a04f', '#4bb35a', '#5cc064'], LIGHT = ['#2f9149', '#3ba554', '#4dba62', '#63c96f', '#78d67f'];
+  for (let i = 0; i < 9500; i++) {
+    const x = -3.4 + R() * 8.6, y = -5 + R() * 10; if (x > jungleEdge(y) - 0.05 || Math.abs(y - riverY(x)) < riverW(x) * 0.7 + 0.04) continue;
+    const k = Math.floor(x / CELL) + ',' + Math.floor(y / CELL); if (!trees.has(k)) trees.set(k, []); trees.get(k).push([x, y, 0.06 + R() * 0.045, Math.floor(R() * 5)]);
   }
-  /* scene B, higher up: the land, its hills and rivers, and the coast */
-  const land = wobbly(0, -0.1, 0.66, 0.6, 56), woods = Array.from({ length: 7 }, () => wobbly((R() - 0.5) * 0.8, -0.1 + (R() - 0.5) * 0.7, 0.07 + R() * 0.1, 0.05 + R() * 0.08, 24));
-  const hills = Array.from({ length: 4 }, () => ({ x: (R() - 0.5) * 0.7, y: -0.5 + R() * 0.25, r: 0.06 + R() * 0.05 }));
-  const bigRivers = [meander(0.08, -0.62, 0, 0, 0.05, 2, 1), meander(0, 0, 0.03, 0.62, 0.035, 2.2, 2), meander(-0.5, -0.3, 0, -0.05, 0.04, 1.6, 3), meander(0.52, -0.25, 0.01, 0.1, 0.04, 1.5, 4), meander(-0.42, 0.2, 0.01, 0.3, 0.03, 1.4, 5)];
-  const clouds = Array.from({ length: 7 }, () => [R() * 6.283, 0.25 + R() * 0.6, 0.5 + R() * 0.6]);
-  const streaks = Array.from({ length: 44 }, () => [R() * 6.283, R(), 0.6 + R() * 0.8]);
+  const FIELD = ['#b9e07a', '#7ecb5f', '#a6de7c', '#d3e58a', '#8fd465'], fields = [], clumps = [], waves = [];
+  for (let i = 0; i < 380; i++) { const y = -5 + R() * 10, x = jungleEdge(y) + 0.15 + R() * (coast(y) - jungleEdge(y) - 0.5); if (Math.abs(y - riverY(x)) < riverW(x) * 0.8 + 0.1) continue; fields.push([x, y, 0.16 + R() * 0.16, 0.12 + R() * 0.12, FIELD[Math.floor(R() * 5)]]); }
+  for (let i = 0; i < 220; i++) { const y = -5 + R() * 10, x = jungleEdge(y) + 0.05 + R() * (coast(y) - jungleEdge(y) - 0.3); if (Math.abs(y - riverY(x)) > riverW(x) + 0.03) clumps.push([x, y, 0.03 + R() * 0.035]); }
+  for (let i = 0; i < 300; i++) { const y = -5.5 + R() * 11; waves.push([coast(y) + 0.5 + R() * 9, y, 0.08 + R() * 0.14]); }
+  const streaks = Array.from({ length: 46 }, () => [R() * 2 - 1, R(), 0.5 + R()]);
 
-  const T = 2800, t0 = performance.now(); let rot = 1.2, last = t0, raf = 0, phase = 'zoom', skipped = false, flyStart = 0, target = null, finished = false;
-  let resolveLanding; const untilLanding = new Promise(r => { resolveLanding = r; });
-  const ease = p => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2), clamp = x => Math.max(0, Math.min(1, x));
-  const Rf = () => Math.min(W, H) * 0.17, Lend = () => Math.log(M * 19.8 / Rf());
-
-  function drawBg(a) {
+  function drawGround(cam, S, th) {
+    const c = lg; c.setTransform(dpr, 0, 0, dpr, 0, 0); c.fillStyle = '#1e6e36'; c.fillRect(0, 0, W, H);
+    c.save(); c.translate(W / 2, H / 2); c.rotate(th); c.scale(S, S); c.translate(-cam.x, -cam.y);
+    const vr = Math.hypot(W, H) / 2 / S + 0.3, x0 = cam.x - vr, x1 = cam.x + vr, y0 = cam.y - vr, y1 = cam.y + vr;
+    const zone = (f, off, color) => { if (f(cam.y) + off - 0.6 > x1) return; c.beginPath(); for (let y = y0; y <= y1 + 0.2; y += 0.2) c.lineTo(f(y) + off, y); c.lineTo(x1 + 1, y1 + 0.2); c.lineTo(x1 + 1, y0); c.closePath(); c.fillStyle = color; c.fill(); };
+    zone(jungleEdge, 0, '#9ad96f');
+    if (x1 > 4) { c.save(); fields.forEach(f => { if (f[0] > x0 && f[0] < x1 && f[1] > y0 && f[1] < y1) { c.fillStyle = f[4]; c.fillRect(f[0] - f[2] / 2, f[1] - f[3] / 2, f[2], f[3]); } }); c.restore();
+      c.fillStyle = '#3f9a4d'; c.beginPath(); clumps.forEach(t => { if (t[0] > x0 && t[0] < x1 && t[1] > y0 && t[1] < y1) { c.moveTo(t[0] + t[2], t[1]); c.arc(t[0], t[1], t[2], 0, 6.2832); } }); c.fill(); }
+    zone(coast, -0.13, '#f2e4b0'); zone(coast, 0, '#7fdbe0'); zone(coast, 0.4, '#3b9bd6'); zone(coast, 0.95, '#0f4fa8');
+    /* the river, wider toward the sea */
+    c.lineCap = 'round';
+    for (const [color, k] of [['#5dc9d6', 1], ['#3f86c4', 0.45]]) { c.strokeStyle = color; for (let x = Math.max(-3.6, x0); x < Math.min(7.9, x1); x += 0.08) { c.lineWidth = riverW(x) * k; c.beginPath(); c.moveTo(x, riverY(x)); c.lineTo(x + 0.08, riverY(x + 0.08)); c.stroke(); } }
+    /* the canopy: one round crown per tree, with a lighter cap when the camera is close */
+    if (x0 < 5.2) {
+      const seen = [[], [], [], [], []];
+      for (let ix = Math.floor(x0 / CELL); ix <= Math.floor(x1 / CELL); ix++) for (let iy = Math.floor(y0 / CELL); iy <= Math.floor(y1 / CELL); iy++) { const b = trees.get(ix + ',' + iy); if (b) for (const t of b) seen[t[3]].push(t); }
+      seen.forEach((list, i) => { c.fillStyle = TREE[i]; c.beginPath(); for (const t of list) { c.moveTo(t[0] + t[2], t[1]); c.arc(t[0], t[1], t[2], 0, 6.2832); } c.fill(); });
+      if (S * 0.08 > 9) seen.forEach((list, i) => { c.fillStyle = LIGHT[i]; c.beginPath(); for (const t of list) { const r = t[2] * 0.5, x = t[0] - t[2] * 0.25, y = t[1] - t[2] * 0.28; c.moveTo(x + r, y); c.arc(x, y, r, 0, 6.2832); } c.fill(); });
+    }
+    if (x1 > 8) { c.strokeStyle = 'rgba(255,255,255,.4)'; c.lineWidth = 0.014; c.beginPath(); waves.forEach(w => { if (w[0] > x0 && w[0] < x1 && w[1] > y0 && w[1] < y1) { c.moveTo(w[0] - w[2], w[1]); c.quadraticCurveTo(w[0], w[1] - w[2] * 0.35, w[0] + w[2], w[1]); } }); c.stroke(); }
+    c.restore();
+  }
+  function drawSky(a) {
     g.globalAlpha = a; const bg = g.createLinearGradient(W, 0, 0, H); bg.addColorStop(0, '#012a70'); bg.addColorStop(0.5, '#0f4699'); bg.addColorStop(1, '#2f6db8');
     g.fillStyle = bg; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
   }
-  function sceneB(px, a) {
-    g.save(); g.globalAlpha = a; g.translate(W / 2, H / 2); g.scale(px, px);
-    g.lineJoin = 'round'; g.lineCap = 'round';
-    path(land, true); g.strokeStyle = '#2f86c9'; g.lineWidth = 0.09; g.stroke(); g.strokeStyle = '#5dc9d6'; g.lineWidth = 0.035; g.stroke();
-    g.fillStyle = '#9ad96f'; g.fill();
-    g.save(); path(land, true); g.clip();
-    g.fillStyle = '#65c65b'; woods.forEach(w => { path(w, true); g.fill(); });
-    g.strokeStyle = '#4ba646'; g.lineWidth = 0.004;
-    hills.forEach(h => { for (let k = 1; k <= 4; k++) { g.beginPath(); g.ellipse(h.x, h.y, h.r * k / 4, h.r * k / 4 * 0.78, 0.3, 0, 6.2832); g.stroke(); } });
-    bigRivers.forEach((r, i) => { path(r); g.strokeStyle = '#5dc9d6'; g.lineWidth = i < 2 ? 0.02 : 0.011; g.stroke(); if (i < 2) { g.strokeStyle = '#5480b0'; g.lineWidth = 0.008; g.stroke(); } });
-    g.restore(); g.restore();
-  }
-  function sceneA(px, a) {
-    g.save(); g.globalAlpha = a; g.translate(W / 2, H / 2); g.scale(px, px);
-    g.save(); g.rotate(0.2); fields.forEach(f => { g.fillStyle = f[4]; g.fillRect(f[0] - f[2] / 2, f[1] - f[3] / 2, f[2], f[3]); }); g.restore();
-    g.lineJoin = 'round'; g.lineCap = 'round';
-    const band = (pts, w) => { path(pts); g.strokeStyle = '#9ad96f'; g.lineWidth = w * 1.5; g.stroke(); g.strokeStyle = '#5dc9d6'; g.lineWidth = w; g.stroke(); g.strokeStyle = '#5480b0'; g.lineWidth = w * 0.42; g.stroke(); };
-    branches.forEach(b => band(b.pts, b.w)); band(mainRiver, 0.17);
-    g.restore();
-  }
+
+  const PAN = 1.6, RISE = 1.25, t0 = performance.now();
+  let phase = 'hover', goAt = 0, rot = 1.2, spin = 7, last = t0, raf = 0, skipped = false, flyStart = 0, target = null, finished = false, autoGo = 0;
+  let resolveLanding; const untilLanding = new Promise(r => { resolveLanding = r; });
+  const Rf = () => Math.min(W, H) * 0.17, cubic = p => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+
   function frame(now) {
     if (finished) return; raf = requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (phase === 'fly') {
-      const q = clamp((now - flyStart) / (skipped ? 200 : 700)), e = q * q * (3 - 2 * q); rot += dt * 2.4;
-      g.clearRect(0, 0, W, H); drawBg(1 - e);
+      const q = clamp((now - flyStart) / (skipped ? 200 : 850)), e = q * q * (3 - 2 * q);
+      spin += (2.4 - spin) * Math.min(1, dt * 3); rot += dt * spin;
+      g.clearRect(0, 0, W, H); drawSky(1 - e);
       if (target && !skipped) { globe.paint(rot); globe.drawTo(g, W / 2 + (target.x - W / 2) * e, H / 2 + (target.y - H / 2) * e, Rf() + (target.r - Rf()) * e); }
       if (q >= 1) end();
       return;
     }
-    const p = clamp((now - t0) / T), L = Lend() * ease(p), pxA = M * Math.exp(-L), pxB = pxA * 9, Rg = pxB * 2.2;
-    const speed = Math.sin(Math.PI * p), aA = clamp((pxA / M - 0.05) / 0.2), aB = clamp((pxB / M - 0.2) / 0.25);
-    rot += dt * (0.5 + 1.9 * p);
-    drawBg(1);
-    if (aB < 1) { globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Math.max(Rg, Rf())); }
-    if (aB > 0) sceneB(pxB, aB);
-    if (aA > 0) sceneA(pxA, aA * aB);
-    /* thin cloud as the camera breaks out of the atmosphere */
-    const hz = 4 * aB * (1 - aB);
-    if (hz > 0.02) clouds.forEach(c => { const d = c[1] * M * (1.5 - aB), x = W / 2 + Math.cos(c[0]) * d, y = H / 2 + Math.sin(c[0]) * d * 0.7, r = c[2] * M * 0.5; const cg = g.createRadialGradient(x, y, 0, x, y, r); cg.addColorStop(0, `rgba(255,255,255,${0.5 * hz})`); cg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = cg; g.fillRect(x - r, y - r, 2 * r, 2 * r); });
-    /* speed lines rushing in toward the centre */
-    if (speed > 0.05) {
-      const D = Math.hypot(W, H) / 2; g.lineCap = 'round'; g.lineWidth = 1.5;
-      streaks.forEach(s => { const f = 1 - ((s[1] + (now - t0) / 520 * s[2]) % 1), r1 = D * (0.3 + f * 0.9), r2 = r1 + D * 0.16 * speed * s[2]; g.strokeStyle = `rgba(255,255,255,${0.26 * speed * f})`; g.beginPath(); g.moveTo(W / 2 + Math.cos(s[0]) * r1, H / 2 + Math.sin(s[0]) * r1); g.lineTo(W / 2 + Math.cos(s[0]) * r2, H / 2 + Math.sin(s[0]) * r2); g.stroke(); });
+    if (phase === 'hold') { spin += (3 - spin) * Math.min(1, dt * 2); rot += dt * spin; drawSky(1); globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Rf()); return; }
+    const tp = phase === 'hover' ? 0 : (now - goAt) / 1000, hover = (now - t0) / 1000;
+    if (tp <= PAN) {
+      /* low over the jungle, then the ground races past toward the sea while the camera climbs */
+      const p = tp / PAN, e = cubic(p), speed = phase === 'hover' ? 0 : (p < 0.5 ? 4 * p * p : 4 * (1 - p) * (1 - p));
+      const cam = { x: 1 + Math.min(hover, 1.2) * 0.06 + 10.4 * e, y: 0.4 - 1.0 * e }, th = -0.5 + 0.42 * e, S = M * (0.6 - 0.4 * Math.pow(e, 1.15));
+      drawGround(cam, S, th);
+      g.globalAlpha = 1 - 0.55 * speed; g.drawImage(layer, 0, 0, W, H); g.globalAlpha = 1;
+      if (speed > 0.05) {
+        const dx = Math.cos(th), dy = Math.sin(th), D = Math.hypot(W, H); g.lineCap = 'round'; g.lineWidth = 2;
+        streaks.forEach(s => { const f = (s[1] + (now - goAt) / 300 * s[2]) % 1, along = (0.5 - f) * D * 1.4, across = s[0] * D * 0.6, x = W / 2 + dx * along - dy * across, y = H / 2 + dy * along + dx * across, len = D * 0.22 * speed * s[2]; g.strokeStyle = `rgba(255,255,255,${0.3 * speed})`; g.beginPath(); g.moveTo(x, y); g.lineTo(x + dx * len, y + dy * len); g.stroke(); });
+      }
+    } else {
+      /* high above the sea now: pull straight back until the whole spinning Earth fits in view */
+      const q = clamp((tp - PAN) / RISE), eo = 1 - Math.pow(1 - q, 3), aW = clamp(1 - q / 0.32), Rbig = M * 2.4, Rg = Math.exp(Math.log(Rbig) + (Math.log(Rf()) - Math.log(Rbig)) * eo);
+      spin += (4.2 - spin) * Math.min(1, dt * 1.2); rot += dt * spin;
+      drawSky(1); g.globalAlpha = clamp(q / 0.22); globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Rg); g.globalAlpha = 1;
+      if (aW > 0) { drawGround({ x: 11.4, y: -0.6 }, M * 0.2 * Math.exp(-5 * q), -0.08); g.globalAlpha = aW; g.drawImage(layer, 0, 0, W, H); g.globalAlpha = 1; }
+      if (q >= 1) { phase = 'hold'; resolveLanding(); }
     }
-    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.hypot(W, H) * 0.62); vg.addColorStop(0, 'rgba(2,11,36,0)'); vg.addColorStop(1, 'rgba(2,11,36,.5)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
-    if (p >= 1 && phase === 'zoom') { phase = 'hold'; resolveLanding(); }
+    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.hypot(W, H) * 0.65); vg.addColorStop(0, 'rgba(2,11,36,0)'); vg.addColorStop(1, 'rgba(2,11,36,.38)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  }
+  function start(withTap) {
+    if (phase !== 'hover') return; clearTimeout(autoGo);
+    phase = 'pan'; goAt = performance.now(); el.classList.remove('waiting'); label.textContent = 'Tap to skip';
+    Sound.unlock(); Sound.play('whoosh');
   }
   function end() {
-    if (finished) return; finished = true; cancelAnimationFrame(raf); window.removeEventListener('resize', size);
-    if (target && !skipped) HeroSync.rot = rot;
+    if (finished) return; finished = true; cancelAnimationFrame(raf); clearTimeout(autoGo); window.removeEventListener('resize', size);
+    if (target && !skipped) { HeroSync.rot = rot; HeroSync.speed = spin; }
     el.remove(); document.body.classList.remove('intro-on');
     if (!skipped) { document.body.classList.add('intro-reveal'); setTimeout(() => document.body.classList.remove('intro-reveal'), 2200); Sound.play('land'); }
   }
-  const skip = () => { if (skipped || phase === 'fly') return; skipped = true; el.classList.add('skipping'); if (phase === 'zoom') { phase = 'hold'; resolveLanding(); } };
-  el.addEventListener('click', skip); const onKey = () => skip(); window.addEventListener('keydown', onKey, { once: true });
-  Sound.unlock(); Sound.play('whoosh');
+  const skip = () => { if (skipped || phase === 'fly') return; skipped = true; el.classList.add('skipping'); if (phase !== 'hold') { phase = 'hold'; resolveLanding(); } };
+  /* the first tap starts it with sound (browsers only allow sound after a tap); a tap after that skips */
+  el.addEventListener('click', () => (phase === 'hover' ? start(true) : skip()));
+  window.addEventListener('keydown', () => (phase === 'hover' ? start(true) : skip()), { once: true });
+  autoGo = setTimeout(() => start(false), Sound.ready() ? 350 : 1300);
   raf = requestAnimationFrame(frame);
   return {
     untilLanding,
     /* the page is drawn underneath now: fly the Earth to its place in the logo and fade away */
     land() {
+      if (finished) return;
       const st = document.querySelector('#stage');
       if (st) { const b = st.getBoundingClientRect(); if (b.width && b.top < H) target = { x: b.left + 0.2675 * b.width, y: b.top + 0.2722 * b.width, r: 0.27 * b.width }; }
-      if (finished) return;
       el.classList.add('landing'); phase = 'fly'; flyStart = performance.now();
     },
     cancel() { skipped = true; resolveLanding(); end(); },
   };
 }
 
-/* a quick curved wipe between pages, like a meridian sweeping across the map */
-function pageSweep() {
-  if (reducedMotion() || document.body.classList.contains('intro-on')) return;
-  const s = document.createElement('div'); s.className = 'sweep'; s.setAttribute('aria-hidden', 'true'); document.body.appendChild(s);
-  setTimeout(() => s.remove(), 700);
+/* between pages: a tsunami. Four layers of water (foam first, deep water last) wash across the screen. */
+const WAVE_SWAP = 420;   // by now the water covers the screen, so the page underneath can change unseen
+function pageWave() {
+  document.querySelectorAll('.tsu').forEach(x => x.remove());
+  const s = document.createElement('div'); s.className = 'tsu'; s.setAttribute('aria-hidden', 'true'); s.innerHTML = '<i></i><i></i><i></i><i></i>';
+  document.body.appendChild(s); setTimeout(() => s.remove(), 1350);
 }
 
 function adminIntro() {
   if (reducedMotion() || seenOnce('bgeo-admin-in')) return;
   markSeen('bgeo-admin-in');
   const el = document.createElement('div'); el.className = 'aintro';
-  el.innerHTML = `<div class="aintro-in"><canvas width="440" height="440" aria-hidden="true"></canvas>
-    <div class="aintro-name"><span>Bangladesh Geography</span><div class="aintro-row"><b>Olympiad</b><b class="aintro-a">Admin</b></div></div></div><p class="intro-skip">Tap to skip</p>`;
+  /* the same lockup as the home page: the Earth behind the Bangla lettering. The last line (অলিম্পিয়াড)
+     is a separate slice of the same picture, so it can slide aside for the word Admin. */
+  el.innerHTML = `<div class="aintro-stage"><canvas aria-hidden="true"></canvas>
+      <span class="aw aw-top" style="background-image:url(${WORDMARK})"></span><span class="aw aw-bot" style="background-image:url(${WORDMARK})"></span><b class="aw-admin">Admin</b></div><p class="intro-skip">Tap to skip</p>`;
   document.body.appendChild(el);
-  const cv = el.querySelector('canvas'), g = cv.getContext('2d'), globe = Globe.create(360);
+  const stage = el.firstChild, cv = stage.querySelector('canvas'), g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = stage.clientWidth || 320, s = Math.round(w * dpr); cv.width = s; cv.height = Math.round(s * 0.56);
+  const globe = Globe.create(Math.min(520, Math.round(0.54 * s)));
   let rot = 0.4, speed = 11, tint = 0, wantTint = 0, last = performance.now(), alive = true;
   const frame = now => {
     if (!alive) return; requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     speed += (0.7 - speed) * Math.min(1, dt * 2.6); rot += speed * dt; tint += (wantTint - tint) * Math.min(1, dt * 3);
-    globe.paint(rot); g.clearRect(0, 0, 440, 440); globe.drawTo(g, 220, 220, 210);
+    globe.paint(rot); g.clearRect(0, 0, cv.width, cv.height); globe.drawTo(g, 0.2675 * s, 0.2722 * s, 0.27 * s);
     /* wash the land toward blue, so the admin Earth is its own colour */
-    if (tint > 0.01) { g.save(); g.globalCompositeOperation = 'source-atop'; g.globalAlpha = tint; g.fillStyle = '#1668d8'; g.fillRect(0, 0, 440, 440); g.restore(); }
+    if (tint > 0.01) { g.save(); g.globalCompositeOperation = 'source-atop'; g.globalAlpha = tint; g.fillStyle = '#1668d8'; g.fillRect(0, 0, cv.width, cv.height); g.restore(); }
   };
   requestAnimationFrame(frame);
   const timers = [];
   const close = () => { if (!alive) return; el.classList.add('bye'); timers.push(setTimeout(() => { alive = false; el.remove(); }, 420)); };
   requestAnimationFrame(() => el.classList.add('in'));
   Sound.play('open');
-  timers.push(setTimeout(() => { el.classList.add('admin'); wantTint = 0.5; speed = 6; Sound.play('good'); }, 950));
-  timers.push(setTimeout(close, 2500));
+  timers.push(setTimeout(() => { el.classList.add('admin'); wantTint = 0.5; speed = 6; Sound.play('good'); }, 1000));
+  timers.push(setTimeout(close, 2700));
   el.addEventListener('click', () => { timers.forEach(clearTimeout); close(); });
 }
 
@@ -2785,10 +2852,10 @@ async function saveAndTell(filename, blob) {
 /* ---------- the public shell: top bar, menu, footer ---------- */
 const NAV = [
   ['home', 'Home', 'compass'], ['about', 'About', 'flag'], ['notices', 'Notices', 'mail'], ['countdown', 'Countdown', 'clock'],
-  ['exams', 'Online exams', 'edit'], ['resources', 'Resources', 'book'], ['explore', 'Explore the Earth', 'globe'], ['results', 'Results', 'trophy'],
+  ['explore', 'Explore the Earth', 'globe'], ['results', 'Results', 'trophy'],
   ['team', 'Team', 'people'], ['faq', 'Questions', 'help'], ['contact', 'Contact', 'pin'],
 ];
-const BAR_LINKS = ['notices', 'countdown', 'exams', 'resources', 'explore', 'results'];
+const BAR_LINKS = ['about', 'notices', 'countdown', 'explore', 'results', 'contact'];
 function buildShell() {
   $('#site').innerHTML = `
   <header class="bar">
@@ -2802,7 +2869,7 @@ function buildShell() {
   </header>
   <div class="menu" id="menu" hidden><nav class="menu-grid" aria-label="All pages">
     ${NAV.map(n => `<a href="#${n[0]}" data-nav="${n[0]}">${icon(n[2])}<span>${n[1]}</span></a>`).join('')}
-    <a href="#account" data-nav="account">${icon('user')}<span>My account</span></a>
+    <a href="#dashboard" data-nav="dashboard">${icon('user')}<span>Dashboard</span></a>
   </nav></div>
   <main id="view" tabindex="-1"></main>
   <footer class="foot"><div class="wrap foot-grid">
@@ -2820,7 +2887,7 @@ function closeMenu() { const m = $('#menu'); if (!m || m.hidden) return; m.hidde
 function syncChrome(name) {
   $$('[data-nav]').forEach(a => { if (a.dataset.nav === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   const u = Store.me(), b = $('#acct-btn');
-  if (u) { b.textContent = u.role === 'admin' ? 'Admin' : 'My account'; b.href = u.role === 'admin' ? '#admin' : '#account'; }
+  if (u) { b.textContent = u.role === 'admin' ? 'Admin' : 'Dashboard'; b.href = u.role === 'admin' ? '#admin' : '#dashboard'; }
   else { b.textContent = 'Log in'; b.href = '#login'; }
 }
 
@@ -2835,15 +2902,18 @@ function render() {
   cleanups.forEach(f => { try { f(); } catch (e) { /* keep going */ } }); cleanups = [];
   closeMenu();
   const isAdmin = name === 'admin' || name.startsWith('admin-');
-  document.body.classList.toggle('is-admin', isAdmin);
-  $('#site').hidden = isAdmin; $('#admin').hidden = !isAdmin;
+  /* the dashboard is its own screen, only for people who are logged in; visitors get the public site */
+  const isDash = !isAdmin && isDashRoute(name) && !!Store.me();
+  document.body.classList.toggle('is-admin', isAdmin); document.body.classList.toggle('is-dash', isDash);
+  $('#site').hidden = isAdmin || isDash; $('#admin').hidden = !isAdmin; $('#dash').hidden = !isDash;
   if (isAdmin) { renderAdmin(name); window.scrollTo(0, 0); return; }
+  if (isDash) { renderDash(DASH_ALIAS[name] || name); window.scrollTo(0, 0); setTimeout(mailMyCard, 600); return; }
   const view = $('#view'), isExam = name.startsWith('exam-');
-  const page = isExam ? pageExam(name.slice(5)) : (PAGES[name] || PAGES.home)();
+  const page = isDashRoute(name) ? PAGES.dashgate() : (PAGES[name] || PAGES.home)();
   /* a fresh holder for every page, so one page's tap handlers can never fire on the next */
   const holder = document.createElement('div'); holder.innerHTML = page.html; view.replaceChildren(holder);
   if (page.mount) page.mount(holder);
-  syncChrome(PAGES[name] ? name : isExam ? 'exams' : 'home');
+  syncChrome(isDashRoute(name) ? 'dashboard' : PAGES[name] ? name : 'home');
   const label = (NAV.find(n => n[0] === name) || [])[1];
   document.title = label && name !== 'home' ? `${label} | Bangladesh Geography Olympiad` : 'Bangladesh Geography Olympiad';
   window.scrollTo(0, 0);
@@ -2897,7 +2967,7 @@ const STEPS = [
 PAGES.home = () => {
   const me = Store.me(), ev = Store.nextEvent(), notices = Store.notices().slice(0, 3), news = Store.news();
   const gallery = (Store.db.settings.media || []).map(mediaItemHtml).filter(Boolean);
-  const cta = me ? `<a class="btn btn-lime" href="#${me.role === 'admin' ? 'admin' : 'account'}">Open my account</a>`
+  const cta = me ? `<a class="btn btn-lime" href="#${me.role === 'admin' ? 'admin' : 'dashboard'}">${me.role === 'admin' ? 'Open the admin portal' : 'Open my dashboard'}</a>`
     : Store.db.settings.regOpen ? '<a class="btn btn-lime" href="#register">Register now</a>' : '<span class="chip chip-sea">Registration is closed</span>';
   return {
     html: `<div class="wrap">
@@ -2928,18 +2998,13 @@ PAGES.home = () => {
       ${news.length > 6 ? '<div style="margin-top:16px"><button type="button" class="btn btn-ghost btn-sm" id="news-more">Show older news</button></div>' : ''}
     </section>` : ''}
     <section class="band">
-      <h2>Train on your phone</h2>
-      <div class="doors">
-        <a class="door door-a" href="#exams"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#04214f" stroke-width="3" opacity=".3"><ellipse cx="70" cy="52" rx="54" ry="44"/><ellipse cx="72" cy="50" rx="40" ry="32"/><ellipse cx="74" cy="48" rx="26" ry="20"/><ellipse cx="76" cy="46" rx="12" ry="9"/></g></svg><h3>Online exams</h3><p>Timed multiple-choice tests you can sit from anywhere.</p></a>
-        <a class="door door-b" href="#resources"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#0b3d8f" stroke-width="3" opacity=".28"><rect x="36" y="16" width="62" height="78" rx="8" transform="rotate(12 67 55)"/><rect x="36" y="16" width="62" height="78" rx="8" fill="#fff"/><path d="M48 38h38M48 52h38M48 66h24"/></g></svg><h3>Resources</h3><p>Notes, past papers and reading picked by the organisers.</p></a>
-        <a class="door door-c" href="#explore"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#04214f" stroke-width="3" opacity=".3"><circle cx="68" cy="52" r="46"/><ellipse cx="68" cy="52" rx="20" ry="46"/><path d="M22 52h92M30 28h76M30 76h76"/></g></svg><h3>Explore the Earth</h3><p>Tap through the planet's layers and test yourself.</p></a>
+      <h2>Learn and take part</h2>
+      <div class="doors doors-2">
+        <a class="door door-a" href="#${me ? (me.role === 'admin' ? 'admin' : 'dashboard') : 'login'}"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#04214f" stroke-width="3" opacity=".3"><ellipse cx="70" cy="52" rx="54" ry="44"/><ellipse cx="72" cy="50" rx="40" ry="32"/><ellipse cx="74" cy="48" rx="26" ry="20"/><ellipse cx="76" cy="46" rx="12" ry="9"/></g></svg><h3>Participant dashboard</h3><p>${me ? 'Your admit card, online exams and study resources.' : 'Registered students log in here for their admit card, online exams and study resources.'}</p></a>
+        <a class="door door-c" href="#explore"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#04214f" stroke-width="3" opacity=".3"><circle cx="68" cy="52" r="46"/><ellipse cx="68" cy="52" rx="20" ry="46"/><path d="M22 52h92M30 28h76M30 76h76"/></g></svg><h3>Explore the Earth</h3><p>Open to everyone: quick facts, small labs and a five-question quiz.</p></a>
       </div>
     </section>
     ${gallery.length ? `<section class="band reel-wrap"><h2>Photos and videos</h2><div class="reel media-reel" tabindex="0" aria-label="Photos and videos" style="margin-top:18px">${gallery.join('')}</div></section>` : ''}
-    <section class="podium">
-      <div class="medal" aria-hidden="true">2<sup>nd</sup></div>
-      <div><h2>Second in the world, first time out</h2><p>In 2026 Bangladesh finished second overall at the first Multinational Youth Geography Olympiad (MY-GEO) in Russia. All five team members won medals.</p></div>
-    </section>
     </div>`,
     mount(v) {
       onLeave(mountHeroStage($('#stage', v)));
@@ -3049,7 +3114,7 @@ PAGES.exams = () => {
     </article>`;
   };
   return {
-    html: `<div class="wrap">${pageHead('Online exams', 'Multiple-choice tests with a timer. You need to be logged in to take one.')}
+    html: `<div class="wrap">${pageHead('Online exams', 'Multiple-choice tests with a timer. The clock starts when you press Start.')}
       <div class="stack">${exams.map(card).join('') || '<div class="sheet"><p class="empty">No online exams are scheduled yet.</p></div>'}</div>
       ${me ? '' : '<p class="note onblue" style="margin-top:16px">Log in or register first, then come back here to start an exam.</p>'}</div>`,
     mount(v) { v.addEventListener('click', e => { const b = e.target.closest('[data-board]'); if (b) boardDialog(Store.get('exams', b.dataset.board)); }); },
@@ -3339,7 +3404,7 @@ function recoveryDialog() {
 }
 
 PAGES.login = () => {
-  if (Store.me()) return PAGES.account();
+  if (Store.me()) return Store.me().role === 'admin' ? simplePage('You are logged in', 'This is an admin account.', '#admin', 'Open the admin portal') : simplePage('You are logged in', 'Your exams, resources and admit card are in your dashboard.', '#dashboard', 'Open my dashboard');
   const fields = [{ key: 'email', label: 'Email', type: 'email', required: true, auto: 'email' }, { key: 'password', label: 'Password', type: 'password', required: true, auto: 'current-password' }];
   return {
     html: `<div class="wrap narrow">${pageHead('Log in', 'Open your account to see your registration card, exams and notices.')}
@@ -3355,7 +3420,7 @@ PAGES.login = () => {
         e.preventDefault(); const vals = readForm(form, fields), btn = $('button[type=submit]', form);
         btn.disabled = true; const r = await Store.signIn(vals.email, form.elements.password.value); if (btn.isConnected) btn.disabled = false;
         if (r.error) { err.textContent = r.error; err.hidden = false; Sound.play('bad'); return; }
-        toast(`Welcome back, ${r.user.name.split(' ')[0]}`, 'good'); go(r.user.role === 'admin' ? 'admin' : 'account');
+        toast(`Welcome back, ${r.user.name.split(' ')[0]}`, 'good'); go(r.user.role === 'admin' ? 'admin' : 'dashboard');
       });
       v.addEventListener('click', e => { const b = e.target.closest('[data-sample]'); if (!b) return; const [em, pw] = SAMPLE_LOGIN[b.dataset.sample]; form.elements.email.value = em; form.elements.password.value = pw; Sound.play('pick'); form.elements.password.focus(); });
       $('#forgot', v).onclick = forgotDialog;
@@ -3411,7 +3476,7 @@ async function checkEmail(raw, skipTypo) {
 }
 
 PAGES.register = () => {
-  if (Store.me()) return PAGES.account();
+  if (Store.me()) return Store.me().role === 'admin' ? simplePage('You are logged in', 'This is an admin account.', '#admin', 'Open the admin portal') : simplePage('You are logged in', 'Your exams, resources and admit card are in your dashboard.', '#dashboard', 'Open my dashboard');
   if (!Store.db.settings.regOpen) return simplePage('Registration is closed', 'Registration is not open right now. Watch the Notices page for the next dates.', '#notices', 'See notices');
   const fields = [
     { key: 'name', label: 'Full name', required: true, auto: 'name' },
@@ -3452,18 +3517,22 @@ PAGES.register = () => {
         if (btn.isConnected) { btn.disabled = false; btn.textContent = label; }
         if (r.error) { err.textContent = r.error; err.hidden = false; Sound.play('bad'); err.scrollIntoView({ block: 'center' }); return; }
         if (r.confirm) { Sound.play('good'); v.innerHTML = `<div class="wrap narrow">${pageHead('Check your email')}<section class="sheet stack"><p>We sent a confirmation link to <b>${esc(r.email)}</b>. Open it, then log in here.</p><div><a class="btn btn-ocean" href="#login">Go to log in</a></div></section></div>`; return window.scrollTo(0, 0); }
-        Sound.play('win'); toast('You are registered. Welcome to BGeO.', 'good'); go('account');
+        Sound.play('win'); toast('You are registered. Welcome to BGeO.', 'good'); go('dashboard');
       });
     },
   };
 };
 
-/* ---------- admit cards, drawn on a canvas so they can be saved as a picture ----------
-   Each card carries a QR code holding the registration number, so an admin can scan
-   it at the venue. The Regional round card is the one every student gets on
-   registering; the National round card goes to the students selected for the final. */
+/* ---------- admit cards, drawn on a canvas so they can be saved as a picture or a PDF ----------
+   Flat colours and plain type, like an official document. Each card carries a QR code
+   holding the student's ID number, so an admin can scan it at the venue. Every student
+   gets the Regional round card; the National round card goes to the finalists. */
 const roundImg = new Image(); roundImg.src = LOGO_ROUND;
 const CARD_W = 1200, CARD_H = 756;
+const CARD_THEME = {
+  regional: { round: 'Regional round', who: 'Participant', paper: '#ffffff', head: '#0b3d8f', headSoft: '#cfe0f7', accent: '#9ad96f', tagInk: '#04214f', ink: '#0a2350', soft: '#4b6088', line: '#dfe8f3', foot: '#f3f7fc', id: '#0b3d8f', qrEdge: '#c8d6e8', frame: '' },
+  national: { round: 'National round', who: 'National finalist', paper: '#071a3e', head: '#04122b', headSoft: '#b9c9e6', accent: '#f2c14e', tagInk: '#04122b', ink: '#ffffff', soft: '#a9bfe3', line: 'rgba(255,255,255,.16)', foot: '#04122b', id: '#ffe29a', qrEdge: '#f2c14e', frame: '#f2c14e' },
+};
 function cardKit(g) {
   const disp = '"Baloo Da 2", "Trebuchet MS", sans-serif', body = '"Anek Bangla", "Segoe UI", sans-serif';
   const fit = (text, maxW, size, weight, fam) => { let px = size; g.font = `${weight} ${px}px ${fam}`; while (g.measureText(text).width > maxW && px > 16) { px -= 2; g.font = `${weight} ${px}px ${fam}`; } };
@@ -3473,154 +3542,151 @@ function cardKit(g) {
     const lines = ['']; String(text).split(/\s+/).forEach(w => { const t = (lines[lines.length - 1] + ' ' + w).trim(); if (g.measureText(t).width <= maxW || !lines[lines.length - 1]) lines[lines.length - 1] = t; else lines.push(w); });
     if (lines.length > 2) { lines[1] = lines.slice(1).join(' '); lines.length = 2; } return lines;
   };
-  /* the QR code: dark squares on a white tile, each square a whole number of pixels so scanners read it cleanly */
+  /* the QR code: dark squares on white, each square a whole number of pixels so scanners read it cleanly */
   const qr = (u, x, y, Q) => {
     const m = qrMatrix(Store.cardCode(u)), n = m.length, px = Math.floor(Q / (n + 4)), side = px * (n + 4), ox = x + Math.round((Q - side) / 2), oy = y + Math.round((Q - side) / 2);
     g.fillStyle = '#04122b';
     for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (m[r][k]) g.fillRect(ox + (k + 2) * px, oy + (r + 2) * px, px, px);
   };
-  const logo = (cx, cy, L, ring) => {
-    g.save(); g.shadowColor = 'rgba(0,0,0,.3)'; g.shadowBlur = L / 7; g.shadowOffsetY = L / 20; g.fillStyle = '#0b3d8f'; g.beginPath(); g.arc(cx, cy, L / 2 - 3, 0, 6.2832); g.fill(); g.restore();
-    if (roundImg.complete && roundImg.naturalWidth) g.drawImage(roundImg, cx - L / 2, cy - L / 2, L, L);
-    g.strokeStyle = ring; g.lineWidth = Math.max(3, L / 48); g.beginPath(); g.arc(cx, cy, L / 2, 0, 6.2832); g.stroke();
-  };
-  return { disp, body, fit, box, twoLines, qr, logo };
+  return { disp, body, fit, box, twoLines, qr };
 }
-function drawRegionalCard(u) {
-  const W = CARD_W, H = CARD_H, PW = 410, c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d'), { disp, body, fit, box, twoLines, qr, logo } = cardKit(g);
-  box(0, 0, W, H, 40); g.save(); g.clip();
-  g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
-  /* left panel: the olympiad's blue, with faint contour lines */
-  const gr = g.createLinearGradient(PW, 0, 0, H); gr.addColorStop(0, '#012a70'); gr.addColorStop(1, '#2f6db8'); g.fillStyle = gr; g.fillRect(0, 0, PW, H);
-  g.save(); g.beginPath(); g.rect(0, 0, PW, H); g.clip(); g.strokeStyle = 'rgba(255,255,255,.1)'; g.lineWidth = 2;
-  for (let i = 1; i <= 8; i++) { g.beginPath(); g.ellipse(40, H - 20, i * 60, i * 46, -0.35, 0, 6.2832); g.stroke(); }
-  for (let i = 1; i <= 4; i++) { g.beginPath(); g.ellipse(PW - 10, 40, i * 48, i * 36, 0.4, 0, 6.2832); g.stroke(); }
-  g.restore();
-  const cx = PW / 2; logo(cx, 186, 224, 'rgba(255,255,255,.85)');
-  g.textAlign = 'center'; g.fillStyle = '#ffffff'; g.font = `800 42px ${disp}`; g.fillText('Bangladesh', cx, 380);
-  fit('Geography Olympiad', PW - 48, 42, 800, disp); g.fillText('Geography Olympiad', cx, 428);
-  g.fillStyle = 'rgba(255,255,255,.82)'; g.font = `500 26px ${body}`; g.fillText('Admit card', cx, 500);
-  g.font = `800 30px ${disp}`; const tag = 'Regional round', tw = g.measureText(tag).width + 56;
-  g.fillStyle = '#9ad96f'; box(cx - tw / 2, 524, tw, 58, 29); g.fill(); g.fillStyle = '#04214f'; g.fillText(tag, cx, 564);
-  g.fillStyle = 'rgba(255,255,255,.8)'; g.font = `500 22px ${body}`; g.fillText('geographyolympiad.org', cx, 700);
-  /* right side: who the card belongs to */
-  const X = PW + 56, R = W - 56; g.textAlign = 'left';
-  g.fillStyle = '#4b6088'; g.font = `500 24px ${body}`; g.fillText('Name', X, 104);
-  g.fillStyle = '#0a2350'; fit(u.name, R - X, 62, 800, disp); g.fillText(u.name, X, 168);
-  g.font = `800 40px ${disp}`; const rw = g.measureText(u.regNo).width + 60;
-  g.fillStyle = '#edf4fb'; box(X, 204, rw, 72, 36); g.fill(); g.fillStyle = '#0b3d8f'; g.fillText(u.regNo, X + 30, 254);
-  g.fillStyle = '#4b6088'; g.font = `500 22px ${body}`; g.fillText('Registration number', X + rw + 20, 248);
-  g.strokeStyle = '#d5e2f0'; g.lineWidth = 2; g.beginPath(); g.moveTo(X, 318); g.lineTo(R, 318); g.stroke();
-  const cell = (label, value, x, y, maxW) => { g.fillStyle = '#4b6088'; g.font = `500 22px ${body}`; g.fillText(label, x, y); g.fillStyle = '#0a2350'; fit(String(value), maxW, 32, 600, body); g.fillText(String(value), x, y + 40); };
-  cell('Category', u.category, X, 372, 230); cell('Class', 'Class ' + u.klass, X + 250, 372, 150);
-  cell('Region', u.region, X, 478, 400);
-  g.fillStyle = '#4b6088'; g.font = `500 22px ${body}`; g.fillText('School or college', X, 584);
-  g.fillStyle = '#0a2350'; g.font = `600 28px ${body}`;
-  twoLines(u.institution, 420).forEach((t, i) => { if (i === 1) fit(t, 420, 28, 600, body); g.fillText(t, X, 622 + i * 36); });
-  const Q = 236, qx = R - Q, qy = 350;
-  g.fillStyle = '#ffffff'; g.strokeStyle = '#d5e2f0'; g.lineWidth = 2; box(qx - 6, qy - 6, Q + 12, Q + 12, 16); g.fill(); g.stroke();
+/* the date and place of a round, if the organisers have added it under Dates */
+const roundEvent = kind => Store.events().find(e => (kind === 'national' ? /national/i : /regional/i).test(e.label || '')) || null;
+function drawCard(u, kind) {
+  const T = CARD_THEME[kind === 'national' ? 'national' : 'regional'], W = CARD_W, H = CARD_H, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), { disp, body, fit, box, twoLines, qr } = cardKit(g), X = 56, R = W - 56;
+  const season = /^\d{6}/.test(String(u.regNo)) ? String(u.regNo).slice(0, 4) : '', ev = roundEvent(kind);
+  box(0, 0, W, H, 28); g.save(); g.clip();
+  g.fillStyle = T.paper; g.fillRect(0, 0, W, H);
+  /* header: who issues the card, and for which round */
+  g.fillStyle = T.head; g.fillRect(0, 0, W, 150); g.fillStyle = T.accent; g.fillRect(0, 150, W, 6);
+  if (roundImg.complete && roundImg.naturalWidth) g.drawImage(roundImg, X, 23, 104, 104);
+  g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 3; g.beginPath(); g.arc(X + 52, 75, 52, 0, 6.2832); g.stroke();
+  g.font = `800 28px ${disp}`; const tw = g.measureText(T.round).width + 56;
+  g.fillStyle = T.accent; box(R - tw, 47, tw, 56, 28); g.fill(); g.fillStyle = T.tagInk; g.textAlign = 'center'; g.fillText(T.round, R - tw / 2, 85); g.textAlign = 'left';
+  g.fillStyle = '#ffffff'; fit('Bangladesh Geography Olympiad', R - tw - 40 - (X + 128), 36, 800, disp); g.fillText('Bangladesh Geography Olympiad', X + 128, 72);
+  g.fillStyle = T.headSoft; g.font = `500 24px ${body}`; g.fillText(`Admit card${season ? ', ' + season + ' season' : ''}`, X + 128, 110);
+  /* the QR code and the ID number under it */
+  const Q = 250, qx = R - Q, qy = 190;
+  g.fillStyle = '#ffffff'; box(qx - 8, qy - 8, Q + 16, Q + 16, 14); g.fill(); g.strokeStyle = T.qrEdge; g.lineWidth = 2; g.stroke();
   qr(u, qx, qy, Q);
-  g.fillStyle = '#4b6088'; g.font = `500 20px ${body}`; g.textAlign = 'center'; g.fillText('Show this code at the venue', qx + Q / 2, qy + Q + 40);
-  g.fillStyle = '#9ad96f'; g.fillRect(PW, H - 20, W - PW, 20);
+  g.textAlign = 'center'; g.fillStyle = T.ink; g.font = `700 26px ${body}`; g.fillText(String(u.regNo), qx + Q / 2, qy + Q + 46);
+  g.fillStyle = T.soft; g.font = `500 20px ${body}`; g.fillText('Scan at the entrance', qx + Q / 2, qy + Q + 76); g.textAlign = 'left';
+  /* the details, in rows */
+  const FW = qx - 48 - X, label = (t, x, y) => { g.fillStyle = T.soft; g.font = `500 21px ${body}`; g.fillText(t, x, y); };
+  const value = (t, x, y, maxW, size = 30, weight = 600, color = T.ink) => { g.fillStyle = color; fit(String(t), maxW, size, weight, body); g.fillText(String(t), x, y); };
+  const rule = y => { g.fillStyle = T.line; g.fillRect(X, y, FW, 2); };
+  label(T.who, X, 204); g.fillStyle = T.ink; fit(u.name, FW, 54, 800, disp); g.fillText(u.name, X, 260);
+  rule(286);
+  const c2 = X + 290, c3 = X + 560;
+  label('ID number', X, 322); value(u.regNo, X, 360, 270, 34, 700, T.id);
+  label('Category', c2, 322); value(u.category, c2, 360, 250);
+  label('Class', c3, 322); value('Class ' + u.klass, c3, 360, FW - 560);
+  rule(386);
+  label('Region', X, 422); value(u.region || 'Not given', X, 460, 270);
+  label('Date of the round', c2, 422); value(ev ? fmtDateTime(ev.at) : 'To be announced', c2, 460, FW - 290, 28);
+  rule(486);
+  label('School or college', X, 522); g.fillStyle = T.ink; g.font = `600 27px ${body}`;
+  twoLines(u.institution || 'Not given', 500).forEach((t, i) => { if (i === 1) fit(t, 500, 27, 600, body); g.fillText(t, X, 558 + i * 34); });
+  label('Venue', c3, 522); g.fillStyle = T.ink; g.font = `600 25px ${body}`;
+  twoLines(ev && ev.place ? ev.place : 'See Notices', FW - 560).forEach((t, i) => { if (i === 1) fit(t, FW - 560, 25, 600, body); g.fillText(t, c3, 558 + i * 32); });
+  /* footer */
+  g.fillStyle = T.foot; g.fillRect(0, 640, W, H - 640); g.fillStyle = T.line; g.fillRect(0, 640, W, 2);
+  g.fillStyle = T.soft; g.font = `500 21px ${body}`;
+  g.fillText('Show this card, printed or on your phone, at the entrance.', X, 684);
+  g.fillText('Dates and venues are published in Notices on geographyolympiad.org', X, 716);
+  g.textAlign = 'right'; g.fillText(u.createdAt ? 'Registered ' + fmtDate(u.createdAt) : '', R, 716); g.textAlign = 'left';
+  if (T.frame) { g.strokeStyle = T.frame; g.lineWidth = 6; box(3, 3, W - 6, H - 6, 26); g.stroke(); }
   g.restore();
   return c;
 }
-/* the National round card: night-blue and gold, for the students who reach the final */
-function drawNationalCard(u) {
-  const W = CARD_W, H = CARD_H, c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d'), { disp, body, fit, box, twoLines, qr, logo } = cardKit(g);
-  const GOLD = '#f2c14e', PALE = '#ffe7a8', MIST = '#a9bfe3';
-  box(0, 0, W, H, 40); g.save(); g.clip();
-  const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#020b24'); bg.addColorStop(0.55, '#06245a'); bg.addColorStop(1, '#0d47a1'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
-  /* a faint globe grid rising from the lower right, and contour rings in the top left */
-  g.lineWidth = 2; g.strokeStyle = 'rgba(242,193,78,.13)';
-  const gx = W - 150, gy = H + 130, GR = 520;
-  g.beginPath(); g.arc(gx, gy, GR, 0, 6.2832); g.stroke();
-  for (let i = 1; i <= 4; i++) { g.beginPath(); g.ellipse(gx, gy, GR * i / 5, GR, 0, 0, 6.2832); g.stroke(); g.beginPath(); g.ellipse(gx, gy, GR, GR * i / 5, 0, 0, 6.2832); g.stroke(); }
-  g.strokeStyle = 'rgba(255,255,255,.06)';
-  for (let i = 1; i <= 6; i++) { g.beginPath(); g.ellipse(120, 40, i * 62, i * 44, 0.3, 0, 6.2832); g.stroke(); }
-  /* gold frame */
-  const fr = g.createLinearGradient(0, 0, W, H); fr.addColorStop(0, PALE); fr.addColorStop(0.5, GOLD); fr.addColorStop(1, '#b8862d');
-  g.strokeStyle = fr; g.lineWidth = 3; box(20, 20, W - 40, H - 40, 26); g.stroke();
-  g.strokeStyle = 'rgba(242,193,78,.35)'; g.lineWidth = 1.5; box(30, 30, W - 60, H - 60, 20); g.stroke();
-  /* heading */
-  const X = 76, R = W - 76; logo(X + 62, 128, 124, PALE);
-  g.textAlign = 'left'; g.fillStyle = '#e6eefc'; g.font = `600 27px ${body}`; g.fillText('Bangladesh Geography Olympiad', X + 152, 106);
-  const tg = g.createLinearGradient(X + 152, 0, X + 640, 0); tg.addColorStop(0, PALE); tg.addColorStop(1, GOLD);
-  g.fillStyle = tg; g.font = `800 66px ${disp}`; g.fillText('National round', X + 150, 172);
-  g.font = `800 26px ${disp}`; const tag = 'Admit card', tw = g.measureText(tag).width + 52;
-  g.fillStyle = fr; box(R - tw, 84, tw, 54, 27); g.fill(); g.fillStyle = '#04122b'; g.textAlign = 'center'; g.fillText(tag, R - tw / 2, 121); g.textAlign = 'left';
-  const rule = g.createLinearGradient(X, 0, R, 0); rule.addColorStop(0, GOLD); rule.addColorStop(1, 'rgba(242,193,78,0)');
-  g.strokeStyle = rule; g.lineWidth = 2; g.beginPath(); g.moveTo(X, 222); g.lineTo(R, 222); g.stroke();
-  /* the finalist */
-  const Q = 244, qx = R - Q, qy = 262, TW = qx - X - 48;
-  g.fillStyle = MIST; g.font = `500 24px ${body}`; g.fillText('National finalist', X, 280);
-  g.fillStyle = '#ffffff'; fit(u.name, TW, 64, 800, disp); g.fillText(u.name, X, 346);
-  g.font = `800 38px ${disp}`; const rw = g.measureText(u.regNo).width + 56;
-  g.strokeStyle = GOLD; g.lineWidth = 2.5; box(X, 380, rw, 66, 33); g.stroke(); g.fillStyle = PALE; g.fillText(u.regNo, X + 28, 427);
-  g.fillStyle = MIST; g.font = `500 22px ${body}`; g.fillText('Registration number', X + rw + 20, 422);
-  const cell = (label, value, x, y, maxW) => { g.fillStyle = MIST; g.font = `500 22px ${body}`; g.fillText(label, x, y); g.fillStyle = '#ffffff'; fit(String(value), maxW, 31, 600, body); g.fillText(String(value), x, y + 40); };
-  cell('Category', u.category, X, 506, 250); cell('Class', 'Class ' + u.klass, X + 280, 506, 140); cell('Region', u.region, X + 440, 506, TW - 440);
-  g.fillStyle = MIST; g.font = `500 22px ${body}`; g.fillText('School or college', X, 604);
-  g.fillStyle = '#ffffff'; g.font = `600 28px ${body}`;
-  twoLines(u.institution, TW).forEach((t, i) => { if (i === 1) fit(t, TW, 28, 600, body); g.fillText(t, X, 642 + i * 36); });
-  /* the QR code on its own white tile */
-  g.save(); g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 30; g.shadowOffsetY = 10; g.fillStyle = '#ffffff'; box(qx - 8, qy - 8, Q + 16, Q + 16, 20); g.fill(); g.restore();
-  g.strokeStyle = fr; g.lineWidth = 3; box(qx - 8, qy - 8, Q + 16, Q + 16, 20); g.stroke();
-  qr(u, qx, qy, Q);
-  g.fillStyle = MIST; g.font = `500 20px ${body}`; g.textAlign = 'center'; g.fillText('Show this code at the venue', qx + Q / 2, qy + Q + 44);
-  g.fillStyle = 'rgba(230,238,252,.75)'; g.fillText('geographyolympiad.org', qx + Q / 2, qy + Q + 76);
-  g.restore();
-  return c;
-}
-const drawCard = (u, kind) => (kind === 'national' ? drawNationalCard(u) : drawRegionalCard(u));
 const isNational = round => /national/i.test(round || '');
 const hasNationalCard = u => (u.selected || []).some(s => isNational(s.round));
+async function cardReady() {
+  try { if (document.fonts && document.fonts.load) await Promise.race([Promise.all([document.fonts.load('800 40px "Baloo Da 2"'), document.fonts.load('700 28px "Anek Bangla"'), document.fonts.load('600 28px "Anek Bangla"'), document.fonts.load('500 22px "Anek Bangla"')]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* fall back to the device's own fonts */ }
+  if (!roundImg.complete) await new Promise(r => { roundImg.addEventListener('load', r, { once: true }); roundImg.addEventListener('error', r, { once: true }); setTimeout(r, 2500); });
+}
+const dataBytes = url => { const bin = atob(url.split(',')[1] || ''), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return bytes; };
 /* the finished picture, drawn only once the site's fonts and the logo are ready */
 async function cardBlob(u, kind) {
-  try { if (document.fonts && document.fonts.load) await Promise.race([Promise.all([document.fonts.load('800 40px "Baloo Da 2"'), document.fonts.load('600 28px "Anek Bangla"'), document.fonts.load('500 22px "Anek Bangla"')]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* fall back to the device's own fonts */ }
-  if (!roundImg.complete) await new Promise(r => { roundImg.addEventListener('load', r, { once: true }); roundImg.addEventListener('error', r, { once: true }); setTimeout(r, 2500); });
+  await cardReady();
   /* toDataURL finishes at once; the browser's toBlob can stall for seconds when the tab is idle or in the background */
-  const b64 = drawCard(u, kind).toDataURL('image/png').split(',')[1] || '', bin = atob(b64), bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  const blob = new Blob([bytes], { type: 'image/png' }); blob.base64 = b64; return blob;
+  const url = drawCard(u, kind).toDataURL('image/png'), blob = new Blob([dataBytes(url)], { type: 'image/png' }); blob.base64 = url.split(',')[1] || ''; return blob;
+}
+/* a one-page A4 PDF: the card at the top, what to do on the day below it. The page is
+   drawn as a picture and wrapped in the few lines a PDF file needs, so no library is loaded. */
+async function cardPdf(u, kind) {
+  await cardReady();
+  const T = CARD_THEME[kind === 'national' ? 'national' : 'regional'], PW = 1240, PH = 1754, c = document.createElement('canvas'); c.width = PW; c.height = PH;
+  const g = c.getContext('2d'), body = '"Anek Bangla", "Segoe UI", sans-serif', disp = '"Baloo Da 2", "Trebuchet MS", sans-serif', X = 90;
+  g.fillStyle = '#ffffff'; g.fillRect(0, 0, PW, PH);
+  g.fillStyle = '#0a2350'; g.font = `800 44px ${disp}`; g.fillText('Bangladesh Geography Olympiad', X, 130);
+  g.fillStyle = '#4b6088'; g.font = `500 28px ${body}`; g.fillText(`Admit card for the ${T.round}`, X, 176);
+  const cw = PW - 2 * X, ch = Math.round(cw * CARD_H / CARD_W); g.drawImage(drawCard(u, kind), X, 220, cw, ch);
+  g.strokeStyle = '#c8d6e8'; g.lineWidth = 2; g.strokeRect(X, 220, cw, ch);
+  let y = 220 + ch + 90;
+  g.fillStyle = '#0a2350'; g.font = `700 32px ${body}`; g.fillText('On the day', X, y); y += 26;
+  const steps = ['Bring this admit card with you, printed or saved on your phone.', 'At the entrance the organisers scan the QR code on the card to mark you present.', 'The date, time and venue of your round are published in Notices on geographyolympiad.org.', 'If any detail on this card is wrong, correct it under My details in your dashboard before the round.'];
+  steps.forEach((t, i) => {
+    y += 52; g.fillStyle = '#0b3d8f'; g.beginPath(); g.arc(X + 18, y - 9, 18, 0, 6.2832); g.fill();
+    g.fillStyle = '#ffffff'; g.font = `700 22px ${body}`; g.textAlign = 'center'; g.fillText(String(i + 1), X + 18, y - 1); g.textAlign = 'left';
+    g.fillStyle = '#0a2350'; g.font = `500 26px ${body}`;
+    const words = t.split(' '), lines = ['']; words.forEach(w => { const s = (lines[lines.length - 1] + ' ' + w).trim(); if (g.measureText(s).width <= cw - 60) lines[lines.length - 1] = s; else lines.push(w); });
+    lines.forEach((ln, k) => { g.fillText(ln, X + 56, y + k * 36); }); y += (lines.length - 1) * 36;
+  });
+  g.fillStyle = '#dfe8f3'; g.fillRect(X, PH - 150, cw, 2);
+  g.fillStyle = '#4b6088'; g.font = `500 22px ${body}`; g.fillText(`${u.name}, ID number ${u.regNo}`, X, PH - 104);
+  g.textAlign = 'right'; g.fillText('geographyolympiad.org', PW - X, PH - 104); g.textAlign = 'left';
+  const jpg = dataBytes(c.toDataURL('image/jpeg', 0.93)), enc = new TextEncoder(), parts = [], offs = []; let len = 0;
+  const put = x => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; }, obj = (n, bodyText) => { offs[n] = len; put(`${n} 0 obj\n${bodyText}\nendobj\n`); };
+  put('%PDF-1.4\n%âãÏÓ\n');
+  obj(1, '<< /Type /Catalog /Pages 2 0 R >>'); obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  obj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+  offs[4] = len; put(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${PW} /Height ${PH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`); put(jpg); put('\nendstream\nendobj\n');
+  const draw = 'q 595.28 0 0 841.89 0 0 cm /Im0 Do Q'; obj(5, `<< /Length ${draw.length} >>\nstream\n${draw}\nendstream`);
+  const xref = len; put(`xref\n0 6\n0000000000 65535 f \n${[1, 2, 3, 4, 5].map(n => String(offs[n]).padStart(10, '0') + ' 00000 n \n').join('')}trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(parts, { type: 'application/pdf' });
 }
 /* once a student is logged in with a confirmed email, their Regional round card is emailed to them (one time) */
 let cardMailTried = false;
 async function mailMyCard() {
   if (cardMailTried || !Store.cardMailDue()) return; cardMailTried = true;
-  try { const u = Store.me(), r = await Store.sendMyCard((await cardBlob(u, 'regional')).base64); if (r === 'sent') toast('Your admit card has been emailed to ' + u.email, 'good'); } catch (e) { /* the card is still in My account */ }
+  try { const u = Store.me(), r = await Store.sendMyCard((await cardBlob(u, 'regional')).base64); if (r === 'sent') toast('Your admit card has been emailed to ' + u.email, 'good'); } catch (e) { /* the card is still in the dashboard */ }
 }
 
+/* ---------- the participant dashboard: its own space, apart from the public site ---------- */
 const initials = name => String(name || '').trim().split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || 'G';
-PAGES.account = () => {
-  const u = Store.me(); if (!u) return needLogin('Log in to see your account.');
-  if (u.role === 'admin') return simplePage('Admin account', 'You are logged in as an admin. The admin portal is where you manage the olympiad.', '#admin', 'Open the admin portal');
-  const msgs = Store.messagesFor(u.id), s = Store.db.settings, national = hasNationalCard(u);
+const DASH = {};
+DASH.dashboard = () => {
+  const u = Store.me();
+  if (u.role === 'admin') return simplePage('Admin account', 'You are logged in as an admin. The admin portal is where you manage the olympiad. The Exams and Resources tabs above show what students see.', '#admin', 'Open the admin portal');
+  const msgs = Store.messagesFor(u.id), s = Store.db.settings, national = hasNationalCard(u), ev = Store.nextEvent();
   const done = Store.all('attempts').filter(a => a.userId === u.id && a.submittedAt).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-  const cardBox = (kind, title, note) => `<div class="cardbox"><div class="between"><div><h3>${title}</h3><p class="muted">${note}</p></div><button type="button" class="btn btn-ocean btn-sm" id="card-${kind === 'national' ? 'nat-' : ''}dl">${icon('download', 18)} Download</button></div><div class="cardprev" id="card${kind === 'national' ? '-nat' : ''}"></div></div>`;
+  const live = Store.all('exams').filter(e => e.published && Store.examState(e) === 'live').length;
+  const cardBox = (kind, title, note) => { const id = kind === 'national' ? 'card-nat' : 'card'; return `<div class="cardbox"><div><h3>${title}</h3><p class="muted">${note}</p></div><div class="cardprev" id="${id}"></div>
+    <div class="btnrow"><button type="button" class="btn btn-ocean" id="${id}-pdf">${icon('download', 18)} Download PDF</button><button type="button" class="btn btn-quiet" id="${id}-dl">${icon('image', 18)} Save as a picture</button></div></div>`; };
   return {
     html: `<div class="wrap">
       <header class="acct-head">
         <span class="avatar avatar-lg" aria-hidden="true">${esc(initials(u.name))}</span>
-        <div class="acct-who"><h1>${esc(u.name)}</h1><p>${esc(u.regNo)}, ${esc(u.category)}, Class ${esc(u.klass)}, ${esc(u.region)}</p>
+        <div class="acct-who"><h1>${esc(u.name)}</h1><p>ID number ${esc(u.regNo)}, ${esc(u.category)}, Class ${esc(u.klass)}, ${esc(u.region)}</p>
           <div class="chips"><span class="chip chip-live">${icon('check', 14)} Registered</span>${(u.selected || []).map(x => `<span class="chip chip-soon">Selected: ${esc(x.round)}</span>`).join('')}${Store.all('attendance').filter(a => a.userId === u.id).map(a => `<span class="chip chip-live">Present: ${esc(a.session)}</span>`).join('')}</div></div>
-        <div class="acct-acts"><button type="button" class="btn btn-ghost btn-sm" id="edit-me">${icon('edit', 18)} Edit details</button><button type="button" class="btn btn-ghost btn-sm" id="logout">${icon('out', 18)} Log out</button></div>
       </header>
+      <div class="dash-facts">
+        <a href="#countdown"><small>Next date</small><b>${ev ? esc(ev.label) : 'To be announced'}</b><span>${ev ? fmtDateTime(ev.at) : 'Watch Notices'}</span></a>
+        <a href="#dashboard-exams"><small>Online exams</small><b>${live ? plural(live, 'exam') + ' open now' : 'None open now'}</b><span>${plural(done.length, 'exam')} finished</span></a>
+        <a href="#dashboard-resources"><small>Resources</small><b>${plural(Store.all('resources').length, 'item')}</b><span>Notes, papers and reading</span></a>
+      </div>
       <div class="acct-grid">
         <div class="acct-main">
           <section class="sheet"><h2>${national ? 'Admit cards' : 'Admit card'}</h2>
             ${s.cardsOpen ? `<div class="stack-lg" style="margin-top:14px">${national ? cardBox('national', 'National round', 'For the final. Bring this card to the national venue.') : ''}${cardBox('regional', 'Regional round', 'Bring this card to your Regional round. The organisers scan the QR code.')}</div>`
               : '<p class="note" style="margin-top:12px">Cards are not released yet. You will get a notice when yours is ready.</p>'}</section>
-          <section class="sheet"><h2>My notices</h2><div class="stack" style="margin-top:12px">${msgs.map(m => `<div class="msg ${m.kind === 'selected' ? 'sel' : ''}"><h3>${esc(m.title)}</h3><p>${esc(m.body)}</p><small class="muted">${fmtDateTime(m.at)}</small></div>`).join('') || '<p class="muted">No personal notices yet.</p>'}</div></section>
-          <section class="sheet"><div class="between"><h2>My online exams</h2><a class="btn btn-quiet btn-sm" href="#exams">All exams</a></div>
-            <div style="margin-top:6px">${done.map(a => { const ex = Store.get('exams', a.examId); return ex ? `<div class="rowi"><div class="grow"><h3>${esc(ex.title)}</h3><p>${fmtDateTime(a.submittedAt)}</p></div><b class="chip chip-live">${a.score} / ${ex.questions.length}</b></div>` : ''; }).join('') || '<p class="muted" style="padding-top:8px">You have not finished an exam yet.</p>'}</div></section>
         </div>
         <aside class="acct-side">
-          <section class="sheet"><h2>My details</h2>
-            <dl class="kv" style="margin-top:12px"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Mobile</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)}</dd><dt>Region</dt><dd>${esc(u.region)}</dd></dl></section>
-          <section class="sheet"><h2>Payment</h2><p class="muted" style="margin-top:8px">Online payment is not open yet. The organisers will announce it in Notices.</p></section>
+          <section class="sheet"><h2>My notices</h2><div class="stack" style="margin-top:12px">${msgs.map(m => `<div class="msg ${m.kind === 'selected' ? 'sel' : ''}"><h3>${esc(m.title)}</h3><p>${esc(m.body)}</p><small class="muted">${fmtDateTime(m.at)}</small></div>`).join('') || '<p class="muted">No personal notices yet.</p>'}</div></section>
+          <section class="sheet"><div class="between"><h2>My exam results</h2><a class="btn btn-quiet btn-sm" href="#dashboard-exams">All exams</a></div>
+            <div style="margin-top:6px">${done.slice(0, 5).map(a => { const ex = Store.get('exams', a.examId); return ex ? `<div class="rowi"><div class="grow"><h3>${esc(ex.title)}</h3><p>${fmtDateTime(a.submittedAt)}</p></div><b class="chip chip-live">${a.score} / ${ex.questions.length}</b></div>` : ''; }).join('') || '<p class="muted" style="padding-top:8px">You have not finished an exam yet.</p>'}</div></section>
         </aside>
       </div>
     </div>`,
@@ -3630,19 +3696,54 @@ PAGES.account = () => {
         const paint = () => { holder.innerHTML = ''; holder.appendChild(drawCard(u, kind)); };
         paint(); if (!roundImg.complete) roundImg.addEventListener('load', paint, { once: true });
         if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (holder.isConnected) paint(); });
-        $('#' + id + '-dl', v).onclick = e => busy(e.currentTarget, async () => saveAndTell(file, await cardBlob(u, kind)));
+        $('#' + id + '-dl', v).onclick = e => busy(e.currentTarget, async () => saveAndTell(file + '.png', await cardBlob(u, kind)));
+        $('#' + id + '-pdf', v).onclick = e => busy(e.currentTarget, async () => saveAndTell(file + '.pdf', await cardPdf(u, kind)));
       };
-      show('card', 'regional', `BGeO-admit-card-${u.regNo}.png`); show('card-nat', 'national', `BGeO-national-admit-card-${u.regNo}.png`);
+      show('card', 'regional', `BGeO-admit-card-${u.regNo}`); show('card-nat', 'national', `BGeO-national-admit-card-${u.regNo}`);
+    },
+  };
+};
+DASH['dashboard-exams'] = () => PAGES.exams();
+DASH['dashboard-resources'] = () => PAGES.resources();
+DASH['dashboard-me'] = () => {
+  const u = Store.me();
+  return {
+    html: `<div class="wrap narrow">${pageHead('My details', 'These details are printed on your admit card.')}
+      <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>ID number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Mobile</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Region</dt><dd>${esc(u.region)}</dd><dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
+        <div style="margin-top:16px"><button type="button" class="btn btn-ocean" id="edit-me">${icon('edit', 18)} Edit details</button></div></section>
+      <section class="sheet"><h2>Payment</h2><p class="muted" style="margin-top:8px">Online payment is not open yet. The organisers will announce it in Notices.</p></section>
+    </div>`,
+    mount(v) {
       $('#edit-me', v).onclick = async () => {
         const fields = [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
           { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) }, { key: 'region', label: 'Region (division)', type: 'select', options: DIVISIONS }];
         const vals = await formDialog({ title: 'Edit my details', fields, values: u, submit: 'Save changes' });
         if (vals) { vals.klass = +vals.klass; try { await Store.updateMe(vals); toast('Changes saved', 'good'); render(); } catch (e) { toast(e.message, 'bad'); } }
       };
-      $('#logout', v).onclick = async () => { await Store.signOut(); toast('You are logged out'); go('home'); };
     },
   };
 };
+const DASH_TABS = [['dashboard', 'Overview', 'compass'], ['dashboard-exams', 'Online exams', 'edit'], ['dashboard-resources', 'Resources', 'book'], ['dashboard-me', 'My details', 'user']];
+/* old addresses that now live inside the dashboard */
+const DASH_ALIAS = { account: 'dashboard', exams: 'dashboard-exams', resources: 'dashboard-resources' };
+const isDashRoute = name => { const n = DASH_ALIAS[name] || name; return n === 'dashboard' || n.startsWith('dashboard-') || n.startsWith('exam-'); };
+function renderDash(name) {
+  const root = $('#dash'), u = Store.me(), isExam = name.startsWith('exam-');
+  const tab = isExam ? 'dashboard-exams' : DASH_TABS.some(t => t[0] === name) ? name : 'dashboard';
+  root.innerHTML = `<header class="dash-top"><a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, public site"><img src="${LOGO_FULL}" alt="" width="560" height="263"></a><b>${u.role === 'admin' ? 'Dashboard preview' : 'Dashboard'}</b>
+      <div class="sp"><a class="btn btn-ghost btn-sm" href="#home">${icon('globe', 18)}<span>Public site</span></a><button type="button" class="iconbtn" id="logout" aria-label="Log out" title="Log out">${icon('out')}</button></div></header>
+    <nav class="dash-tabs" aria-label="Dashboard sections">${DASH_TABS.map(t => `<a href="#${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${icon(t[2], 18)} ${t[1]}</a>`).join('')}</nav>
+    <main id="dash-view"></main>`;
+  $('#logout', root).onclick = async () => { await Store.signOut(); toast('You are logged out'); go('home'); };
+  const cur = $('.dash-tabs [aria-current]', root); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
+  const page = isExam ? pageExam(name.slice(5)) : DASH[tab]();
+  const holder = document.createElement('div'); holder.innerHTML = page.html; $('#dash-view', root).replaceChildren(holder);
+  if (page.mount) page.mount(holder);
+  document.title = `${isExam ? 'Online exam' : DASH_TABS.find(t => t[0] === tab)[1]} | BGeO dashboard`;
+}
+/* what a visitor sees if they open a dashboard address without being logged in */
+PAGES.dashgate = () => ({ html: `<div class="wrap narrow">${pageHead('Participant dashboard', 'Online exams, study resources and your admit card are in the dashboard, for registered students.')}
+  <section class="sheet stack"><p>Log in to open your dashboard. New here? Register first. It takes about two minutes.</p><div class="btnrow"><a class="btn btn-ocean" href="#login">Log in</a>${Store.db.settings.regOpen ? '<a class="btn btn-quiet" href="#register">Register</a>' : ''}</div></section></div>` });
 
 /* ---------- taking an exam ---------- */
 const examDeadline = (ex, at) => (at.deadline ? new Date(at.deadline).getTime() : Math.min(new Date(at.startedAt).getTime() + ex.minutes * 60000, new Date(ex.closesAt).getTime()));
@@ -3650,7 +3751,7 @@ const examFresh = {};
 const clock = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${pad2(s % 60)}`; };
 function pageExam(id) {
   const ex = Store.get('exams', id), me = Store.me();
-  if (!ex || !ex.published) return simplePage('Exam not found', 'This exam does not exist or is not open to students.', '#exams', 'Back to exams');
+  if (!ex || !ex.published) return simplePage('Exam not found', 'This exam does not exist or is not open to students.', '#dashboard-exams', 'Back to exams');
   if (!me) return needLogin('Log in to take this exam.');
   if (me.role !== 'participant') return simplePage(ex.title, 'Admins manage exams from the admin portal. Log in as a student to take one.', '#admin-exams', 'Open exam admin');
   /* online: fetch this exam's questions and my attempts first, then draw the page */
@@ -3662,9 +3763,9 @@ function pageExam(id) {
   if (!CLOUD && at && !at.submittedAt && examDeadline(ex, at) <= Date.now()) at = Store.finish(at.id);
   const st = Store.examState(ex);
   if (at && at.submittedAt) return examResult(ex, at, st);
-  if (st === 'soon') return simplePage(ex.title, `This exam opens on ${fmtDateTime(ex.opensAt)}, Bangladesh time.`, '#exams', 'Back to exams');
-  if (st === 'done') return simplePage(ex.title, 'This exam is closed.', '#exams', 'Back to exams');
-  if (at && !ex.questions.every(Boolean)) return simplePage(ex.title, 'The questions could not be loaded. Go back and open the exam again.', '#exams', 'Back to exams');
+  if (st === 'soon') return simplePage(ex.title, `This exam opens on ${fmtDateTime(ex.opensAt)}, Bangladesh time.`, '#dashboard-exams', 'Back to exams');
+  if (st === 'done') return simplePage(ex.title, 'This exam is closed.', '#dashboard-exams', 'Back to exams');
+  if (at && !ex.questions.every(Boolean)) return simplePage(ex.title, 'The questions could not be loaded. Go back and open the exam again.', '#dashboard-exams', 'Back to exams');
   return at ? examRun(ex, at) : examIntro(ex);
 }
 function examIntro(ex) {
@@ -3673,7 +3774,7 @@ function examIntro(ex) {
       <section class="sheet stack"><h2>Before you start</h2>
         <div class="ticket-facts"><span>${icon('list', 18)} ${plural(ex.questions.length, 'question')}</span><span>${icon('clock', 18)} ${plural(ex.minutes, 'minute')}</span></div>
         <p>The timer starts when you press Start and cannot be paused. Each question has one correct answer. The exam is handed in automatically when the time runs out.</p>
-        <div class="btnrow"><button type="button" class="btn btn-ocean" id="begin">Start the exam</button><a class="btn btn-quiet" href="#exams">Not now</a></div></section></div>`,
+        <div class="btnrow"><button type="button" class="btn btn-ocean" id="begin">Start the exam</button><a class="btn btn-quiet" href="#dashboard-exams">Not now</a></div></section></div>`,
     mount(v) { $('#begin', v).onclick = e => busy(e.currentTarget, async () => { await Store.begin(ex.id); examFresh[ex.id] = Date.now(); Sound.play('good'); render(); }); },
   };
 }
@@ -3727,7 +3828,7 @@ function examResult(ex, at, st) {
       <section class="sheet stack">
         <p class="score">${at.score}<small> / ${n}</small></p>
         <div class="ticket-facts"><span>${icon('clock', 18)} ${Math.floor(at.secs / 60)} min ${at.secs % 60} s</span><span id="rank"></span></div>
-        <div class="btnrow">${canRetake ? '<button type="button" class="btn btn-ocean" id="again">Try again</button>' : ''}<button type="button" class="btn btn-quiet" id="board">Leaderboard</button><a class="btn btn-quiet" href="#exams">Back to exams</a></div>
+        <div class="btnrow">${canRetake ? '<button type="button" class="btn btn-ocean" id="again">Try again</button>' : ''}<button type="button" class="btn btn-quiet" id="board">Leaderboard</button><a class="btn btn-quiet" href="#dashboard-exams">Back to exams</a></div>
       </section>
       ${canReview ? `<section class="sheet"><h2>Check your answers</h2><div class="review">${ex.questions.map((q, i) => `<div class="stack"><p class="qtext">${i + 1}. ${esc(q.q)}</p><div class="opts">${q.options.map((o, k) => `<button type="button" class="opt ${k === q.answer ? 'right' : at.answers[i] === k ? 'wrong' : ''}" disabled><span class="key">${'ABCD'[k]}</span><span>${esc(o)}${k === q.answer ? ' (correct)' : at.answers[i] === k ? ' (your answer)' : ''}</span></button>`).join('')}</div>${at.answers[i] == null ? '<small class="muted">You did not answer this one.</small>' : ''}</div>`).join('')}</div></section>` : '<p class="note onblue" style="margin-top:16px">The correct answers for this exam are not shown.</p>'}
     </div>`,
@@ -3930,13 +4031,14 @@ async function readQrFromFile(file, read) {
     return await read(cv, cv.width, cv.height, 1600);
   } finally { URL.revokeObjectURL(url); }
 }
-const findByNumber = text => { const num = parseInt(String(text).replace(/\D/g, ''), 10); return Store.participants().find(p => parseInt(String(p.regNo).replace(/\D/g, ''), 10) === num) || null; };
+/* the whole ID number, or just the serial at its end (7 finds 2027010007) */
+const findByNumber = text => { const d = String(text).replace(/\D/g, ''); if (!d) return null; const ps = Store.participants(); return ps.find(p => String(p.regNo).replace(/\D/g, '') === d) || (d.length <= 5 ? ps.find(p => regSerial(p.regNo) === +d) : null) || null; };
 async function scanDialog(session, after) {
   const d = openDialog({ title: 'Scan cards', html: `<p class="muted">Attendance for <b>${esc(session)}</b>. Hold the QR code on a card in front of the camera, or upload a picture of the card.</p>
     <div class="scanbox"><video playsinline muted></video></div>
     <div class="scanres" id="sc-res" aria-live="assertive"><p>Starting the camera…</p></div>
     <div><button type="button" class="btn btn-quiet btn-sm" id="sc-up">${icon('image', 18)} Upload a card picture</button><input type="file" id="sc-file" accept="image/*" hidden></div>
-    <form class="form" id="sc-form" novalidate><div class="field"><label for="sc-num">Or type the registration number</label><input id="sc-num" placeholder="BGEO-0007" autocomplete="off" inputmode="text"></div>
+    <form class="form" id="sc-form" novalidate><div class="field"><label for="sc-num">Or type the ID number</label><input id="sc-num" placeholder="2027010007" autocomplete="off" inputmode="numeric"></div>
     <div class="dlg-actions"><button type="button" class="btn btn-quiet btn-sm" data-close>Done</button><button type="submit" class="btn btn-ocean btn-sm">Mark present</button></div></form>` });
   const video = $('video', d), res = $('#sc-res', d), file = $('#sc-file', d); let stream = null, alive = true, last = '', lastAt = 0, readerP = null;
   const reader = () => (readerP = readerP || makeQrReader());
@@ -3986,7 +4088,7 @@ ADMIN['admin-attend'] = main => {
       <p class="muted">Each registration card has a QR code. Scan it when a student arrives and they are marked present. Inside the scanner you can also upload a picture of a card.</p>
       <div class="field"><label for="at-session">Taking attendance for</label><input id="at-session" list="at-known" value="${esc(attendSession)}"><datalist id="at-known">${known().map(k => `<option value="${esc(k)}"></option>`).join('')}</datalist><small>Pick a round, or type your own name for this session.</small></div>
       <div class="btnrow"><button type="button" class="btn btn-ocean" id="at-scan">${icon('check', 20)} Scan cards</button>${CLOUD ? '<button type="button" class="btn btn-quiet btn-sm" id="at-refresh">Load the latest</button>' : ''}<button type="button" class="btn btn-quiet btn-sm" id="at-csv">${icon('download', 18)} Export list</button></div>
-      <form class="field" id="at-form" novalidate><label for="at-num">Mark by registration number</label><div class="inrow"><input id="at-num" placeholder="BGEO-0007" autocomplete="off"><button type="submit" class="btn btn-quiet btn-sm">Mark present</button></div><small>For a student who has no card with them.</small></form>
+      <form class="field" id="at-form" novalidate><label for="at-num">Mark by ID number</label><div class="inrow"><input id="at-num" placeholder="2027010007" autocomplete="off" inputmode="numeric"><button type="submit" class="btn btn-quiet btn-sm">Mark present</button></div><small>For a student who has no card with them. The last digits are enough: 7 finds 2027010007.</small></form>
       <div>${rows.map(x => `<div class="rowi"><span class="tick on">${icon('check', 18)}</span><div class="grow"><h3>${esc(x.u.name)}</h3><p>${esc(x.u.regNo)}, Class ${esc(x.u.klass)}, ${esc(x.u.institution)}</p><p>${fmtDateTime(x.a.at)}</p></div><div class="acts"><button type="button" class="mini del" data-undo="${x.u.id}" aria-label="Remove ${esc(x.u.name)} from the present list">${icon('close', 18)}</button></div></div>`).join('') || '<p class="empty">Nobody is marked present for this session yet.</p>'}</div></section>`;
     $('#at-session', main).addEventListener('change', e => { const v = e.target.value.trim(); if (!v || v === attendSession) return; attendSession = v; setTimeout(draw, 0); });
     $('#at-scan', main).onclick = () => scanDialog(attendSession, draw);
@@ -4041,7 +4143,7 @@ const NOTICE_TEMPLATES = [
     make: v => [`${v.round}${v.region ? ', ' + v.region : ''}: date and venue`, `The ${v.round}${v.region ? ' for ' + v.region : ''} will be held on ${v.date}.\n\nVenue: ${v.venue}\nReporting time: ${v.time}${v.bring ? '\nBring with you: ' + v.bring : ''}\n\nPlease arrive on time.`], tagFrom: 'round' },
   { name: 'Online exam announced', tag: 'Online exam',
     fields: [{ key: 'exam', label: 'Name of the exam', required: true }, { key: 'opens', label: 'When it opens', placeholder: 'For example: Friday, 4 December, 6:00 pm', required: true }, { key: 'closes', label: 'When it closes', placeholder: 'For example: the same day, 8:00 pm', required: true }, { key: 'mins', label: 'Time allowed, in minutes', type: 'number', min: 1, required: true }],
-    make: v => [`Online exam: ${v.exam}`, `${v.exam} will be held on this website.\n\nOpens: ${v.opens}\nCloses: ${v.closes}\nTime allowed: ${v.mins} minutes\n\nLog in and open Online exams to take it. The timer starts when you press Start and cannot be paused.`] },
+    make: v => [`Online exam: ${v.exam}`, `${v.exam} will be held on this website.\n\nOpens: ${v.opens}\nCloses: ${v.closes}\nTime allowed: ${v.mins} minutes\n\nLog in and open Online exams in your dashboard to take it. The timer starts when you press Start and cannot be paused.`] },
   { name: 'Results are out', tag: 'Results',
     fields: [{ key: 'round', label: 'Which round', type: 'select', options: ROUNDS.slice(0, 2).concat('Online exam') }, { key: 'next', label: 'What happens next (optional)', type: 'textarea', rows: 3 }],
     make: v => [`Results: ${v.round}`, `The results of the ${v.round} are now on the Results page. Search for your name there.${v.next ? '\n\n' + v.next : ''}`] },
@@ -4376,8 +4478,17 @@ async function boot() {
   catch (e) { if (intro) intro.cancel(); $('#view').innerHTML = `<div class="wrap narrow"><header class="pagehead"><h1>Could not load the olympiad data</h1><p>${esc(e.message)}</p></header><p><a class="btn btn-lime" href="">Try again</a></p></div>`; return; }
   Store.onRecovery = recoveryDialog;
   drawContours($('#contours'));
-  let drawn = false;
-  window.addEventListener('hashchange', () => { drawn = true; if (intro) intro.cancel(); Sound.play('move'); const to = routeName(); if (!(to === 'admin' || to.startsWith('admin-'))) pageSweep(); render(); });
+  /* moving between pages: a tsunami crosses the screen and the page changes underneath it.
+     Inside the admin portal and between dashboard tabs the change is instant, since those are places to work in. */
+  let drawn = false, lastRoute = routeName(), swapT = 0;
+  const isAdminRoute = n => n === 'admin' || n.startsWith('admin-');
+  window.addEventListener('hashchange', () => {
+    drawn = true; if (intro) intro.cancel();
+    const to = routeName(), from = lastRoute; lastRoute = to; clearTimeout(swapT);
+    const inDash = n => isDashRoute(n) && !!Store.me();
+    if (reducedMotion() || isAdminRoute(to) || (inDash(to) && inDash(from))) { Sound.play('tap'); render(); return; }
+    Sound.play('wave'); pageWave(); swapT = setTimeout(render, WAVE_SWAP);
+  });
   /* the first tap anywhere switches sound on (browsers only allow audio after a tap) */
   document.addEventListener('click', e => {
     Sound.unlock();
