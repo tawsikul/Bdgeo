@@ -46,17 +46,15 @@ button{font:inherit}
 .onsea{color:#d6e5fb}
 .ic{flex:none;vertical-align:middle}
 
-/* the sea behind everything */
-.sea{position:fixed;inset:0;z-index:-1;background:linear-gradient(200deg,#012a70 0%,#0f4699 50%,#2f6db8 100%);overflow:hidden}
-.sea canvas{position:absolute;left:-10%;top:-10%;width:120%;height:120%;animation:drift 70s ease-in-out infinite alternate}
-@keyframes drift{from{transform:translate3d(-2%,-1%,0) rotate(-1deg)}to{transform:translate3d(2%,2%,0) rotate(1.5deg)}}
+/* the sea behind everything: the design's plain blue, deep on the left and lighter toward the right, with nothing drawn over it */
+.sea{position:fixed;inset:0;z-index:-1;background:linear-gradient(90deg,#01296f 0%,#17498e 52%,#336eb4 100%)}
 body.is-admin .sea{display:none}
 body.is-admin{background:var(--foam);color:var(--ink)}
 
 /* top bar */
 /* One bar on every screen. On a tablet or computer it carries the page links between the logo and the buttons.
    A phone is too narrow for six links, so there they are listed under the menu button instead. */
-.bar{position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:40;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(3,31,80,.96);border-bottom:1px solid rgba(255,255,255,.12)}
+.bar{position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:40;display:flex;align-items:center;gap:10px;padding:0 14px;background:#052057;border-bottom:1px solid rgba(255,255,255,.1)}
 .brand{display:flex;align-items:center;flex:none}
 .brand img{height:42px;width:auto;display:block}
 .bar-links{display:none;align-items:center;gap:0;min-width:0}
@@ -82,7 +80,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .bar.bar-tight .bar-links{display:none}
 @media(min-width:1000px){.bar-links{gap:4px}.bar-tools .bar-admit{display:inline-flex}}
 
-.menu{position:fixed;inset:var(--bar-h) 0 0 0;z-index:39;background:#04214f;overflow:auto;padding:18px 16px 40px;animation:menuIn .26s ease both}
+.menu{position:fixed;inset:var(--bar-h) 0 0 0;z-index:39;background:#052057;overflow:auto;padding:18px 16px 40px;animation:menuIn .26s ease both}
 @keyframes menuIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:640px;margin-inline:auto}
 .menu a{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.08);text-decoration:none;font:600 1.02rem/1.2 var(--body)}
@@ -492,7 +490,7 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 .qf-msg{color:#e2edfc;font-size:1.1rem}
 
 /* opening animation, page wipe, admin entry */
-.intro{position:fixed;inset:0;z-index:120;cursor:pointer;background:#0f4699}
+.intro{position:fixed;inset:0;z-index:120;cursor:pointer;background:#17498e}
 .intro.landing{background:transparent;pointer-events:none}
 .intro.skipping{opacity:0;pointer-events:none;transition:opacity .22s}
 .intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -567,7 +565,7 @@ body.intro-reveal .hero-copy > :nth-child(3){animation-delay:.5s}
 </style>
 </head>
 <body>
-<div class="sea" aria-hidden="true"><canvas id="contours"></canvas></div>
+<div class="sea" aria-hidden="true"></div>
 <div id="site"></div>
 <div id="dash" hidden></div>
 <div id="admin" hidden></div>
@@ -2583,27 +2581,6 @@ function mountGlobe(cv, turnsPerMinute = 1.2) {
   return reducedMotion() ? () => {} : Globe.loop(cv, frame);
 }
 
-/* contour lines for the sea behind every page. Every fifth line is drawn heavier,
-   the way index contours are on a real topographic map. */
-function drawContours(cv) {
-  const W = cv.width = Math.min(1400, Math.round(window.innerWidth * 1.2)), H = cv.height = Math.min(1800, Math.round(window.innerHeight * 1.2));
-  const g = cv.getContext('2d'); let seed = 5; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const hills = Math.max(4, Math.round(W * H / 190000));
-  for (let k = 0; k < hills; k++) {
-    const cx = R() * W, cy = R() * H, base = 90 + R() * 170, rings = 6 + Math.floor(R() * 5), p = [R() * 6.283, R() * 6.283, R() * 6.283];
-    for (let j = 1; j <= rings; j++) {
-      const rr = base * j / rings, wob = 0.5 + j / rings;
-      g.beginPath();
-      for (let i = 0; i <= 72; i++) {
-        const t = i / 72 * 6.2832, kf = 1 + (0.16 * Math.sin(2 * t + p[0] + j * 0.2) + 0.1 * Math.sin(3 * t + p[1] - j * 0.15) + 0.05 * Math.sin(5 * t + p[2])) * wob;
-        const x = cx + Math.cos(t) * rr * kf, y = cy + Math.sin(t) * rr * kf * 0.82; i ? g.lineTo(x, y) : g.moveTo(x, y);
-      }
-      g.closePath(); const index = j % 5 === 0;
-      g.strokeStyle = `rgba(255,255,255,${index ? 0.13 : 0.07})`; g.lineWidth = index ? 1.6 : 1; g.stroke();
-    }
-  }
-}
-
 /* ---------- the Earth's coastlines ----------
    Outlines of the continents and large islands, drawn by hand as longitude and latitude
    (in tenths of a degree). They are simplified: on a small turning globe only the overall
@@ -2791,7 +2768,7 @@ function siteIntro() {
   }
   function drawSky(a) {
     if (a <= 0) return;
-    g.globalAlpha = a; const bg = g.createLinearGradient(W, 0, 0, H); bg.addColorStop(0, '#012a70'); bg.addColorStop(0.5, '#0f4699'); bg.addColorStop(1, '#2f6db8');
+    g.globalAlpha = a; const bg = g.createLinearGradient(0, 0, W, 0); bg.addColorStop(0, '#01296f'); bg.addColorStop(0.52, '#17498e'); bg.addColorStop(1, '#336eb4');   // the page's own background
     g.fillStyle = bg; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
   }
   const show = alpha => { g.globalAlpha = alpha; g.drawImage(layer, (W - D) / 2, (H - D) / 2, D, D); g.globalAlpha = 1; };
@@ -4682,7 +4659,6 @@ async function boot() {
   try { await Store.init(); }
   catch (e) { if (intro) intro.cancel(); $('#view').innerHTML = `<div class="wrap narrow"><header class="pagehead"><h1>Could not load the olympiad data</h1><p>${esc(e.message)}</p></header><p><a class="btn btn-lime" href="">Try again</a></p></div>`; return; }
   Store.onRecovery = recoveryDialog;
-  drawContours($('#contours'));
   /* moving between pages: a tsunami crosses the screen and the page changes underneath it.
      Inside the admin portal and between dashboard tabs the change is instant, since those are places to work in. */
   let drawn = false, lastRoute = routeName(), swapT = 0;
