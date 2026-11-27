@@ -78,7 +78,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .iconbtn[aria-pressed="false"]{opacity:.7}
 @media(max-width:380px){.bar{gap:6px;padding:0 10px}.bar-tools{gap:6px}.brand img{height:36px}.bar .iconbtn{width:40px;height:40px}}
 @media(min-width:740px){:root{--bar-h:66px}.bar{gap:clamp(6px,1.4vw,22px);padding:0 max(14px,calc((100% - 1080px) / 2))}.bar-links{display:flex}.bar .iconbtn{width:40px;height:40px}}
-@media(min-width:740px) and (max-width:859px){.brand img{height:38px}.bar{gap:8px}.bar-tools{gap:6px}.bar-links > a,.dd-btn{font-size:.875rem;padding-inline:5px}.bar .iconbtn{width:38px;height:38px}.bar .btn-sm{padding:0 10px}#acct-btn .ic{display:none}}
+@media(min-width:740px) and (max-width:859px){.brand img{height:38px}.bar{gap:8px}.bar-tools{gap:6px}.bar-links > a,.dd-btn{font-size:.875rem;padding-inline:5px}.bar .iconbtn{width:38px;height:38px}.bar .btn-sm{padding:0 10px;gap:5px}}
 .bar.bar-tight .bar-links{display:none}
 @media(min-width:1000px){.bar-links{gap:4px}.bar-tools .bar-admit{display:inline-flex}}
 
@@ -1899,6 +1899,7 @@ const IC = {
   close: '<path d="M6 6l12 12M18 6L6 18"/>',
   sound: '<path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>',
   mute: '<path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16.5 9.5l5 5M21.5 9.500l-5 5"/>',
+  account: '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4.2a3.3 3.3 0 110 6.6 3.3 3.3 0 010-6.6zM5.9 17.2c1.4-2.1 3.6-3.3 6.1-3.3s4.7 1.2 6.1 3.3a8 8 0 01-12.2 0z"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.500-4 4.500-6 8-6s6.500 2 8 6"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   pin: '<path d="M12 21s7-6.200 7-11a7 7 0 10-14 0c0 4.800 7 11 7 11z"/><circle cx="12" cy="10" r="2.500"/>',
@@ -3091,7 +3092,7 @@ function syncChrome(name) {
   $$('[data-nav]').forEach(a => { if (a.dataset.nav === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   $$('.dd').forEach(d => d.classList.toggle('here', !!$('[aria-current]', d)));
   const u = Store.me(), b = $('#acct-btn');
-  b.innerHTML = `${icon('user', 16)} ${u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login'}`; b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
+  b.innerHTML = `${icon('account', 18)} ${u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login'}`; b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
   const hasCard = !!(u && u.role === 'participant' && Store.db.settings.cardsOpen);
   $$('.bar-admit').forEach(a => { a.hidden = !hasCard; });
   $$('[data-nav="register"]').forEach(a => { a.hidden = !!u; });
