@@ -1515,6 +1515,53 @@ PAGES.login = () => {
   };
 };
 
+/* ---------- is this email address real enough to accept? ----------
+   Three checks, none of them through the database:
+   1. it is written like an email address,
+   2. it is not a slip of the finger on a well-known provider (gmial.com, yaho.com),
+   3. its domain exists on the internet and is set up to receive mail (a public DNS lookup). */
+const MAIL_BIG = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com', 'live.com', 'ymail.com', 'proton.me', 'protonmail.com'];
+const MAIL_REAL = MAIL_BIG.concat(['mail.com', 'email.com', 'gmx.com', 'gmx.net', 'aol.com', 'msn.com', 'me.com', 'mac.com', 'zoho.com', 'yandex.com', 'rocketmail.com', 'googlemail.com', 'yahoo.co.uk', 'yahoo.co.in', 'outlook.co.uk', 'hotmail.co.uk', 'pm.me', 'duck.com', 'hey.com', 'fastmail.com', 'tuta.io']);
+const MAIL_THROWAWAY = ['mailinator.com', 'yopmail.com', 'guerrillamail.com', '10minutemail.com', 'tempmail.com', 'temp-mail.org', 'trashmail.com', 'sharklasers.com', 'getnada.com', 'dispostable.com', 'maildrop.cc', 'throwawaymail.com', 'fakeinbox.com', 'emailondeck.com', 'mohmal.com'];
+function editDistance(a, b) {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0]; row[0] = i;
+    for (let j = 1; j <= b.length; j++) { const keep = row[j]; row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = keep; }
+  }
+  return row[b.length];
+}
+function emailTypo(domain) {
+  if (MAIL_REAL.includes(domain)) return null;
+  let best = null;
+  for (const d of MAIL_BIG) { const k = editDistance(domain, d); if (k > 0 && k <= 2 && (!best || k < best.k)) best = { d, k }; }
+  return best ? best.d : null;
+}
+/* true = the domain can receive mail, false = it cannot, null = the lookup itself failed */
+async function domainTakesMail(domain) {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 4000);
+  try {
+    const r = await fetch('https://dns.google/resolve?type=MX&name=' + encodeURIComponent(domain), { signal: ctl.signal });
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (j.Status === 3) return false;                       /* no such domain */
+    if (j.Status !== 0) return null;
+    const mx = (j.Answer || []).filter(a => a.type === 15).map(a => String(a.data).trim());
+    return mx.length > 0 && !mx.every(d => /^\d+\s+\.$/.test(d)); /* "0 ." means: this domain takes no mail */
+  } catch (e) { return null; } finally { clearTimeout(timer); }
+}
+async function checkEmail(raw, skipTypo) {
+  const email = String(raw).trim().toLowerCase();
+  if (!/^[a-z0-9](?:[a-z0-9._%+-]*[a-z0-9])?@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/.test(email) || email.includes('..')) return { error: 'That does not look like an email address. Check it for spaces or missing parts.' };
+  const domain = email.split('@')[1];
+  if (MAIL_THROWAWAY.includes(domain)) return { error: 'Temporary email addresses are not accepted. Use your own everyday email.' };
+  const fix = skipTypo ? null : emailTypo(domain);
+  if (fix) return { suggest: email.split('@')[0] + '@' + fix };
+  const takes = MAIL_REAL.includes(domain) ? true : await domainTakesMail(domain);
+  if (takes === false) return { error: `No email can be delivered to "${domain}". Check the part after the @ sign.` };
+  return { ok: true };
+}
+
 PAGES.register = () => {
   if (Store.me()) return PAGES.account();
   if (!Store.db.settings.regOpen) return simplePage('Registration is closed', 'Registration is not open right now. Watch the Notices page for the next dates.', '#notices', 'See notices');
@@ -1530,6 +1577,7 @@ PAGES.register = () => {
   return {
     html: `<div class="wrap">${pageHead('Register', 'Fill this in once. Your registration card is ready as soon as you finish.')}
       <section class="sheet"><form class="form" id="reg-form" novalidate><div class="form-2">${fields.map(f => fieldHtml(f, '', 'rg')).join('')}</div>
+        <div class="note" id="mail-hint" role="alert" hidden></div>
         <p class="err" role="alert" hidden></p>${previewNote}
         <div class="btnrow"><button class="btn btn-ocean" type="submit">Create my account</button><a class="textlink" href="#login">I already have an account</a></div></form></section></div>`,
     mount(v) {
@@ -1537,7 +1585,23 @@ PAGES.register = () => {
       form.addEventListener('submit', async e => {
         e.preventDefault(); const vals = readForm(form, fields), btn = $('button[type=submit]', form); vals.password = form.elements.password.value;
         const miss = missing(fields, vals); btn.disabled = true;
-        const r = miss ? { error: `Please fill in "${miss.label}".` } : await Store.signUp(vals); if (btn.isConnected) btn.disabled = false;
+        const hint = $('#mail-hint', form), label = btn.textContent; let r;
+        hint.hidden = true; err.hidden = true;
+        if (miss) r = { error: `Please fill in "${miss.label}".` };
+        else {
+          btn.textContent = 'Checking your email…';
+          const chk = await checkEmail(vals.email, form.dataset.keepEmail === vals.email.toLowerCase());
+          if (chk.suggest) {
+            btn.textContent = label; btn.disabled = false; Sound.play('pick');
+            hint.innerHTML = `<p>Did you mean <b>${esc(chk.suggest)}</b>?</p><div class="btnrow" style="margin-top:10px"><button type="button" class="btn btn-ocean btn-sm" data-fix>Yes, fix it</button><button type="button" class="btn btn-quiet btn-sm" data-keep>No, mine is correct</button></div>`;
+            hint.hidden = false; hint.scrollIntoView({ block: 'center' });
+            $('[data-fix]', hint).onclick = () => { form.elements.email.value = chk.suggest; hint.hidden = true; Sound.play('good'); };
+            $('[data-keep]', hint).onclick = () => { form.dataset.keepEmail = vals.email.toLowerCase(); hint.hidden = true; };
+            return;
+          }
+          r = chk.error ? { error: chk.error } : await Store.signUp(vals);
+        }
+        if (btn.isConnected) { btn.disabled = false; btn.textContent = label; }
         if (r.error) { err.textContent = r.error; err.hidden = false; Sound.play('bad'); err.scrollIntoView({ block: 'center' }); return; }
         if (r.confirm) { Sound.play('good'); v.innerHTML = `<div class="wrap narrow">${pageHead('Check your email')}<section class="sheet stack"><p>We sent a confirmation link to <b>${esc(r.email)}</b>. Open it, then log in here.</p><div><a class="btn btn-ocean" href="#login">Go to log in</a></div></section></div>`; return window.scrollTo(0, 0); }
         Sound.play('win'); toast('You are registered. Welcome to BGeO.', 'good'); go('account');
