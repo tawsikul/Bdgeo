@@ -373,24 +373,30 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .msg.sel{background:#e6f7e0;border-left:6px solid var(--leaf)}
 
 /* footer, compass, toasts, dialogs */
-/* the footer, from the Figma: the page's blue with faint upright bands, the committee's details on the left, links on the right */
-.foot{position:relative;background:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 64px,rgba(255,255,255,0) 64px 128px),linear-gradient(90deg,#01296f,#17498e 52%,#336eb4);border-top:1px solid rgba(255,255,255,.16);padding:48px 0 34px;color:#fff}
-.foot-grid{display:grid;gap:34px}
+/* the footer, from the Figma: deep navy, the committee's details on the left, two columns of links on the right, small print along the bottom */
+.foot{position:relative;background:#052057;padding:48px 0 30px;color:#fff}
+.foot-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px 20px}
+.foot-main{grid-column:1 / -1}
 .foot img{height:86px;width:auto;margin-left:-4px}
 .foot h2{font:700 1.3rem/1.25 var(--body);color:#fff;margin:22px 0 12px}
 .foot-main p{margin:0 0 7px;max-width:36ch;font-size:1.06rem;line-height:1.45;color:#e6effc}
 .foot-main p strong{color:#fff;font-weight:700}
 .foot a{color:inherit;text-decoration:none}
-.foot-main p a{text-decoration:underline;text-decoration-color:rgba(255,255,255,.4);text-underline-offset:4px}
-.foot-social{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px !important;max-width:none !important}
+.foot-social{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px !important;max-width:none !important}
 .foot-social[hidden]{display:none}
-.foot-social a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid rgba(255,255,255,.5);border-radius:999px;font-weight:600;font-size:.98rem;text-decoration:none !important}
-.foot-links h2{margin-top:0}
-.foot-links a{display:block;padding:9px 0;font-size:1.1rem;color:#e6effc}
-.foot small{color:#c4d6f2;display:block}
-.foot-base{display:flex;flex-wrap:wrap;gap:4px 24px;justify-content:space-between;margin-top:34px;padding-top:16px;border-top:1px solid rgba(255,255,255,.18)}
-.foot-base small{font-size:.85rem}
-@media(min-width:740px){.foot{padding:64px 0 36px}.foot-grid{grid-template-columns:minmax(0,1fr) auto;gap:40px 80px}.foot-links{padding-top:118px;min-width:190px}}
+.foot-social a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid rgba(255,255,255,.5);border-radius:999px;font-weight:600;font-size:.98rem}
+.foot-links h2{margin:0 0 10px;font-size:1.16rem}
+.foot-links a{display:block;padding:9px 0;font-size:1.08rem;color:#e6effc}
+.foot small{color:#dbe6f8;display:block;font-size:.9rem}
+.foot-base{display:flex;flex-wrap:wrap;gap:14px 24px;justify-content:space-between;align-items:center;margin-top:34px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14)}
+.foot-legal{display:flex;flex-wrap:wrap;gap:6px 0}
+.foot-legal a{padding:6px 13px;font-size:.92rem;color:#e6effc;border-left:1px solid rgba(255,255,255,.45);line-height:1.1}
+.foot-legal a:first-child{padding-left:0;border-left:0}
+@media(min-width:740px){.foot{padding:60px 0 34px}.foot-grid{grid-template-columns:minmax(0,1fr) auto auto;gap:40px 84px}.foot-main{grid-column:auto}.foot-links{padding-top:74px}.foot-base{border-top:0;padding-top:0}}
+/* small print pages and the site map */
+.prose h2{margin:22px 0 8px;font-size:1.2rem}.prose h2:first-child{margin-top:0}.prose p{margin:0 0 9px;max-width:68ch}
+.sitemap{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px 28px}
+.sitemap h2{font-size:1.1rem;margin:0 0 6px}.sitemap a{display:block;padding:7px 0;color:var(--ocean);text-decoration:none;font-weight:500}
 .north{position:fixed;right:14px;bottom:calc(18px + var(--tab-h));z-index:35;width:54px;height:54px;border-radius:50%;border:0;background:#fff;color:var(--abyss);box-shadow:0 10px 26px -8px rgba(0,0,0,.6);cursor:pointer;display:grid;place-content:center}
 .north svg{transform:rotate(var(--turn,0deg))}
 #toasts{position:fixed;left:0;right:0;bottom:calc(18px + var(--tab-h));z-index:90;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
@@ -759,10 +765,10 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-mark .
   .news:hover{transform:translateY(-2px);border-color:#b9cbe4;box-shadow:0 16px 28px -22px rgba(10,35,80,.45)}
   .news:hover .news-pic img{transform:scale(1.03)}
   .nextup:hover strong{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
-  .foot-links a,.foot-social a{transition:color var(--m-in) var(--ease),background-color var(--m-in) var(--ease),border-color var(--m-in) var(--ease)}
-  .foot-links a:hover{color:var(--lime)}
+  .foot-links a,.foot-social a,.foot-legal a,.foot-main p a,.sitemap a{transition:color var(--m-in) var(--ease),background-color var(--m-in) var(--ease),border-color var(--m-in) var(--ease)}
+  .foot-links a:hover,.foot-legal a:hover,.foot-main p a:hover{color:var(--lime)}
   .foot-social a:hover{background:#fff;color:#0b3a85;border-color:#fff}
-  .foot-main p a:hover{text-decoration-color:#fff}
+  .sitemap a:hover{color:var(--navy,#052057);text-decoration:underline}
   /* a soft light follows the pointer across the cards */
   .door::before,.news::before,.dash-facts a::before,.xfacts > div::before,.glance div::before,.shuffle::before,.qf::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s var(--ease);background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(154,217,111,.2),transparent 62%)}
   .news::before{background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(47,109,184,.13),transparent 62%)}
@@ -2262,14 +2268,17 @@ const Sound = (() => {
       /* a clear note rising toward the landing chime */
       path(now, { wave: 'sine', pts: [[2.82, 0, 660], [3.0, 0.012, 680], [3.85, 0.05, 960], [4.12, 0, 988]] });
     },
-    /* what the site adds to the recorded wind of the filmed opening: the tap's pop and breath, leaves and birds in the forest,
-       and a clear note rising toward the landing chime */
+    /* what the site adds to the recorded wind of the filmed opening: the tap's pop and breath, two bird calls in the forest,
+       a whoosh as each place rushes past (the passes, centred on 0.97 and 1.57 s), a longer rush for the roll into cloud
+       (from 2.2 s), and a clear note rising toward the landing chime */
     enter(now) {
       tone(now, { f: 620, f2: 240, t: 0.12, g: 0.24, attack: 0.003 }); air(now, { t: 0.05, f: 1400, q: 1, g: 0.14, peak: 0 });
       air(now, { t: 0.28, f: 4200, f2: 700, q: 0.8, g: 0.16, peak: 0.6 });
-      air(now, { t: 1.4, f: 5200, f2: 4400, q: 0.6, g: 0.04, at: 0.15, peak: 0.2 });
-      bird(now, 0.3, 2500, 3, 0.08); bird(now, 0.72, 3100, 2, 0.06); bird(now, 1.12, 2250, 2, 0.05);
-      path(now, { wave: 'sine', pts: [[3.3, 0, 660], [3.5, 0.012, 680], [4.35, 0.05, 960], [4.65, 0, 988]] });
+      air(now, { t: 0.7, f: 5200, f2: 4400, q: 0.6, g: 0.04, at: 0.1, peak: 0.2 });
+      bird(now, 0.22, 2500, 3, 0.08); bird(now, 0.56, 3100, 2, 0.06);
+      [0.97, 1.57].forEach((t, i) => { air(now, { t: 0.4, f: 480 + i * 80, f2: 3800 + i * 400, q: 0.9, g: 0.2, at: t - 0.2, peak: 0.5 }); tone(now, { f: 240, f2: 90, t: 0.3, g: 0.11, at: t - 0.12, peak: 0.35 }); });
+      air(now, { t: 0.7, f: 700, f2: 4600, q: 0.8, g: 0.17, at: 2.2, peak: 0.75 });
+      path(now, { wave: 'sine', pts: [[2.8, 0, 660], [3.0, 0.012, 680], [3.6, 0.05, 960], [3.87, 0, 988]] });
     },
     /* a tsunami: a deep surge that swells, breaks and hisses away */
     wave(now) { air(now, { t: 1.05, f: 180, fm: 1300, f2: 300, q: 0.9, g: 0.2, type: 'lowpass', peak: 0.45 }); air(now, { t: 0.7, f: 2400, f2: 5200, q: 0.9, g: 0.06, at: 0.38, peak: 0.25 }); tone(now, { f: 58, f2: 40, t: 0.9, g: 0.16, peak: 0.3 }); },
@@ -3037,9 +3046,12 @@ function paintEarth(g, W, H) {
 /* ---------- entry animations ----------
    Opening the site: a title screen first. The Earth turns in the middle with a pin on Dhaka, satellites circle it, the
    olympiad's lettering sits above and "Tap to enter" below. A tap cuts straight to the forest: no zoom into the globe.
-   The flight itself is a short film (media/intro-wide.mp4, or intro-tall.mp4 on an upright screen): out of the forest,
-   over farmland, desert, coast and sea, up into cloud. In the cloud the film hands over to the site's own Earth, which
-   pulls away, turns, and settles into its place on the page. The film's wind is media/intro.mp3.
+   The flight itself is a short film (media/intro-wide.mp4, or intro-tall.mp4 on an upright screen), cut by
+   tools/film_edit.py. The camera only ever travels: a level, backward run through the forest; the forest slides away
+   in a streak of speed and farmland comes in from behind the camera; the same again into the desert coast; then one
+   unbroken stretch along the coast and out over the sea; then a roll to the left into cloud. In the cloud the film hands over to
+   the site's own Earth, which finishes the roll, pulls away, turns, and settles into its place on the page. The film's
+   wind is media/intro.mp3.
    If the film has not loaded by the time of the tap (or cannot play), the same journey is drawn instead:
    the camera starts inside a forest, a few feet above the ground, looking
    straight down a path between the trunks, and it is already moving. In one unbroken movement
@@ -3227,7 +3239,7 @@ function siteIntro() {
   /* ---- the film. It is fetched whole while the title screen waits, so that it starts the instant the screen is tapped.
           VCUT: the moment in the film when the picture has gone to cloud-white. V_R0: how far into its pull-away the site's
           own Earth is when it appears out of that cloud. ---- */
-  const VCUT = 3.7, V_R0 = 0.34, MEDIA = 'media/';
+  const VCUT = 2.84, V_R0 = 0.34, V_ROLL = 0.5, MEDIA = 'media/';   // V_ROLL: seconds the site's Earth takes to finish the film's roll
   let vidOK = false, mode = 'canvas', vOut = false, washT = 0, windData = null, lastVt = -1, stall = 0;
   (function loadFilm() {
     const conn = navigator.connection; if (conn && conn.saveData) return;   // the visitor asked to save data: draw the journey instead
@@ -3287,7 +3299,7 @@ function siteIntro() {
       const vt = vid.currentTime; stall = vt === lastVt ? stall + dt : 0; lastVt = vt;
       if (vt >= VCUT || vid.ended || stall > 0.9) { vOut = true; el.classList.add('out'); clock = LEAD + RUN + TIP + OUT * V_R0; } else return;
     }
-    if (vOut) washT += dt;
+    if (vOut) { washT += dt; const k = 1 - smooth(clamp(washT / V_ROLL)); cv.style.transform = k > 0.001 ? `rotate(${(-16 * k).toFixed(2)}deg) scale(${(1 + 0.62 * k).toFixed(3)})` : ''; }
     if (clock < CUT) {
       /* the cut: a quick wash of light, and the forest is there */
       drawGate(); wash(smooth(clock / CUT)); return;
@@ -3526,8 +3538,10 @@ function buildShell() {
       <p><strong>Phone:</strong> <a id="foot-phone"></a></p>
       <p class="foot-social" id="foot-social" hidden></p>
     </div>
-    <nav class="foot-links" aria-label="Organization"><h2>Organization</h2><a href="#team">About Us</a><a href="#about">About BdGeO</a></nav>
-  </div><div class="wrap foot-base"><small>&copy; ${new Date().getFullYear()} Bangladesh Geography Olympiad. All rights reserved.</small>${CLOUD ? '' : '<small>Preview build with sample data. Sign-ups made here stay in this browser only.</small>'}</div></footer>`;
+    <nav class="foot-links" aria-label="Organization"><h2>Organization</h2><a href="#about">About Us</a><a href="#about">Goals</a><a href="#team">Peoples</a><a href="#contact">Join Us</a><a href="#faq">FAQs</a></nav>
+    <nav class="foot-links" aria-label="General"><h2>General</h2><a href="#register">Registration</a><a href="#syllabus">Syllabus &amp; Topic</a><a href="#notices">Notice</a><a href="#countdown">Schedule</a><a href="#results">Results</a></nav>
+  </div><div class="wrap foot-base"><small>Copyright &copy; ${new Date().getFullYear()} BdGeO. All rights reserved.${CLOUD ? '' : ' Preview build with sample data. Sign-ups made here stay in this browser only.'}</small>
+    <nav class="foot-legal" aria-label="Legal"><a href="#privacy">Privacy Policy</a><a href="#terms">Terms of Use</a><a href="#legal">Legal</a><a href="#sitemap">Site Map</a></nav></div></footer>`;
   const sb = $('#sound-btn');
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
   paintSound(); sb.addEventListener('click', () => { Sound.toggle(); paintSound(); });
@@ -3561,11 +3575,12 @@ function arriveOnScroll(root) {
 function openMenu() { $('#menu').hidden = false; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'true'); b.innerHTML = icon('close'); Sound.play('open'); }
 function closeMenu() { closeDrops(); const m = $('#menu'); if (!m || m.hidden) return; m.hidden = true; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'false'); b.innerHTML = icon('menu'); }
 /* the organisers' details. An admin can change the email, phone, address and social links under Admin, Site. */
-const ORG = { name: 'Bangladesh Geography Olympiad Committee', address: 'Prothom Alo Bhaban, 1st Floor, 19 Karwan Bazar, Dhaka, Bangladesh, 1215', email: 'support@geographyolympiad.org', phone: '+880 9638-713534' };
+const ORG = { name: 'Bangladesh Geography Olympiad Committee', address: 'Prothom Alo Bhaban, 1st Floor, 19 Karwan Bazar, Dhaka, Bangladesh, 1215', email: 'support@geographyolympiad.org', phone: '+880 9638-713534',
+  socials: { facebook: 'https://www.facebook.com/BdGeOC', instagram: 'https://www.instagram.com/bdgeographyolympiad', x: 'https://www.x.com/BdGeOC', linkedin: 'https://www.linkedin.com/company/BdGeOC' } };
 const SOCIALS = [['facebook', 'Facebook'], ['instagram', 'Instagram'], ['x', 'X'], ['linkedin', 'LinkedIn']];
 function contactOf() {
   const s = (Store.db && Store.db.settings) || {};
-  return { address: s.contactAddress || ORG.address, email: s.contactEmail || ORG.email, phone: s.contactPhone || ORG.phone, socials: SOCIALS.map(([k, label]) => [label, safeUrl(s[k])]).filter(x => x[1]) };
+  return { address: s.contactAddress || ORG.address, email: s.contactEmail || ORG.email, phone: s.contactPhone || ORG.phone, socials: SOCIALS.map(([k, label]) => [label, safeUrl(s[k]) || ORG.socials[k]]).filter(x => x[1]) };
 }
 function fillFoot() {
   const c = contactOf(), em = $('#foot-email'), ph = $('#foot-phone'), so = $('#foot-social'); if (!em) return;
@@ -3739,6 +3754,12 @@ PAGES.home = () => {
   };
 };
 
+const TOPICS_HTML = () => `<div style="margin-top:6px">
+      <div class="res"><div class="res-ic">${icon('globe')}</div><div><h3>Physical geography</h3><p class="muted">Landforms, rivers, oceans, weather and climate.</p></div></div>
+      <div class="res"><div class="res-ic">${icon('people')}</div><div><h3>Human and economic geography</h3><p class="muted">People, cities, farming, industry and trade.</p></div></div>
+      <div class="res"><div class="res-ic">${icon('flag')}</div><div><h3>Environment</h3><p class="muted">Ecosystems, natural hazards and climate change.</p></div></div>
+      <div class="res"><div class="res-ic">${icon('compass')}</div><div><h3>Map and data skills</h3><p class="muted">Reading maps, using scale, and making sense of graphs and field data.</p></div></div>
+    </div>`;
 PAGES.about = () => ({
   html: `<div class="wrap">
   ${pageHead('About the olympiad', 'BGeO is a yearly contest for students who are curious about geography, geology and the other Earth sciences.')}
@@ -3746,12 +3767,7 @@ PAGES.about = () => ({
     <ol class="dates" style="margin-top:8px">${STEPS.map((s, i) => `<li><span class="rank">${i + 1}</span><div><h3>${s[0]}</h3><p class="muted">${s[1]}</p></div></li>`).join('')}</ol>
   </section>
   <section class="sheet"><h2>What the questions cover</h2>
-    <div style="margin-top:6px">
-      <div class="res"><div class="res-ic">${icon('globe')}</div><div><h3>Physical geography</h3><p class="muted">Landforms, rivers, oceans, weather and climate.</p></div></div>
-      <div class="res"><div class="res-ic">${icon('people')}</div><div><h3>Human and economic geography</h3><p class="muted">People, cities, farming, industry and trade.</p></div></div>
-      <div class="res"><div class="res-ic">${icon('flag')}</div><div><h3>Environment</h3><p class="muted">Ecosystems, natural hazards and climate change.</p></div></div>
-      <div class="res"><div class="res-ic">${icon('compass')}</div><div><h3>Map and data skills</h3><p class="muted">Reading maps, using scale, and making sense of graphs and field data.</p></div></div>
-    </div>
+    ${TOPICS_HTML()}
     <p class="note" style="margin-top:10px">The full syllabus will be shared in Notices.</p>
   </section>
   <section class="sheet"><div class="between"><h2>Categories</h2><span class="chip chip-sample">Sample</span></div>
@@ -4085,6 +4101,42 @@ PAGES.contact = () => {
       <dt>Email</dt><dd><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></dd>
       <dt>Phone</dt><dd><a href="tel:${esc(c.phone.replace(/[^+\d]/g, ''))}">${esc(c.phone)}</a></dd>
       ${c.socials.map(([label, url]) => `<dt>${label}</dt><dd><a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a></dd>`).join('')}</dl></section></div>` };
+};
+
+PAGES.syllabus = () => ({ html: `<div class="wrap">${pageHead('Syllabus and topics', 'What the olympiad questions are about.')}
+  <section class="sheet"><h2>Topics</h2>${TOPICS_HTML()}
+    <p class="note" style="margin-top:10px">The full syllabus will be shared in Notices.</p>
+    <div class="btnrow" style="margin-top:14px"><a class="btn btn-ocean" href="#notices">See notices</a><a class="btn btn-quiet" href="#explore">Explore the Earth</a></div></section></div>` });
+
+/* The small print. Written in plain words from how this website actually works; the committee can change the wording. */
+const smallPrint = (title, lead, parts) => ({ html: `<div class="wrap">${pageHead(title, lead)}
+  <section class="sheet prose">${parts.map(([h, ps]) => `<h2>${h}</h2>${ps.map(x => `<p>${x}</p>`).join('')}`).join('')}
+    <p class="muted">Last updated 28 November 2026. Questions: <a href="mailto:${ORG.email}">${ORG.email}</a></p></section></div>` });
+PAGES.privacy = () => smallPrint('Privacy Policy', 'What this website keeps about you, and why.', [
+  ['What we keep', ['When you register: your full name, email, mobile number, school or college, class, division and district. Your password is kept in a scrambled form that nobody, including the organisers, can read.', 'When you sit the E-Regional exam: your answers, your score and the time you took.', 'When you write to the organisers through this website: your message.']],
+  ['Why we keep it', ['To run the olympiad: your registration card and admit card, the online exam, attendance on exam day, results, and emails about notices and selection.']],
+  ['Who can see it', ['The organisers of the Bangladesh Geography Olympiad, through their admin accounts.', 'Result lists published on this website show the details the organisers choose to publish, such as a name and school.']],
+  ['Where it is kept', ['In an online database run for us by Supabase. Emails are sent through Brevo. This website has no adverts and no tracking tools.']],
+  ['Your choices', [`To see, correct or delete your details, write to <a href="mailto:${ORG.email}">${ORG.email}</a> from the email you registered with.`, 'If you are under 18, ask a parent or guardian before you register.']],
+]);
+PAGES.terms = () => smallPrint('Terms of Use', 'The rules for using this website.', [
+  ['Your account', ['Register with your own true details. One account for each student.', 'Keep your password to yourself. Tell the organisers if someone else has used your account.']],
+  ['The exam', ['Sit the E-Regional exam yourself, without help from other people. The rules shown before the exam starts apply.']],
+  ['Fair use', ['Do not try to break into the website, disturb it for others, or collect other people\'s details from it.']],
+  ['Changes', ['Dates, venues and rules can change. The Notices page is where the organisers announce them.']],
+]);
+PAGES.legal = () => smallPrint('Legal', 'Who runs this website and who owns what is on it.', [
+  ['Who we are', [`${ORG.name}, ${ORG.address}.`]],
+  ['Copyright', ['The Bangladesh Geography Olympiad name and logo, and the text, questions and pictures made for this website, belong to the committee. Ask before you reuse them.']],
+  ['Links', ['Links to other websites are there to help. The committee does not run those websites.']],
+]);
+PAGES.sitemap = () => {
+  const groups = [['Olympiad', [['home', 'Home'], ['about', 'About the olympiad'], ['syllabus', 'Syllabus and topics'], ['team', 'Team and partners'], ['faq', 'Questions and answers'], ['contact', 'Contact']]],
+    ['Take part', [['register', 'Registration'], ['login', 'Log in'], ['dashboard', 'Participant dashboard'], ['eregional', 'E-Regional exam'], ['notices', 'Notice'], ['countdown', 'Schedule'], ['results', 'Results']]],
+    ['Learn', [['explore', 'Explore the Earth'], ['dashboard-resources', 'Study resources']]],
+    ['Small print', [['privacy', 'Privacy Policy'], ['terms', 'Terms of Use'], ['legal', 'Legal']]]];
+  return { html: `<div class="wrap">${pageHead('Site Map', 'Every page on this website.')}
+    <section class="sheet"><div class="sitemap">${groups.map(([h, links]) => `<div><h2>${h}</h2>${links.map(([to, label]) => `<a href="#${to}">${label}</a>`).join('')}</div>`).join('')}</div></section></div>` };
 };
 
 /* ---------- log in, register, my account ---------- */
@@ -5211,7 +5263,7 @@ async function emailNoticeDialog(n) {
   busy(null, async () => { const k = await Store.queueMail(people, v.subject, v.body); const r = await sendAndTell(); if (r.preview) toast(`${plural(k, 'email')} listed in the Emails tab (preview)`, 'good'); });
 }
 ADMIN['admin-site'] = main => {
-  const s = Store.db.settings, cf = [{ key: 'contactEmail', label: 'Contact email', type: 'email', placeholder: ORG.email }, { key: 'contactPhone', label: 'Contact phone', type: 'tel', placeholder: ORG.phone }, { key: 'contactAddress', label: 'Address', placeholder: ORG.address }, { key: 'facebook', label: 'Facebook page link', type: 'url', placeholder: 'https://' }, { key: 'instagram', label: 'Instagram link', type: 'url', placeholder: 'https://' }, { key: 'x', label: 'X (Twitter) link', type: 'url', placeholder: 'https://' }, { key: 'linkedin', label: 'LinkedIn link', type: 'url', placeholder: 'https://' }];
+  const s = Store.db.settings, cf = [{ key: 'contactEmail', label: 'Contact email', type: 'email', placeholder: ORG.email }, { key: 'contactPhone', label: 'Contact phone', type: 'tel', placeholder: ORG.phone }, { key: 'contactAddress', label: 'Address', placeholder: ORG.address }, { key: 'facebook', label: 'Facebook page link', type: 'url', placeholder: ORG.socials.facebook }, { key: 'instagram', label: 'Instagram link', type: 'url', placeholder: ORG.socials.instagram }, { key: 'x', label: 'X (Twitter) link', type: 'url', placeholder: ORG.socials.x }, { key: 'linkedin', label: 'LinkedIn link', type: 'url', placeholder: ORG.socials.linkedin }];
   const top = document.createElement('div'); top.className = 'stack'; top.style.gap = '16px';
   top.innerHTML = `<section class="panel"><h2>Switches</h2>
       <label class="check" for="sw-reg"><input type="checkbox" id="sw-reg"${s.regOpen ? ' checked' : ''}><span>Registration is open</span></label>
@@ -5219,7 +5271,7 @@ ADMIN['admin-site'] = main => {
       <label class="check" for="sw-split"><input type="checkbox" id="sw-split"${s.examSplit ? ' checked' : ''}><span>Students in the admit card districts sit the Regional round in person only (the E-Regional exam is closed to them)</span></label>
       <form class="form" id="cd" novalidate style="margin-top:14px"><div class="field"><label for="cd-list">Admit cards are only for these districts</label><input id="cd-list" name="list" value="${esc(Store.cardDistricts().join(', '))}" placeholder="Every district"><small>Write district names with commas between them, for example: Dhaka, Gazipur. Leave it empty to give the card to every district. A student selected for the National round always gets the National card.</small></div>
         <p class="err" role="alert" hidden></p><div><button class="btn btn-ocean btn-sm" type="submit">Save districts</button></div></form></section>
-    <section class="panel"><h2>Contact details</h2><p class="muted">These show in the footer and on the Contact page. A social link appears in the footer once you paste it here. Leave email, phone or address empty to keep the ones shown in grey.</p><form class="form" id="cf" novalidate>${cf.map(f => fieldHtml(f, s[f.key], 'cf')).join('')}<div><button class="btn btn-ocean btn-sm" type="submit">Save contact details</button></div></form></section>`;
+    <section class="panel"><h2>Contact details</h2><p class="muted">These show in the footer and on the Contact page. Leave a box empty to keep the one shown in grey.</p><form class="form" id="cf" novalidate>${cf.map(f => fieldHtml(f, s[f.key], 'cf')).join('')}<div><button class="btn btn-ocean btn-sm" type="submit">Save contact details</button></div></form></section>`;
   main.appendChild(top);
   $('#sw-reg', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('regOpen', on); toast(on ? 'Registration is open' : 'Registration is closed', 'good'); });
   $('#sw-card', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('cardsOpen', on); toast(on ? 'Cards can be downloaded' : 'Cards are hidden', 'good'); });
