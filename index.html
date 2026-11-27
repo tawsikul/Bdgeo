@@ -426,7 +426,7 @@ dialog.dlg[open]{animation:rise .3s ease both}
 .mini.del{color:#b93a26}
 .filters{display:grid;gap:10px;grid-template-columns:1fr 1fr}
 .filters > :first-child{grid-column:1/-1}
-@media(min-width:760px){.filters{grid-template-columns:2fr 1fr 1fr 1fr}.filters > :first-child{grid-column:auto}}
+@media(min-width:760px){.filters{grid-template-columns:2fr 1fr 1fr 1fr 1fr}.filters > :first-child{grid-column:auto}}
 .scanbox{aspect-ratio:4/3;background:#000;border-radius:16px;overflow:hidden}
 .scanbox video{width:100%;height:100%;object-fit:cover;display:block}
 .scanres{padding:14px 16px;border-radius:14px;background:var(--foam);min-height:92px;display:grid;gap:2px;align-content:center}
@@ -2038,6 +2038,21 @@ const Sound = (() => {
    so the pages themselves do not have to change. */
 const DIVISIONS = ['Barishal', 'Chattogram', 'Dhaka', 'Khulna', 'Mymensingh', 'Rajshahi', 'Rangpur', 'Sylhet'];
 const CLASSES = [6, 7, 8, 9, 10, 11, 12];
+/* the 64 districts, under their divisions */
+const DISTRICTS = {
+  Barishal: ['Barguna', 'Barishal', 'Bhola', 'Jhalokathi', 'Patuakhali', 'Pirojpur'],
+  Chattogram: ['Bandarban', 'Brahmanbaria', 'Chandpur', 'Chattogram', "Cox's Bazar", 'Cumilla', 'Feni', 'Khagrachhari', 'Lakshmipur', 'Noakhali', 'Rangamati'],
+  Dhaka: ['Dhaka', 'Faridpur', 'Gazipur', 'Gopalganj', 'Kishoreganj', 'Madaripur', 'Manikganj', 'Munshiganj', 'Narayanganj', 'Narsingdi', 'Rajbari', 'Shariatpur', 'Tangail'],
+  Khulna: ['Bagerhat', 'Chuadanga', 'Jashore', 'Jhenaidah', 'Khulna', 'Kushtia', 'Magura', 'Meherpur', 'Narail', 'Satkhira'],
+  Mymensingh: ['Jamalpur', 'Mymensingh', 'Netrokona', 'Sherpur'],
+  Rajshahi: ['Bogura', 'Chapai Nawabganj', 'Joypurhat', 'Naogaon', 'Natore', 'Pabna', 'Rajshahi', 'Sirajganj'],
+  Rangpur: ['Dinajpur', 'Gaibandha', 'Kurigram', 'Lalmonirhat', 'Nilphamari', 'Panchagarh', 'Rangpur', 'Thakurgaon'],
+  Sylhet: ['Habiganj', 'Moulvibazar', 'Sunamganj', 'Sylhet'],
+};
+const ALL_DISTRICTS = Object.values(DISTRICTS).flat().sort((a, b) => a.localeCompare(b));
+const divisionOf = d => DIVISIONS.find(v => DISTRICTS[v].includes(d)) || '';
+/* where a student is from, in a few words: "Gazipur, Dhaka division", or just the division for an older account with no district yet */
+const placeOf = u => (u.district ? (u.district === u.region ? `${u.district} district` : `${u.district}, ${u.region} division`) : (u.region || 'Not given'));
 const ROUNDS = ['Regional round', 'National round', 'Training camp', 'Team Bangladesh'];
 const RES_CATS = ['Physical geography', 'Human geography', 'Environment', 'Maps and skills', 'Past papers'];
 const TEAM_GROUPS = ['Organising team', 'Hosts and partners', 'Website'];
@@ -2077,7 +2092,7 @@ const QUIZ_POOL = [
 
 function seed() {
   const P = (name, klass, region, institution, email, extra = {}) => ({
-    id: uid('u'), role: 'participant', name, email, phone: '', institution, klass, category: categoryFor(klass), region,
+    id: uid('u'), role: 'participant', name, email, phone: '', institution, klass, category: categoryFor(klass), region, district: region,
     regNo: '', createdAt: dAt(-Math.ceil(Math.random() * 9), 14), pass: hashPw('geo12345'), selected: [], sample: true, ...extra,
   });
   const users = [
@@ -2106,7 +2121,7 @@ function seed() {
     return { id: uid('a'), examId: practice.id, userId: u.id, startedAt: dAt(-1, 10 + i), submittedAt: dAt(-1, 10 + i, 6), answers, score: answers.filter((a, qi) => a === practice.questions[qi].answer).length, secs: 300 + i * 37 };
   });
   return {
-    v: 5,
+    v: 6,
     settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', seq: users.length - 1 },
     users,
     notices: [
@@ -2193,7 +2208,7 @@ const Store = (() => {
     return m;
   };
   const ok = r => { if (r.error) throw new Error(friendly(r.error)); return r.data; };
-  const mapUser = p => ({ id: p.id, role: p.role, name: p.name, email: p.email, phone: p.phone, institution: p.institution, klass: p.klass, category: p.category, region: p.region, regNo: p.reg_no, createdAt: p.created_at, selected: p.selected || [] });
+  const mapUser = p => ({ id: p.id, role: p.role, name: p.name, email: p.email, phone: p.phone, institution: p.institution, klass: p.klass, category: p.category, region: p.region, district: p.district || '', regNo: p.reg_no, createdAt: p.created_at, selected: p.selected || [] });
   const mapAttempt = a => ({ id: a.id, examId: a.exam_id, userId: a.user_id, startedAt: a.started_at, deadline: a.deadline, submittedAt: a.submitted_at, answers: a.answers || [], score: a.score, secs: a.secs });
   const mapMsg = m => ({ id: m.id, userId: m.user_id, title: m.title, body: m.body, kind: m.kind, at: m.at });
   const mapMail = m => ({ id: m.id, to: m.to_email, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at, sentAt: m.sent_at, error: m.error, cardUrl: m.card_url || '' });
@@ -2213,7 +2228,7 @@ const Store = (() => {
   async function refresh() {
     const sess = ok(await sb.auth.getSession()).session, authed = !!sess;
     const [settings, content, exams] = await Promise.all([sb.from('settings').select('data').eq('id', 1).maybeSingle().then(ok), fetchAll('content', ['kind', 'id']), fetchAll('exams', ['id'])]);
-    const fresh = { v: 5, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
+    const fresh = { v: 6, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
       users: [], notices: [], news: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [] };
     content.forEach(r => { if (KINDS.includes(r.kind)) fresh[r.kind].push({ ...r.data, id: r.id }); });
     let qs = [], keys = []; cardMail = null;
@@ -2249,7 +2264,7 @@ const Store = (() => {
     init() {
       if (CLOUD) return refresh();
       db = read(KEY);
-      if (!db || db.v !== 5) { db = seed(); save(); }
+      if (!db || db.v !== 6) { db = seed(); save(); }
       db.attendance = db.attendance || []; db.news = db.news || [];
       session = read(SKEY);
       if (session && !db.users.some(u => u.id === session)) session = null;
@@ -2282,7 +2297,7 @@ const Store = (() => {
       if (String(d.password).length < 8) return { error: 'Choose a password with at least 8 characters.' };
       if (CLOUD) return (async () => {
         try {
-          const r = await sb.auth.signUp({ email, password: d.password, options: { emailRedirectTo: location.origin + location.pathname, data: { name: d.name.trim(), phone: d.phone.trim(), institution: d.institution.trim(), klass: +d.klass, region: d.region } } });
+          const r = await sb.auth.signUp({ email, password: d.password, options: { emailRedirectTo: location.origin + location.pathname, data: { name: d.name.trim(), phone: d.phone.trim(), institution: d.institution.trim(), klass: +d.klass, region: d.region, district: d.district || '' } } });
           if (r.error) return { error: friendly(r.error) };
           if (!r.data.session) return { confirm: true, email };
           await refresh(); const u = me();
@@ -2291,7 +2306,7 @@ const Store = (() => {
       })();
       if (db.users.some(x => x.email.toLowerCase() === email)) return { error: 'An account with this email already exists. Log in instead.' };
       db.settings.seq += 1;
-      const u = { id: uid('u'), role: 'participant', name: d.name.trim(), email, phone: d.phone.trim(), institution: d.institution.trim(), klass: +d.klass, category: categoryFor(d.klass), region: d.region,
+      const u = { id: uid('u'), role: 'participant', name: d.name.trim(), email, phone: d.phone.trim(), institution: d.institution.trim(), klass: +d.klass, category: categoryFor(d.klass), region: d.region, district: d.district || '',
         regNo: REG_PREFIX + String(db.settings.seq).padStart(4, '0'), createdAt: new Date().toISOString(), pass: hashPw(d.password), selected: [] };
       db.users.push(u);
       db.messages.push({ id: uid('m'), userId: u.id, title: 'Welcome to BGeO', body: 'Your registration is complete. Watch the Notices page for dates and venues.', at: new Date().toISOString(), kind: 'info' });
@@ -2303,13 +2318,15 @@ const Store = (() => {
     },
     async updateMe(patch) {
       const u = me(); if (!u) return;
-      if (CLOUD) ok(await sb.from('profiles').update({ name: patch.name, phone: patch.phone || '', institution: patch.institution, klass: +patch.klass, region: patch.region }).eq('id', u.id));
-      Object.assign(u, patch); if (patch.klass) u.category = categoryFor(patch.klass); save();
+      const clean = { name: patch.name, phone: patch.phone || '', institution: patch.institution, klass: +patch.klass, region: patch.region };
+      if (!u.district && patch.district) clean.district = patch.district;   // chosen once; after that only an admin changes it
+      if (CLOUD) ok(await sb.from('profiles').update(clean).eq('id', u.id));
+      Object.assign(u, clean); u.category = categoryFor(clean.klass); save();
     },
     /* an admin corrects a participant's details */
     async updateUser(id, patch) {
       const u = get('users', id); if (!u) return;
-      const clean = { name: patch.name, phone: patch.phone || '', institution: patch.institution, klass: +patch.klass, region: patch.region };
+      const clean = { name: patch.name, phone: patch.phone || '', institution: patch.institution, klass: +patch.klass, region: patch.region, district: patch.district || '' };
       if (CLOUD) ok(await sb.from('profiles').update(clean).eq('id', id));
       Object.assign(u, clean); u.category = categoryFor(clean.klass); save();
     },
@@ -2452,7 +2469,10 @@ const Store = (() => {
       return sb.storage.from('site-files').getPublicUrl(path).data.publicUrl;
     },
     /* true when this student has not been emailed their Regional round card yet */
-    cardMailDue() { const u = me(); return !!(CLOUD && u && u.role === 'participant' && db.settings.cardsOpen && cardMail && !cardMail.sent_at && (cardMail.tries || 0) < 3); },
+    /* the districts whose students can have the Regional admit card: Dhaka until an admin says otherwise; an empty list means every district */
+    cardDistricts() { const l = db.settings.cardDistricts; return Array.isArray(l) ? l : ['Dhaka']; },
+    districtOpen(u) { const l = this.cardDistricts(); return !l.length || (!!u && l.includes(u.district)); },
+    cardMailDue() { const u = me(); return !!(CLOUD && u && u.role === 'participant' && db.settings.cardsOpen && this.districtOpen(u) && cardMail && !cardMail.sent_at && (cardMail.tries || 0) < 3); },
     async sendMyCard(pngBase64) {
       if (!CLOUD) return 'off';
       let r; try { r = await sb.functions.invoke('send-emails', { body: { action: 'card', png: pngBase64 } }); } catch (e) { r = { error: e }; }
@@ -3040,11 +3060,11 @@ function readForm(form, fields) {
 }
 function missing(fields, vals) { return fields.find(f => f.required && (vals[f.key] === '' || vals[f.key] == null)); }
 /* a dialog with a form; resolves with the values, or null if closed */
-function formDialog({ title, fields, values = {}, submit = 'Save', intro }) {
+function formDialog({ title, fields, values = {}, submit = 'Save', intro, mount }) {
   return new Promise(res => {
     let result = null; const px = uid('d');
     const d = openDialog({ title, html: `<form class="form" novalidate>${intro ? `<p class="muted">${esc(intro)}</p>` : ''}${fields.map(f => fieldHtml(f, values[f.key], px)).join('')}<p class="err" role="alert" hidden></p><div class="dlg-actions"><button type="button" class="btn btn-quiet btn-sm" data-close>Cancel</button><button type="submit" class="btn btn-ocean btn-sm">${esc(submit)}</button></div></form>` });
-    const form = $('form', d);
+    const form = $('form', d); if (mount) mount(form);
     form.addEventListener('submit', e => {
       e.preventDefault(); const vals = readForm(form, fields), miss = missing(fields, vals), err = $('.err', form);
       if (miss) { err.textContent = `Please fill in "${miss.label}".`; err.hidden = false; Sound.play('bad'); return; }
@@ -3146,7 +3166,7 @@ function syncChrome(name) {
   const u = Store.me(), b = $('#acct-btn');
   const what = u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login';
   b.innerHTML = `${icon('account', 18)}<span>${what}</span>`; b.setAttribute('aria-label', what); b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
-  const hasCard = !!(u && u.role === 'participant' && Store.db.settings.cardsOpen);
+  const hasCard = cardOpenFor(u);
   $$('.bar-admit').forEach(a => { a.hidden = !hasCard; }); $('.bar').classList.toggle('has-card', hasCard);
   $$('[data-nav="register"]').forEach(a => { a.hidden = !!u; });
   $$('.menu [data-nav="dashboard"]').forEach(a => { a.hidden = !!(u && u.role === 'admin'); });
@@ -3762,7 +3782,8 @@ PAGES.register = () => {
     { key: 'phone', label: 'Mobile number', type: 'tel', required: true, auto: 'tel' },
     { key: 'institution', label: 'School or college', required: true },
     { key: 'klass', label: 'Class', type: 'select', required: true, options: [['', 'Choose your class'], ...CLASSES.map(c => [c, 'Class ' + c])] },
-    { key: 'region', label: 'Region (division)', type: 'select', required: true, options: [['', 'Choose your division'], ...DIVISIONS] },
+    { key: 'region', label: 'Division', type: 'select', required: true, options: [['', 'Choose your division'], ...DIVISIONS] },
+    { key: 'district', label: 'District', type: 'select', required: true, options: [['', 'Choose your division first']] },
     { key: 'password', label: 'Password', type: 'password', required: true, auto: 'new-password', help: 'At least 8 characters.' },
   ];
   return {
@@ -3772,7 +3793,7 @@ PAGES.register = () => {
         <p class="err" role="alert" hidden></p>${previewNote}
         <div class="btnrow"><button class="btn btn-ocean" type="submit">Create my account</button><a class="textlink" href="#login">I already have an account</a></div></form></section></div>`,
     mount(v) {
-      const form = $('#reg-form', v), err = $('.err', form);
+      const form = $('#reg-form', v), err = $('.err', form); linkDistrict(form);
       form.addEventListener('submit', async e => {
         e.preventDefault(); const vals = readForm(form, fields), btn = $('button[type=submit]', form); vals.password = form.elements.password.value;
         const miss = missing(fields, vals); btn.disabled = true;
@@ -3858,7 +3879,7 @@ function drawCard(u, kind) {
   label('Category', c2, 322); value(u.category, c2, 360, 250);
   label('Class', c3, 322); value('Class ' + u.klass, c3, 360, FW - 560);
   rule(386);
-  label('Region', X, 422); value(u.region || 'Not given', X, 460, 270);
+  label(u.district ? 'District' : 'Region', X, 422); value(u.district || u.region || 'Not given', X, 460, 270);
   label('Date of the round', c2, 422); value(ev ? fmtDateTime(ev.at) : 'To be announced', c2, 460, FW - 290, 28);
   rule(486);
   label('School or college', X, 522); g.fillStyle = T.ink; g.font = `600 27px ${body}`;
@@ -3888,9 +3909,21 @@ async function cardBlob(u, kind) {
 }
 /* a one-page A4 PDF: the card at the top, what to do on the day below it. The page is
    drawn as a picture and wrapped in the few lines a PDF file needs, so no library is loaded. */
+/* The division and district boxes of a form work as a pair: choosing a division lists its districts. */
+const districtOptions = (region, now) => { const list = DISTRICTS[region] || (now ? [now] : []); return (list.length ? [['', 'Choose your district']] : [['', 'Choose your division first']]).concat(list.map(x => [x, x])); };
+function linkDistrict(form) {
+  const reg = form.elements.region, dis = form.elements.district; if (!reg || !dis) return;
+  const fill = () => { const keep = dis.value; dis.innerHTML = districtOptions(reg.value).map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join(''); if ((DISTRICTS[reg.value] || []).includes(keep)) dis.value = keep; dis.disabled = !DISTRICTS[reg.value]; };
+  reg.addEventListener('change', fill); fill();
+}
+/* Who has an admit card to open or download. The National card belongs to every student an admin has selected.
+   The Regional card is for the districts the cards are open for (Store.cardDistricts). */
+const regionalOpen = u => !!(u && u.role === 'participant' && Store.db.settings.cardsOpen && Store.districtOpen(u));
+const cardOpenFor = u => !!(u && u.role === 'participant' && Store.db.settings.cardsOpen && (hasNationalCard(u) || Store.districtOpen(u)));
+const cardDistrictWords = () => { const l = Store.cardDistricts(); return l.length === 1 ? `${l[0]} district` : l.length === 2 ? `${l[0]} and ${l[1]} districts` : `${l.slice(0, -1).join(', ')} and ${l[l.length - 1]} districts`; };
 /* the admit card as a PDF, straight from a button: the National card once a student is selected, the Regional one before that */
 function downloadMyCard(btn) {
-  const u = Store.me(); if (!u || u.role !== 'participant' || !Store.db.settings.cardsOpen) { go(u ? 'dashboard' : 'login'); return null; }
+  const u = Store.me(); if (!cardOpenFor(u)) { go(u ? 'dashboard' : 'login'); return null; }
   return busy(btn, async () => { const kind = hasNationalCard(u) ? 'national' : 'regional'; await saveAndTell(`BGeO-${kind === 'national' ? 'national-' : ''}admit-card-${u.regNo}.pdf`, await cardPdf(u, kind)); });
 }
 async function cardPdf(u, kind) {
@@ -3937,7 +3970,7 @@ const DASH = {};
 DASH.dashboard = () => {
   const u = Store.me();
   if (u.role === 'admin') return simplePage('Admin account', 'You are logged in as an admin. The admin portal is where you manage the olympiad. The Exams and Resources tabs above show what students see.', '#admin', 'Open the admin portal');
-  const msgs = Store.messagesFor(u.id), s = Store.db.settings, national = hasNationalCard(u), ev = Store.nextEvent();
+  const msgs = Store.messagesFor(u.id), s = Store.db.settings, national = hasNationalCard(u), regional = regionalOpen(u), ev = Store.nextEvent();
   const done = Store.all('attempts').filter(a => a.userId === u.id && a.submittedAt).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
   const live = Store.all('exams').filter(e => e.published && Store.examState(e) === 'live').length;
   const cardBox = (kind, title, note) => { const id = kind === 'national' ? 'card-nat' : 'card'; return `<div class="cardbox"><div><h3>${title}</h3><p class="muted">${note}</p></div><div class="cardprev" id="${id}"></div>
@@ -3946,7 +3979,7 @@ DASH.dashboard = () => {
     html: `<div class="wrap">
       <header class="acct-head">
         <span class="avatar avatar-lg" aria-hidden="true">${esc(initials(u.name))}</span>
-        <div class="acct-who"><h1>${esc(u.name)}</h1><p>Registration number ${esc(u.regNo)}, ${esc(u.category)}, Class ${esc(u.klass)}, ${esc(u.region)}</p>
+        <div class="acct-who"><h1>${esc(u.name)}</h1><p>Registration number ${esc(u.regNo)}, ${esc(u.category)}, Class ${esc(u.klass)}, ${esc(placeOf(u))}</p>
           <div class="chips"><span class="chip chip-live">${icon('check', 14)} Registered</span>${(u.selected || []).map(x => `<span class="chip chip-soon">Selected: ${esc(x.round)}</span>`).join('')}${Store.all('attendance').filter(a => a.userId === u.id).map(a => `<span class="chip chip-live">Present: ${esc(a.session)}</span>`).join('')}</div></div>
       </header>
       <div class="dash-facts">
@@ -3957,8 +3990,12 @@ DASH.dashboard = () => {
       <div class="acct-grid">
         <div class="acct-main">
           <section class="sheet"><h2>${national ? 'Admit cards' : 'Admit card'}</h2>
-            ${s.cardsOpen ? `<div class="stack-lg" style="margin-top:14px">${national ? cardBox('national', 'National round', 'For the final. Bring this card to the national venue.') : ''}${cardBox('regional', 'Regional round', 'Bring this card to your Regional round. The organisers scan the QR code.')}</div>`
-              : '<p class="note" style="margin-top:12px">Cards are not released yet. You will get a notice when yours is ready.</p>'}</section>
+            ${!u.district ? `<form class="note" id="pick-district" style="margin-top:12px"><p><b>Choose your district.</b> Your admit card depends on it, and it can only be set once.</p>
+                <div class="btnrow" style="margin-top:10px"><select name="district" aria-label="District" required><option value="">Choose your district</option>${ALL_DISTRICTS.map(x => `<option>${esc(x)}</option>`).join('')}</select><button type="submit" class="btn btn-ocean btn-sm">Save my district</button></div></form>` : ''}
+            ${!s.cardsOpen ? '<p class="note" style="margin-top:12px">Cards are not released yet. You will get a notice when yours is ready.</p>'
+              : (national || regional) ? `<div class="stack-lg" style="margin-top:14px">${national ? cardBox('national', 'National round', 'For the final. Bring this card to the national venue.') : ''}${regional ? cardBox('regional', 'Regional round', 'Bring this card to your Regional round. The organisers scan the QR code.') : ''}</div>`
+              : u.district ? `<p class="note" style="margin-top:12px">Admit cards are open for ${esc(cardDistrictWords())} only right now. You are registered from ${esc(u.district)}. Your card will appear here when your district opens.</p>`
+              : `<p class="note" style="margin-top:12px">Admit cards are open for ${esc(cardDistrictWords())} only right now.</p>`}</section>
         </div>
         <aside class="acct-side">
           <section class="sheet"><h2>My notices</h2><div class="stack" style="margin-top:12px">${msgs.map(m => `<div class="msg ${m.kind === 'selected' ? 'sel' : ''}"><h3>${esc(m.title)}</h3><p>${esc(m.body)}</p><small class="muted">${fmtDateTime(m.at)}</small></div>`).join('') || '<p class="muted">No personal notices yet.</p>'}</div></section>
@@ -3975,6 +4012,11 @@ DASH.dashboard = () => {
         $('#' + id + '-dl', v).onclick = e => busy(e.currentTarget, async () => saveAndTell(file + '.png', await cardBlob(u, kind)));
         $('#' + id + '-pdf', v).onclick = e => busy(e.currentTarget, async () => saveAndTell(file + '.pdf', await cardPdf(u, kind)));
       };
+      const pd = $('#pick-district', v);
+      if (pd) pd.addEventListener('submit', e => {
+        e.preventDefault(); const dist = pd.elements.district.value; if (!dist) return;
+        busy($('button', pd), async () => { await Store.updateMe({ name: u.name, phone: u.phone, institution: u.institution, klass: u.klass, region: divisionOf(dist) || u.region, district: dist }); toast('District saved', 'good'); render(); });
+      });
       show('card', 'regional', `BGeO-admit-card-${u.regNo}`); show('card-nat', 'national', `BGeO-national-admit-card-${u.regNo}`);
     },
   };
@@ -3985,16 +4027,18 @@ DASH['dashboard-me'] = () => {
   const u = Store.me();
   return {
     html: `<div class="wrap narrow">${pageHead('My details', 'These details are printed on your admit card.')}
-      <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Registration number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Mobile</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Region</dt><dd>${esc(u.region)}</dd><dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
+      <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Registration number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Mobile</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Division</dt><dd>${esc(u.region || 'Not given')}</dd><dt>District</dt><dd>${esc(u.district || 'Not chosen yet')}</dd><dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
         <div style="margin-top:16px"><button type="button" class="btn btn-ocean" id="edit-me">${icon('edit', 18)} Edit details</button></div></section>
       <section class="sheet"><h2>Payment</h2><p class="muted" style="margin-top:8px">Online payment is not open yet. The organisers will announce it in Notices.</p></section>
     </div>`,
     mount(v) {
       $('#edit-me', v).onclick = async () => {
         const fields = [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
-          { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) }, { key: 'region', label: 'Region (division)', type: 'select', options: DIVISIONS }];
-        const vals = await formDialog({ title: 'Edit my details', fields, values: u, submit: 'Save changes' });
-        if (vals) { vals.klass = +vals.klass; try { await Store.updateMe(vals); toast('Changes saved', 'good'); render(); } catch (e) { toast(e.message, 'bad'); } }
+          { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) }]
+          /* the district is chosen once: after that it and its division are fixed, and only the organisers can change them */
+          .concat(u.district ? [] : [{ key: 'region', label: 'Division', type: 'select', required: true, options: [['', 'Choose your division'], ...DIVISIONS] }, { key: 'district', label: 'District', type: 'select', required: true, options: districtOptions(u.region), help: 'This can only be set once.' }]);
+        const vals = await formDialog({ title: 'Edit my details', fields, values: u, submit: 'Save changes', mount: linkDistrict, intro: u.district ? `Your district is ${u.district}. To change it, write to the organisers.` : '' });
+        if (vals) { vals.klass = +vals.klass; if (u.district) vals.region = u.region; try { await Store.updateMe(vals); toast('Changes saved', 'good'); render(); } catch (e) { toast(e.message, 'bad'); } }
       };
     },
   };
@@ -4007,7 +4051,7 @@ function renderDash(name) {
   const root = $('#dash'), u = Store.me(), isExam = name.startsWith('exam-');
   const tab = isExam ? 'dashboard-exams' : DASH_TABS.some(t => t[0] === name) ? name : 'dashboard';
   root.innerHTML = `<header class="dash-top"><a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, public site"><img src="${LOGO_FULL}" alt="" width="560" height="263"></a><b>${u.role === 'admin' ? 'Dashboard preview' : 'Dashboard'}</b>
-      <div class="sp">${u.role === 'participant' && Store.db.settings.cardsOpen ? `<button type="button" class="btn btn-lime btn-sm" id="dash-card">Admit card ${icon('download', 16)}</button>` : ''}<a class="btn btn-ghost btn-sm" href="#home" aria-label="Public site">${icon('globe', 18)}<span>Public site</span></a><button type="button" class="iconbtn" id="logout" aria-label="Log out" title="Log out">${icon('out')}</button></div></header>
+      <div class="sp">${cardOpenFor(u) ? `<button type="button" class="btn btn-lime btn-sm" id="dash-card">Admit card ${icon('download', 16)}</button>` : ''}<a class="btn btn-ghost btn-sm" href="#home" aria-label="Public site">${icon('globe', 18)}<span>Public site</span></a><button type="button" class="iconbtn" id="logout" aria-label="Log out" title="Log out">${icon('out')}</button></div></header>
     <nav class="dash-tabs" aria-label="Dashboard sections">${DASH_TABS.map(t => `<a href="#${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${icon(t[2], 18)} ${t[1]}</a>`).join('')}</nav>
     <main id="dash-view"></main>`;
   $('#logout', root).onclick = async () => { await Store.signOut(); toast('You are logged out'); go('home'); };
@@ -4188,8 +4232,9 @@ ADMIN.admin = main => {
       ${next ? `<p><b>${esc(next.label)}</b> ${sampleChip(next)}<br><span class="muted">${fmtDateTime(next.at)}, in ${shortSpan(new Date(next.at) - Date.now()).replace(/ \d+m \d+s$/, '')}. The public countdown points at this date.</span></p>` : '<p class="muted">No upcoming date is set, so the countdown page is empty.</p>'}</section>
     <section class="panel"><h2>By category</h2>${barsHtml(countBy(ps, 'category', ['Junior', 'Secondary', 'Higher secondary']))}</section>
     <section class="panel"><h2>By region</h2>${barsHtml(countBy(ps, 'region', DIVISIONS))}</section>
+    <section class="panel"><h2>By district</h2>${(() => { const rows = countBy(ps.map(p => ({ district: p.district || 'Not chosen yet' })), 'district').sort((a, b) => b[1] - a[1]); return rows.length ? barsHtml(rows.slice(0, 12)) + (rows.length > 12 ? `<p class="muted" style="margin-top:8px">And ${plural(rows.length - 12, 'more district')}.</p>` : '') : '<p class="muted">No participants yet.</p>'; })()}</section>
     <section class="panel"><div class="panel-head"><h2>Newest sign-ups</h2><a class="btn btn-quiet btn-sm" href="#admin-people">All participants</a></div>
-      <div>${ps.slice(0, 5).map(p => `<div class="rowi"><div class="grow"><h3>${esc(p.name)} ${sampleChip(p)}</h3><p>${esc(p.regNo)}, Class ${esc(p.klass)}, ${esc(p.region)}</p></div><small class="muted">${fmtDate(p.createdAt)}</small></div>`).join('') || '<p class="empty">Nobody has registered yet.</p>'}</div></section>`;
+      <div>${ps.slice(0, 5).map(p => `<div class="rowi"><div class="grow"><h3>${esc(p.name)} ${sampleChip(p)}</h3><p>${esc(p.regNo)}, Class ${esc(p.klass)}, ${esc(placeOf(p))}</p></div><small class="muted">${fmtDate(p.createdAt)}</small></div>`).join('') || '<p class="empty">Nobody has registered yet.</p>'}</div></section>`;
 };
 
 /* ---------- participants ---------- */
@@ -4207,7 +4252,7 @@ function personDialog(p, after) {
   const tries = Store.all('attempts').filter(a => a.userId === p.id && a.submittedAt);
   const d = openDialog({ title: p.name, html: `
     <dl class="kv"><dt>Registration no.</dt><dd>${esc(p.regNo)}</dd><dt>Email</dt><dd>${esc(p.email)}</dd><dt>Mobile</dt><dd>${esc(p.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(p.institution)}</dd>
-      <dt>Class</dt><dd>Class ${esc(p.klass)} (${esc(p.category)})</dd><dt>Region</dt><dd>${esc(p.region)}</dd><dt>Registered</dt><dd>${fmtDateTime(p.createdAt)}</dd>
+      <dt>Class</dt><dd>Class ${esc(p.klass)} (${esc(p.category)})</dd><dt>Division</dt><dd>${esc(p.region || 'Not given')}</dd><dt>District</dt><dd>${esc(p.district || 'Not chosen yet')}</dd><dt>Registered</dt><dd>${fmtDateTime(p.createdAt)}</dd>
       <dt>Selected for</dt><dd>${(p.selected || []).map(s => esc(s.round)).join(', ') || 'Nothing yet'}</dd>
       <dt>Attendance</dt><dd id="pd-att"></dd>
       <dt>Online exams</dt><dd>${tries.map(a => { const ex = Store.get('exams', a.examId); return ex ? `${esc(ex.title)}: ${a.score}/${ex.questions.length}` : ''; }).filter(Boolean).join('<br>') || 'None finished'}</dd></dl>
@@ -4223,20 +4268,21 @@ function personDialog(p, after) {
   };
   $('[data-sel]', d).onclick = () => { d.close(); selectDialog([p.id], after); };
   $('[data-ed]', d).onclick = async () => {
-    const v = await formDialog({ title: 'Edit ' + p.name, submit: 'Save changes', values: p, fields: [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
-      { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) }, { key: 'region', label: 'Region (division)', type: 'select', options: DIVISIONS }] });
+    const v = await formDialog({ title: 'Edit ' + p.name, submit: 'Save changes', values: p, mount: linkDistrict, fields: [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
+      { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) }, { key: 'region', label: 'Division', type: 'select', options: DIVISIONS }, { key: 'district', label: 'District', type: 'select', options: districtOptions(p.region, p.district) }] });
     if (v) busy(null, async () => { await Store.updateUser(p.id, v); d.close(); toast('Changes saved', 'good'); after(); });
   };
   const un = $('[data-unsel]', d); if (un) un.onclick = () => busy(un, async () => { for (const s of (p.selected || []).slice()) await Store.unselect([p.id], s.round); d.close(); toast('Selection cleared'); after(); });
   $('[data-rm]', d).onclick = async () => { if (await confirmDialog(`Remove ${p.name} and all of their exam attempts? This cannot be undone.`, 'Remove', true)) busy(null, async () => { await Store.removeUser(p.id); d.close(); toast('Participant removed'); after(); }); };
 }
 ADMIN['admin-people'] = main => {
-  const picked = new Set(); const f = { q: '', cat: '', region: '', sel: '' };
+  const picked = new Set(); const f = { q: '', cat: '', region: '', district: '', sel: '' };
   main.innerHTML = `<section class="panel"><div class="panel-head"><h2>Participants</h2><button type="button" class="btn btn-quiet btn-sm" id="p-csv">${icon('download', 18)} Export list</button></div>
       <div class="filters">
         <div class="field"><label for="p-q">Search</label><input id="p-q" type="search" placeholder="Name, email, school or registration no."></div>
         <div class="field"><label for="p-cat">Category</label><select id="p-cat"><option value="">All</option>${['Junior', 'Secondary', 'Higher secondary'].map(c => `<option>${c}</option>`).join('')}</select></div>
         <div class="field"><label for="p-reg">Region</label><select id="p-reg"><option value="">All</option>${DIVISIONS.map(c => `<option>${c}</option>`).join('')}</select></div>
+        <div class="field"><label for="p-dist">District</label><select id="p-dist"><option value="">All</option><option value="-">Not chosen yet</option>${ALL_DISTRICTS.map(c => `<option>${esc(c)}</option>`).join('')}</select></div>
         <div class="field"><label for="p-sel">Status</label><select id="p-sel"><option value="">All</option><option value="yes">Selected</option><option value="no">Not selected</option></select></div>
       </div>
       <label class="check" for="p-all"><input type="checkbox" id="p-all"><span id="p-count"></span></label>
@@ -4245,20 +4291,21 @@ ADMIN['admin-people'] = main => {
   const list = $('#p-list', main), bulk = $('#p-bulk', main);
   const shown = () => Store.participants().filter(p => {
     const hay = `${p.name} ${p.email} ${p.institution} ${p.regNo}`.toLowerCase(), isSel = (p.selected || []).length > 0;
-    return (!f.q || hay.includes(f.q)) && (!f.cat || p.category === f.cat) && (!f.region || p.region === f.region) && (!f.sel || (f.sel === 'yes') === isSel);
+    return (!f.q || hay.includes(f.q)) && (!f.cat || p.category === f.cat) && (!f.region || p.region === f.region) && (!f.district || (f.district === '-' ? !p.district : p.district === f.district)) && (!f.sel || (f.sel === 'yes') === isSel);
   });
   const draw = () => {
     const rows = shown(); [...picked].forEach(id => { if (!Store.get('users', id)) picked.delete(id); });
     $('#p-count', main).textContent = `Tick all ${rows.length} shown`;
     $('#p-all', main).checked = rows.length > 0 && rows.every(p => picked.has(p.id));
     list.innerHTML = rows.map(p => `<div class="rowi"><input type="checkbox" class="pcheck" data-pick="${p.id}" aria-label="Tick ${esc(p.name)}"${picked.has(p.id) ? ' checked' : ''}>
-      <button type="button" class="plink grow" data-open="${p.id}"><h3>${esc(p.name)} ${sampleChip(p)}</h3><p>${esc(p.regNo)}, Class ${esc(p.klass)} (${esc(p.category)}), ${esc(p.region)}</p><p>${esc(p.institution)}</p>
+      <button type="button" class="plink grow" data-open="${p.id}"><h3>${esc(p.name)} ${sampleChip(p)}</h3><p>${esc(p.regNo)}, Class ${esc(p.klass)} (${esc(p.category)}), ${esc(placeOf(p))}</p><p>${esc(p.institution)}</p>
       <span class="notice-meta">${(p.selected || []).map(s => `<span class="chip chip-live">Selected: ${esc(s.round)}</span>`).join('')}</span></button></div>`).join('') || '<p class="empty">No participants match these filters.</p>';
     bulk.hidden = picked.size === 0; $('#p-n', main).textContent = `${picked.size} ticked`;
   };
   $('#p-q', main).addEventListener('input', e => { f.q = e.target.value.trim().toLowerCase(); draw(); });
   $('#p-cat', main).addEventListener('change', e => { f.cat = e.target.value; draw(); });
   $('#p-reg', main).addEventListener('change', e => { f.region = e.target.value; draw(); });
+  $('#p-dist', main).addEventListener('change', e => { f.district = e.target.value; draw(); });
   $('#p-sel', main).addEventListener('change', e => { f.sel = e.target.value; draw(); });
   $('#p-all', main).addEventListener('change', e => { shown().forEach(p => (e.target.checked ? picked.add(p.id) : picked.delete(p.id))); Sound.play('pick'); draw(); });
   main.addEventListener('change', e => { const c = e.target.closest('[data-pick]'); if (!c) return; c.checked ? picked.add(c.dataset.pick) : picked.delete(c.dataset.pick); Sound.play('pick'); draw(); });
@@ -4267,8 +4314,8 @@ ADMIN['admin-people'] = main => {
   $('#p-mark', main).onclick = () => selectDialog([...picked], () => { picked.clear(); draw(); });
   $('#p-csv', main).onclick = () => {
     const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
-    const lines = [['Registration no', 'Name', 'Email', 'Mobile', 'School', 'Class', 'Category', 'Region', 'Registered', 'Selected for'].map(q).join(',')]
-      .concat(shown().map(p => [p.regNo, p.name, p.email, p.phone, p.institution, p.klass, p.category, p.region, fmtDateTime(p.createdAt), (p.selected || []).map(s => s.round).join('; ')].map(q).join(',')));
+    const lines = [['Registration no', 'Name', 'Email', 'Mobile', 'School', 'Class', 'Category', 'Region', 'District', 'Registered', 'Selected for'].map(q).join(',')]
+      .concat(shown().map(p => [p.regNo, p.name, p.email, p.phone, p.institution, p.klass, p.category, p.region, p.district || '', fmtDateTime(p.createdAt), (p.selected || []).map(s => s.round).join('; ')].map(q).join(',')));
     saveAndTell('bgeo-participants.csv', new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv' }));
   };
   draw();
@@ -4378,7 +4425,7 @@ ADMIN['admin-attend'] = main => {
     const rf = $('#at-refresh', main); if (rf) rf.onclick = () => busy(rf, async () => { await Store.loadAttendance(); draw(); toast('Latest attendance loaded', 'good'); });
     $('#at-csv', main).onclick = () => {
       const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-      const lines = [['Registration no', 'Name', 'School', 'Class', 'Region', 'Marked present'].map(q).join(',')].concat(rows.map(x => [x.u.regNo, x.u.name, x.u.institution, x.u.klass, x.u.region, fmtDateTime(x.a.at)].map(q).join(',')));
+      const lines = [['Registration no', 'Name', 'School', 'Class', 'Region', 'District', 'Marked present'].map(q).join(',')].concat(rows.map(x => [x.u.regNo, x.u.name, x.u.institution, x.u.klass, x.u.region, x.u.district || '', fmtDateTime(x.a.at)].map(q).join(',')));
       saveAndTell('bgeo-attendance.csv', new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv' }));
     };
   };
@@ -4704,6 +4751,7 @@ function audienceOptions() {
   const ps = Store.participants(), opts = [['all', `All participants (${ps.length})`]];
   ['Junior', 'Secondary', 'Higher secondary'].forEach(c => { const k = ps.filter(p => p.category === c).length; if (k) opts.push(['cat:' + c, `${c} category (${k})`]); });
   DIVISIONS.forEach(d => { const k = ps.filter(p => p.region === d).length; if (k) opts.push(['reg:' + d, `${d} region (${k})`]); });
+  ALL_DISTRICTS.forEach(d => { const k = ps.filter(p => p.district === d).length; if (k) opts.push(['dis:' + d, `${d} district (${k})`]); });
   ROUNDS.forEach(r => { const k = ps.filter(p => (p.selected || []).some(x => x.round === r)).length; if (k) opts.push(['sel:' + r, `Selected for the ${r} (${k})`]); });
   return opts;
 }
@@ -4711,6 +4759,7 @@ function audience(key) {
   const ps = Store.participants(), v = key.slice(4);
   if (key.startsWith('cat:')) return ps.filter(p => p.category === v);
   if (key.startsWith('reg:')) return ps.filter(p => p.region === v);
+  if (key.startsWith('dis:')) return ps.filter(p => p.district === v);
   if (key.startsWith('sel:')) return ps.filter(p => (p.selected || []).some(x => x.round === v));
   return ps;
 }
@@ -4729,11 +4778,19 @@ ADMIN['admin-site'] = main => {
   const top = document.createElement('div'); top.className = 'stack'; top.style.gap = '16px';
   top.innerHTML = `<section class="panel"><h2>Switches</h2>
       <label class="check" for="sw-reg"><input type="checkbox" id="sw-reg"${s.regOpen ? ' checked' : ''}><span>Registration is open</span></label>
-      <label class="check" for="sw-card"><input type="checkbox" id="sw-card"${s.cardsOpen ? ' checked' : ''}><span>Students can download their registration card</span></label></section>
+      <label class="check" for="sw-card"><input type="checkbox" id="sw-card"${s.cardsOpen ? ' checked' : ''}><span>Students can download their admit card</span></label>
+      <form class="form" id="cd" novalidate style="margin-top:14px"><div class="field"><label for="cd-list">Admit cards are only for these districts</label><input id="cd-list" name="list" value="${esc(Store.cardDistricts().join(', '))}" placeholder="Every district"><small>Write district names with commas between them, for example: Dhaka, Gazipur. Leave it empty to give the card to every district. A student selected for the National round always gets the National card.</small></div>
+        <p class="err" role="alert" hidden></p><div><button class="btn btn-ocean btn-sm" type="submit">Save districts</button></div></form></section>
     <section class="panel"><h2>Contact details</h2><form class="form" id="cf" novalidate>${cf.map(f => fieldHtml(f, s[f.key], 'cf')).join('')}<div><button class="btn btn-ocean btn-sm" type="submit">Save contact details</button></div></form></section>`;
   main.appendChild(top);
   $('#sw-reg', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('regOpen', on); toast(on ? 'Registration is open' : 'Registration is closed', 'good'); });
   $('#sw-card', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('cardsOpen', on); toast(on ? 'Cards can be downloaded' : 'Cards are hidden', 'good'); });
+  $('#cd', top).addEventListener('submit', e => {
+    e.preventDefault(); const err = $('.err', e.target), names = e.target.elements.list.value.split(/[,\n]/).map(x => x.trim()).filter(Boolean);
+    const list = [], bad = []; names.forEach(n => { const hit = ALL_DISTRICTS.find(d => d.toLowerCase() === n.toLowerCase()); if (!hit) bad.push(n); else if (!list.includes(hit)) list.push(hit); });
+    if (bad.length) { err.textContent = `"${bad[0]}" is not one of the 64 districts. Check the spelling, for example Chattogram, Cumilla, Jashore, Bogura, Barishal.`; err.hidden = false; Sound.play('bad'); return; }
+    err.hidden = true; busy($('button', e.target), async () => { await Store.setting('cardDistricts', list); e.target.elements.list.value = list.join(', '); toast(list.length ? `Admit cards are for ${plural(list.length, 'district')}` : 'Admit cards are for every district', 'good'); });
+  });
   $('#cf', top).addEventListener('submit', e => { e.preventDefault(); const v = readForm(e.target, cf); busy($('button', e.target), async () => { for (const [k, val] of Object.entries(v)) await Store.setting(k, val); toast('Contact details saved', 'good'); }); });
   main.appendChild(crudPanel({ table: 'team', title: 'Team and partners', addLabel: 'Add a person or partner',
     fields: [{ key: 'name', label: 'Name', required: true }, { key: 'role', label: 'Role', required: true, placeholder: 'For example: Convener' }, { key: 'group', label: 'Section', type: 'select', options: TEAM_GROUPS }],
