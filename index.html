@@ -25,6 +25,8 @@
   --display:"Anek Bangla","Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
   --body:"Hind Siliguri","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --r-md:14px; --r-lg:22px; --bar-h:62px;
+  /* motion: one ease-out for the interface, one for things arriving; nothing bounces or overshoots */
+  --ease:cubic-bezier(.2,.8,.2,1); --ease-enter:cubic-bezier(.22,1,.36,1); --m-in:.15s; --m-out:.12s; --m-press:.09s;
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -60,25 +62,31 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .bar-links{display:none;align-items:center;gap:0;min-width:0}
 .bar-links > a,.dd-btn{display:inline-flex;align-items:center;gap:4px;padding:8px clamp(6px,.95vw,12px);border:0;border-radius:10px;background:none;text-decoration:none;font:600 clamp(.9rem,1.75vw,.97rem)/1.3 var(--body);white-space:nowrap;color:#fff;cursor:pointer}
 .dd{position:relative;flex:none}
-.dd-btn[aria-expanded="true"],.dd-btn:hover,.bar-links > a:hover{background:rgba(255,255,255,.1)}
+.bar-links > a,.dd-btn{position:relative}
+.bar-links > a::after,.dd-btn::after{content:"";position:absolute;left:clamp(6px,.95vw,12px);right:clamp(6px,.95vw,12px);bottom:3px;height:2px;border-radius:2px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform var(--m-in) var(--ease)}
+.bar-links > a[aria-current="page"]::after,.dd.here .dd-btn::after,.dd-btn[aria-expanded="true"]::after{transform:scaleX(1)}
 .dd.here .dd-btn{color:var(--lime)}
 .dd-btn[aria-expanded="true"] .ic{transform:rotate(180deg)}
 .dd-menu{position:absolute;left:0;top:calc(100% + 12px);z-index:45;min-width:220px;display:grid;gap:2px;padding:8px;border-radius:14px;background:#fff;box-shadow:0 22px 50px -18px rgba(2,20,60,.75);animation:menuIn .18s ease both}
 .dd-menu a{padding:11px 12px;border-radius:9px;text-decoration:none;font-weight:600;color:var(--ink);white-space:nowrap}
 .dd-menu a:hover{background:var(--foam)}
 .dd-menu a[aria-current="page"]{background:#e6effd;color:var(--ocean)}
-.bar-links > a[aria-current="page"]{background:rgba(154,217,111,.22);color:var(--lime)}
+.bar-links > a[aria-current="page"]{color:var(--lime)}
 .bar-tools{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
-.bar-tools .bar-admit{display:none}
+/* the admit card button: a square with the download arrow on a phone or tablet, the full label on a computer */
+.bar .bar-admit{padding:0;width:44px;min-height:44px}
+.bar .bar-admit span{display:none}
 .iconbtn{width:44px;height:44px;border-radius:12px;border:0;display:grid;place-content:center;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,background .2s}
 .iconbtn:active{transform:scale(.9)}
 .iconbtn.dark{background:var(--foam);color:var(--ink)}
 .iconbtn[aria-pressed="false"]{opacity:.7}
-@media(max-width:380px){.bar{gap:6px;padding:0 10px}.bar-tools{gap:6px}.brand img{height:36px}.bar .iconbtn{width:40px;height:40px}}
+@media(max-width:380px){.bar{gap:6px;padding:0 10px}.bar-tools{gap:6px}.brand img{height:36px}.bar .iconbtn,.bar .bar-admit,.bar.has-card #acct-btn{width:40px;height:40px;min-height:40px}}
 @media(min-width:740px){:root{--bar-h:66px}.bar{gap:clamp(6px,1.4vw,22px);padding:0 max(14px,calc((100% - 1080px) / 2))}.bar-links{display:flex}.bar .iconbtn{width:40px;height:40px}}
 @media(min-width:740px) and (max-width:859px){.brand img{height:38px}.bar{gap:8px}.bar-tools{gap:6px}.bar-links > a,.dd-btn{font-size:.875rem;padding-inline:5px}.bar .iconbtn{width:38px;height:38px}.bar .btn-sm{padding:0 10px;gap:5px}}
 .bar.bar-tight .bar-links{display:none}
-@media(min-width:1000px){.bar-links{gap:4px}.bar-tools .bar-admit{display:inline-flex}}
+@media(min-width:740px){.bar .bar-admit{width:40px;min-height:40px}}
+@media(min-width:1000px){.bar-links{gap:4px}.bar .bar-admit{width:auto;min-height:38px;padding:0 14px}.bar .bar-admit span{display:inline}#menu-btn{display:none}.bar.bar-tight #menu-btn{display:grid}}
+@media(max-width:420px){.bar.has-card #acct-btn{width:44px;padding:0}.bar.has-card #acct-btn span{display:none}}
 
 .menu{position:fixed;inset:var(--bar-h) 0 0 0;z-index:39;background:#052057;overflow:auto;padding:18px 16px 40px;animation:menuIn .26s ease both}
 @keyframes menuIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
@@ -86,12 +94,11 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .menu a{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.08);text-decoration:none;font:600 1.02rem/1.2 var(--body)}
 .menu a[aria-current="page"]{background:var(--lime);color:var(--abyss)}
 .menu a.wide{grid-column:1/-1}
-.menu a.menu-admit{background:var(--lime);color:var(--abyss);justify-content:center}
 
 /* buttons */
 /* Flat and even: one weight, a small radius, a hairline border. They darken on hover and dip a pixel when pressed. */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:12px;border:1px solid transparent;font:600 1rem/1 var(--body);letter-spacing:.005em;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s,box-shadow .15s,transform .08s;white-space:nowrap}
-.btn:active{transform:translateY(1px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:12px;border:1px solid transparent;font:600 1rem/1 var(--body);letter-spacing:.005em;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color var(--m-in) var(--ease),border-color var(--m-in) var(--ease),transform var(--m-in) var(--ease),box-shadow var(--m-in) var(--ease)}
+.btn:active{transform:translateY(1px) scale(.985);transition-duration:var(--m-press)}
 .btn-lime{background:var(--lime);color:var(--abyss);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 8px 18px -10px rgba(0,0,0,.55)}
 .btn-lime:hover{background:#a9e381}
 .btn-ocean{background:var(--ocean);color:#fff;box-shadow:0 1px 2px rgba(4,33,79,.25)}
@@ -109,11 +116,9 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 
 /* page frame */
 #view{padding:calc(var(--bar-h) + 4px) 0 56px;outline:none}
-#view > div > .wrap > *{animation:rise .55s cubic-bezier(.2,.8,.2,1) both}
-#view > div > .wrap > *:nth-child(2){animation-delay:.06s}
-#view > div > .wrap > *:nth-child(3){animation-delay:.12s}
-#view > div > .wrap > *:nth-child(n+4){animation-delay:.18s}
-@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.pagehead > *{animation:rise .52s var(--ease-enter) both}
+.pagehead > :nth-child(2){animation-delay:.06s}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .pagehead{padding:30px 0 20px;display:grid;gap:10px}
 .pagehead p{max-width:60ch;color:#d6e5fb;font-size:1.12rem}
 .sheet{background:var(--sheet);color:var(--ink);border-radius:var(--r-lg);padding:22px 20px;box-shadow:0 18px 40px -20px rgba(2,20,60,.6)}
@@ -134,49 +139,88 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .empty{padding:26px 10px;text-align:center;color:var(--ink-soft)}
 
 /* home */
-/* the headline on the left and the Earth beside it on the right, on every screen; on a phone the line of English and the buttons run underneath, full width */
-.hero{padding:22px 0 10px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 10px;align-items:center}
+/* Three grounds, in big blocks: the blue of the design, the bar's deep navy, and a pale sheet for things to read. */
+.home{margin-bottom:-56px}
+.band{padding:clamp(56px,8vw,104px) 0}
+.band h2{max-width:22ch}
+.band .sub{margin-top:clamp(48px,7vw,80px)}
+.ground-deep{background:#052057;padding-bottom:clamp(40px,5vw,60px)}
+.ground-light{background:#f1f5fb;color:var(--ink)}
+.ground-light .sheet{box-shadow:none;border:1px solid var(--line)}
+/* the first screen is the hero alone: the headline on the left, the Earth beside it, and the next date along the bottom */
+.hero-screen > .wrap{min-height:min(calc(100vh - var(--bar-h) - 4px),600px);min-height:min(calc(100svh - var(--bar-h) - 4px),600px);display:grid;grid-template-rows:1fr auto}
+@media(min-width:740px){.hero-screen > .wrap{min-height:calc(100vh - var(--bar-h) - 4px);min-height:calc(100svh - var(--bar-h) - 4px)}}
+.hero{padding:22px 0 26px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 10px;align-items:center;align-content:center}
 .hero-copy{display:contents}
 .hero-copy > *{grid-column:1/-1}
 .hero-copy > .hero-title{grid-column:1;grid-row:1}
-.stage{position:relative;grid-column:2;grid-row:1;justify-self:end;width:min(100%,clamp(104px,33vw,300px));aspect-ratio:1}
+.stage{position:relative;grid-column:2;grid-row:1;justify-self:end;width:min(100%,clamp(104px,33vw,300px));aspect-ratio:1;border-radius:50%;cursor:grab;touch-action:pan-y;-webkit-user-select:none;user-select:none;outline-offset:6px}
+.stage.grabbing{cursor:grabbing}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.stage-hint{display:none}
 /* the headline, as in the logo: white, then the big word in lime, then white with the year in teal */
 .hero-title{display:grid;font-family:var(--display);font-weight:800;line-height:1.16;letter-spacing:0;white-space:nowrap}
-.ht-1{font-size:clamp(1.05rem,4.6vw,2.5rem);color:#fff;padding-left:.7em}
+/* each line rises once out of its own mask; the room above and below the mask keeps the Bangla marks whole */
+.hero-title > span{display:block;overflow:hidden;padding:.24em .06em .14em 0;margin:-.24em 0 -.14em}
+.hero-title i{display:block;font-style:normal;animation:lineUp .7s var(--ease-enter) both}
+.hero-title > :nth-child(2) i{animation-delay:.08s}
+.hero-title > :nth-child(3) i{animation-delay:.16s}
+@keyframes lineUp{from{transform:translateY(112%)}to{transform:none}}
+.hero .lede,.hero .btnrow{animation:rise .52s var(--ease-enter) .42s both}
+.hero .btnrow{animation-delay:.48s}
+.stage.settle canvas{animation:settle .9s var(--ease-enter) both}
+@keyframes settle{from{transform:scale(.96);opacity:.4}to{transform:none;opacity:1}}
+.ht-1{font-size:clamp(1.05rem,4.6vw,2.5rem);color:#fff}
+.hero-title > .ht-1{padding-left:.7em}
 .ht-2{font-size:clamp(2.3rem,11.4vw,6.6rem);color:var(--lime);line-height:1.08}
 .ht-3{font-size:clamp(1.55rem,7.3vw,4.4rem);color:#fff;line-height:1.12}
 .ht-3 b{color:var(--lagoon);font-weight:800}
-.learn{display:inline-flex;align-items:center;gap:6px;min-height:46px;padding:0 6px;color:var(--lime);font-weight:600;text-decoration:none}
-.learn:hover{text-decoration:underline;text-underline-offset:4px}
+.learn{display:inline-flex;align-items:center;gap:7px;min-height:46px;padding:0 6px;color:var(--lime);font-weight:600;text-decoration:none}
+.learn .ic,.door-go .ic,.nu-go .ic,.btn .ic{transition:transform var(--m-in) var(--ease)}
 .lede{font-size:1.16rem;color:#e2edfc;max-width:46ch}
 .lede strong{color:#fff;font-weight:600}
-@media(min-width:900px){.hero{grid-template-columns:1.25fr 1fr;padding:56px 0 34px;column-gap:20px}.hero-copy{display:grid;gap:14px}.hero-copy > .hero-title{grid-row:auto}.stage{grid-row:auto;width:100%;max-width:400px;justify-self:center}}
-.nextup{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;padding:14px 18px;border-radius:var(--r-md);background:rgba(3,31,80,.5);border:1.5px dashed rgba(255,255,255,.5);text-decoration:none}
-.nextup b{font:800 1.4rem/1 var(--display);color:var(--lime);font-variant-numeric:tabular-nums}
-.band{padding:44px 0 0}
-.trail{position:relative;display:grid;gap:22px;padding-left:58px;margin-top:22px;max-width:640px}
+@media(min-width:900px){.hero{grid-template-columns:1.25fr 1fr;padding:40px 0;column-gap:20px}.hero-copy{display:grid;gap:14px}.hero-copy > .hero-title{grid-row:auto}.stage{grid-row:auto;width:100%;max-width:420px;justify-self:center}
+  .stage-hint{display:block;position:absolute;left:0;right:0;top:calc(100% + 12px);text-align:center;font-size:.875rem;color:#bcd3f3;pointer-events:none;transition:opacity .3s}.stage.used .stage-hint{opacity:0}}
+/* the next date: one quiet line along the bottom of the first screen */
+.nextup{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;padding:16px 0 22px;border-top:1px solid rgba(255,255,255,.2);text-decoration:none;color:#d6e5fb}
+.nextup strong{color:#fff;font-weight:600;margin-left:6px}
+.nextup b{font:700 1.12rem/1 var(--body);color:var(--lime);font-variant-numeric:tabular-nums;margin-left:auto}
+.nu-go{display:none;align-items:center;gap:4px;font-weight:600;color:#fff}
+@media(min-width:640px){.nu-go{display:inline-flex}}
+.qf-msg{color:#e2edfc;font-size:1.1rem}
+/* the journey: a river with four stops. It fills, and each stop lights, as the section is scrolled through. */
+.trail{--p:1;position:relative;display:grid;gap:26px;padding-left:60px;margin-top:34px;max-width:640px}
 .trail .river{position:absolute;left:8px;top:0;width:28px;height:100%;overflow:visible}
-.trail .river path{fill:none;stroke:var(--lagoon);stroke-width:7;stroke-linecap:round;vector-effect:non-scaling-stroke}
-.trail .river path.flow{stroke:#fff;stroke-width:2;stroke-dasharray:3 15;animation:flow 1.4s linear infinite;opacity:.9}
-@keyframes flow{to{stroke-dashoffset:-18}}
+.trail .river path{fill:none;stroke:rgba(150,190,240,.3);stroke-width:5;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.trail .river.lit path{stroke:var(--lagoon)}
+.trail .river-v.lit{clip-path:inset(-6px -12px calc((1 - var(--p)) * 100%) -12px)}
+.trail .river-h{display:none}
 .stop{position:relative}
-.stop i{position:absolute;left:-58px;top:-2px;width:44px;height:44px;border-radius:50%;display:grid;place-content:center;background:var(--lime);color:var(--abyss);font:800 1.25rem/1 var(--display);font-style:normal;box-shadow:0 0 0 5px rgba(3,31,80,.55)}
-.stop p{color:#d6e5fb}
-.tropic{margin:46px 0 0;display:grid;gap:8px}
-.tropic b{font:800 1.05rem var(--display);color:var(--sun)}
-.tropic::after{content:"";height:0;border-top:2px dashed rgba(255,201,77,.7);margin-inline:-16px}
+.stop i{position:absolute;left:-60px;top:-4px;width:44px;height:44px;border-radius:50%;display:grid;place-content:center;background:#052057;color:#9db9e4;border:2px solid rgba(93,201,214,.5);font:800 1.15rem/1 var(--display);font-style:normal;transition:background-color .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease),transform .3s var(--ease-enter);transform:scale(.9)}
+.stop h3,.stop p{transition:opacity .3s var(--ease);opacity:.55}
+.stop p{color:#d6e5fb;margin-top:4px}
+.stop.on i{background:var(--lime);color:var(--abyss);border-color:var(--lime);transform:none}
+.stop.on h3,.stop.on p{opacity:1}
+@media(min-width:860px){.trail{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;padding:66px 0 0;max-width:none}
+  .trail .river-v{display:none}.trail .river-h{display:block;left:22px;top:8px;width:calc(75% + 16.5px);height:28px}
+  .trail .river-h.lit{clip-path:inset(-12px calc((1 - var(--p)) * 100%) -12px -6px)}
+  .stop i{left:0;top:-66px}.stop p{max-width:26ch}}
+.tropic{margin:clamp(44px,6vw,72px) 0 0;display:grid;gap:6px}
+.tropic b{font:700 1rem var(--body);color:var(--sun)}
+.tropic::after{content:"";height:0;border-top:2px dashed rgba(255,201,77,.65);margin:10px calc(50% - 50vw) 0}
 .tropic p{color:#d6e5fb;max-width:52ch}
-.doors{display:grid;gap:14px;margin-top:20px}
+/* two ways in, one card style: the bar's navy, a hairline edge, and a line of lime that says where it goes */
+.doors{display:grid;gap:16px;margin-top:26px}
 @media(min-width:760px){.doors{grid-template-columns:1.25fr 1fr 1fr}}
-.door{position:relative;display:grid;align-content:end;gap:4px;min-height:176px;padding:20px;text-decoration:none;overflow:hidden;transition:transform .18s}
-.door:active{transform:scale(.975)}
-.door h3{font-size:1.45rem}
-.door p{max-width:26ch;line-height:1.35}
-.door-a{background:var(--lime);color:var(--abyss);border-radius:var(--r-lg) var(--r-lg) var(--r-lg) 8px}
-.door-b{background:#fff;color:var(--ink);border-radius:var(--r-lg)}
-.door-c{background:var(--lagoon);color:var(--abyss);border-radius:var(--r-lg) 8px var(--r-lg) var(--r-lg)}
-.door .art{position:absolute;right:-14px;top:-14px;width:128px;height:128px}
+.door{position:relative;display:grid;align-content:end;gap:6px;min-height:188px;padding:24px;border-radius:18px;background:#052057;border:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;overflow:hidden;transition:transform .18s var(--ease),border-color .18s var(--ease),box-shadow .18s var(--ease)}
+.door:active{transform:scale(.985);transition-duration:var(--m-press)}
+.door h3{font-size:1.4rem}
+.door p{max-width:34ch;line-height:1.4;color:#cfe0f7}
+.door-go{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-weight:600;color:var(--lime)}
+.door .art{position:absolute;right:-22px;top:-22px;width:104px;height:104px}
+.door h3{padding-right:64px}
+@media(min-width:760px){.door .art{right:-14px;top:-14px;width:128px;height:128px}}
+.door .art g{stroke:var(--lagoon);opacity:.28}
 
 /* notices */
 .notice{display:grid;grid-template-columns:62px 1fr;gap:14px;padding:16px 0;border-top:1px solid var(--line)}
@@ -405,10 +449,10 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 .newsgrid{display:grid;gap:14px;margin-top:18px}
 @media(min-width:700px){.newsgrid{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:1000px){.newsgrid{grid-template-columns:repeat(3,1fr)}}
-.news{display:grid;grid-template-rows:auto 1fr;text-align:left;padding:0;border:0;border-radius:18px;overflow:hidden;background:#fff;color:var(--ink);cursor:pointer;font:inherit;box-shadow:0 18px 40px -24px rgba(2,20,60,.7);transition:transform .15s}
-.news:hover{transform:translateY(-2px)}
+.news{display:grid;grid-template-rows:auto 1fr;text-align:left;padding:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;color:var(--ink);cursor:pointer;font:inherit;transition:transform .18s var(--ease),border-color .18s var(--ease),box-shadow .18s var(--ease)}
+.news:active{transform:scale(.985);transition-duration:var(--m-press)}
 .news-pic{display:block;aspect-ratio:16/9;background:var(--abyss);overflow:hidden}
-.news-pic img{width:100%;height:100%;object-fit:cover;display:block}
+.news-pic img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
 .news-pic.none{display:grid;place-content:center;color:var(--lagoon);background:linear-gradient(135deg,#04214f,#0f4699)}
 .news-body{display:grid;gap:6px;padding:14px 16px 16px;align-content:start}
 .news-body small{color:var(--ink-soft)}
@@ -498,15 +542,8 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 .intro.landing .intro-skip{opacity:0}
 body.intro-on{overflow:hidden}
 body.intro-globe .stage canvas{opacity:0}
-body.intro-on .hero-copy > *,body.intro-on .hero-title > *{opacity:0;animation:none}
-body.intro-reveal .hero-title > *{animation:logoPop .7s cubic-bezier(.2,1.5,.4,1) both}
-body.intro-reveal .hero-title > :nth-child(2){animation-delay:.1s}
-body.intro-reveal .hero-title > :nth-child(3){animation-delay:.2s}
-body.intro-reveal .hero-copy > *{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
-body.intro-reveal .hero-copy > :nth-child(1){animation:none}
-body.intro-reveal .hero-copy > :nth-child(2){animation-delay:.38s}
-body.intro-reveal .hero-copy > :nth-child(3){animation-delay:.5s}
-@keyframes logoPop{from{opacity:0;transform:scale(.55) translateY(10px)}to{opacity:1;transform:none}}
+body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-title i,body.intro-on .nextup{opacity:0;animation:none}
+.nextup{animation:rise .52s var(--ease-enter) .56s both}
 /* the tsunami between pages: foam first, then three bodies of water, each with a scalloped front */
 .tsu{position:fixed;inset:0;z-index:110;pointer-events:none;overflow:hidden}
 .tsu i{position:absolute;top:-4%;height:108%;left:0;width:185vw;transform:translateX(-200vw);animation:tsu .95s cubic-bezier(.5,.05,.4,1) both}
@@ -558,6 +595,18 @@ body.intro-reveal .hero-copy > :nth-child(3){animation-delay:.5s}
 .dash-facts span{color:#d6e5fb;font-size:.95rem}
 @media(min-width:760px){.doors.doors-2{grid-template-columns:1fr 1fr}}
 
+/* pointing at things (mouse or trackpad only): buttons step up a pixel, linked cards lift two, arrows lean, pictures ease in */
+@media(hover:hover) and (pointer:fine){
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(1px) scale(.985)}
+  .bar-links > a:hover::after,.dd-btn:hover::after{transform:scaleX(1)}
+  .learn:hover .ic,.door:hover .door-go .ic,.nextup:hover .nu-go .ic{transform:translateX(3px)}
+  .learn:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+  .door:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.34);box-shadow:0 18px 30px -22px rgba(0,0,0,.7)}
+  .news:hover{transform:translateY(-2px);border-color:#b9cbe4;box-shadow:0 16px 28px -22px rgba(10,35,80,.45)}
+  .news:hover .news-pic img{transform:scale(1.03)}
+  .nextup:hover strong{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none !important;transition:none !important}
 }
@@ -1893,6 +1942,7 @@ const IC = {
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   down: '<path d="M6 9l6 6 6-6"/>',
   upright: '<path d="M7 17L17 7M9 7h8v8"/>',
+  goto: '<circle cx="12" cy="12" r="9"/><path d="M9.5 14.5l5-5M10.5 9.5h4v4"/>',
   shuffle: '<path d="M3 7h3c5 0 6 10 11 10h3M3 17h3c1.800 0 3-1.300 4.100-3M13.900 10c1.100-1.700 2.300-3 4.100-3h2M18 4l3 3-3 3M18 14l3 3-3 3"/>',
   close: '<path d="M6 6l12 12M18 6L6 18"/>',
   sound: '<path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>',
@@ -2547,26 +2597,51 @@ const Globe = (() => {
   return { create, loop };
 })();
 
-/* The hero's Earth: it turns the way the real one does, fast at first, easing off as Bangladesh comes round. */
+/* The hero's Earth: it turns the way the real one does, fast at first, easing off as Bangladesh comes round.
+   It can be spun by hand: drag it sideways (or use the left and right arrow keys), let go, and it coasts,
+   then settles back into its own slow turn. */
 function mountHeroStage(stage) {
-  const cv = $('canvas', stage), dpr = Math.min(window.devicePixelRatio || 1, 2);
-  let S = 0, g = null, globe = null, rot = reducedMotion() ? 0 : -2.0, speed = reducedMotion() ? 0 : 2.4;
+  const cv = $('canvas', stage), dpr = Math.min(window.devicePixelRatio || 1, 2), still = reducedMotion();
+  let S = 0, g = null, globe = null, rot = still ? 0 : -2.0, speed = still ? 0 : 2.4, drag = null;
   function setup() {
     const w = stage.clientWidth; if (!w) return;
     S = Math.round(w * dpr); cv.width = cv.height = S; g = cv.getContext('2d');
     /* after the opening animation, keep using its globe instead of building a second one */
     const want = Math.min(560, S); globe = HeroSync.globe && HeroSync.globe.size >= want * 0.8 ? HeroSync.globe : Globe.create(want);
   }
+  const draw = () => { if (!g) return; globe.paint(rot); g.clearRect(0, 0, S, S); globe.drawTo(g, S / 2, S / 2, S / 2); };
   function frame(dt) {
     if (!g || HeroSync.live) return;   // while the opening animation runs, its own globe is the one on screen
     /* after the opening animation, carry on from where its globe stopped */
     if (HeroSync.rot !== null) { rot = HeroSync.rot; HeroSync.rot = null; speed = HeroSync.speed || 2.4; }
-    speed += (0.16 - speed) * Math.min(1, dt * 1.1); rot += speed * dt;
-    globe.paint(rot); g.clearRect(0, 0, S, S); globe.drawTo(g, S / 2, S / 2, S / 2);
+    if (!drag) { speed += ((still ? 0 : 0.16) - speed) * Math.min(1, dt * 1.1); rot += speed * dt; }
+    draw();
   }
   setup(); frame(0); HeroSync.kick = () => frame(0);
+  /* a hand on the globe: the surface follows the finger exactly, and keeps the speed it was let go with */
+  const down = e => {
+    if (e.button || HeroSync.live || !g) return;
+    drag = { x: e.clientX, rot, t: performance.now(), v: 0, lastX: e.clientX, id: e.pointerId };
+    try { stage.setPointerCapture(e.pointerId); } catch (err) { /* older browsers */ }
+    stage.classList.add('grabbing', 'used');
+  };
+  const move = e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const r = stage.clientWidth / 2 || 1, now = performance.now(), dt = Math.max(1, now - drag.t) / 1000;
+    rot = drag.rot + (e.clientX - drag.x) / r;
+    drag.v = 0.6 * drag.v + 0.4 * ((e.clientX - drag.lastX) / r / dt); drag.lastX = e.clientX; drag.t = now;
+    draw();
+  };
+  const up = e => {
+    if (!drag || (e.pointerId !== undefined && e.pointerId !== drag.id)) return;
+    speed = performance.now() - drag.t > 120 ? 0 : Math.max(-7, Math.min(7, drag.v));   // held still before letting go: no throw
+    drag = null; stage.classList.remove('grabbing'); if (still) draw();
+  };
+  const key = e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); stage.classList.add('used'); if (still) { rot += e.key === 'ArrowRight' ? 0.35 : -0.35; draw(); } else speed = e.key === 'ArrowRight' ? 2.6 : -2.6; } };
+  stage.addEventListener('pointerdown', down); stage.addEventListener('pointermove', move);
+  stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up); stage.addEventListener('keydown', key);
   let stop = () => {};
-  if (!reducedMotion()) stop = Globe.loop(stage, frame);
+  if (!still) stop = Globe.loop(stage, frame);
   let rt = 0, lastW = stage.clientWidth; const onResize = () => { clearTimeout(rt); rt = setTimeout(() => { if (stage.clientWidth !== lastW) { lastW = stage.clientWidth; setup(); frame(0); } }, 200); };
   window.addEventListener('resize', onResize);
   return () => { stop(); HeroSync.kick = null; window.removeEventListener('resize', onResize); };
@@ -2814,7 +2889,7 @@ function siteIntro() {
   /* the page's own headline and buttons come in as the Earth arrives */
   function reveal() {
     if (revealed) return; revealed = true; el.classList.add('landing');
-    document.body.classList.remove('intro-on'); document.body.classList.add('intro-reveal'); setTimeout(() => document.body.classList.remove('intro-reveal'), 2200);
+    document.body.classList.remove('intro-on');   // the hero's own entrance takes over: the headline rises line by line
   }
 
   function frame(now) {
@@ -3027,14 +3102,13 @@ function buildShell() {
       ${BAR_MENU.map((m, i) => (m.items ? `<div class="dd"><button type="button" class="dd-btn" aria-expanded="false" data-dd="${i}">${m.label} ${icon('down', 14)}</button><div class="dd-menu" hidden>${m.items.map(x => `<a href="#${x[0]}" data-nav="${x[0]}">${x[1]}</a>`).join('')}</div></div>` : `<a href="#${m.to}" data-nav="${m.to}">${m.label}</a>`)).join('')}
     </nav>
     <div class="bar-tools">
-      <a class="btn btn-lime btn-sm bar-admit" href="#dashboard">Admit card ${icon('download', 16)}</a>
+      <button type="button" class="btn btn-lime btn-sm bar-admit" id="bar-admit" aria-label="Download admit card" title="Download admit card" hidden><span>Admit card</span>${icon('download', 16)}</button>
       <a class="btn btn-ghost btn-sm" id="acct-btn" href="#login">Login</a>
       <button type="button" class="iconbtn" id="sound-btn" aria-label="Sound effects"></button>
       <button type="button" class="iconbtn" id="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Menu">${icon('menu')}</button>
     </div>
   </header>
   <div class="menu" id="menu" hidden><nav class="menu-grid" aria-label="All pages">
-    <a class="wide menu-admit bar-admit" href="#dashboard">${icon('download')}<span>Admit card</span></a>
     ${NAV.map(n => `<a href="#${n[0]}" data-nav="${n[0]}">${icon(n[2])}<span>${n[1]}</span></a>`).join('')}
     <a href="#register" data-nav="register">${icon('edit')}<span>Registration</span></a>
     <a href="#dashboard" data-nav="dashboard">${icon('user')}<span>Dashboard</span></a>
@@ -3047,6 +3121,7 @@ function buildShell() {
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
   paintSound(); sb.addEventListener('click', () => { Sound.toggle(); paintSound(); });
   $('#menu-btn').addEventListener('click', () => ($('#menu').hidden ? openMenu() : closeMenu()));
+  $('#bar-admit').addEventListener('click', e => downloadMyCard(e.currentTarget));
   /* drop-downs open on a tap and close on a second tap, a tap elsewhere, or Escape */
   document.addEventListener('click', e => {
     const b = e.target.closest('.dd-btn'), open = b && b.getAttribute('aria-expanded') === 'true';
@@ -3069,9 +3144,10 @@ function syncChrome(name) {
   $$('[data-nav]').forEach(a => { if (a.dataset.nav === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   $$('.dd').forEach(d => d.classList.toggle('here', !!$('[aria-current]', d)));
   const u = Store.me(), b = $('#acct-btn');
-  b.innerHTML = `${icon('account', 18)} ${u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login'}`; b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
+  const what = u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login';
+  b.innerHTML = `${icon('account', 18)}<span>${what}</span>`; b.setAttribute('aria-label', what); b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
   const hasCard = !!(u && u.role === 'participant' && Store.db.settings.cardsOpen);
-  $$('.bar-admit').forEach(a => { a.hidden = !hasCard; });
+  $$('.bar-admit').forEach(a => { a.hidden = !hasCard; }); $('.bar').classList.toggle('has-card', hasCard);
   $$('[data-nav="register"]').forEach(a => { a.hidden = !!u; });
   $$('.menu [data-nav="dashboard"]').forEach(a => { a.hidden = !!(u && u.role === 'admin'); });
   fitBar();
@@ -3157,44 +3233,59 @@ PAGES.home = () => {
     : Store.db.settings.regOpen ? '<a class="btn btn-lime" href="#register">Register now</a>' : '<span class="chip chip-sea">Registration is closed</span>';
   const year = REG_PREFIX.slice(0, 4), bn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
   return {
-    html: `<div class="wrap">
-    <section class="hero">
-      <div class="hero-copy">
-        <h1 class="hero-title" lang="bn"><span class="ht-1">১ম বাংলাদেশ</span><span class="ht-2">জিওগ্রাফি</span><span class="ht-3">অলিম্পিয়াড <b>${bn(year)}</b></span></h1>
-        <p class="lede">The <strong>1st Bangladesh Geography Olympiad ${year}</strong>, open to all young geographers and bright minds.</p>
-        <div class="btnrow">${cta}<a class="learn" href="#about">Learn more ${icon('upright', 18)}</a></div>
+    html: `<div class="home">
+    <section class="hero-screen"><div class="wrap">
+      <div class="hero">
+        <div class="hero-copy">
+          <h1 class="hero-title" lang="bn"><span class="ht-1"><i>১ম বাংলাদেশ</i></span><span class="ht-2"><i>জিওগ্রাফি</i></span><span class="ht-3"><i>অলিম্পিয়াড <b>${bn(year)}</b></i></span></h1>
+          <p class="lede">The <strong>1st Bangladesh Geography Olympiad ${year}</strong>, open to all young geographers and bright minds.</p>
+          <div class="btnrow">${cta}<a class="learn" href="#about">Learn more ${icon('goto', 20)}</a></div>
+        </div>
+        <div class="stage" id="stage" tabindex="0" role="img" aria-label="The Earth, turning. Drag it, or press the left and right arrow keys, to spin it."><canvas aria-hidden="true"></canvas><span class="stage-hint" aria-hidden="true">Drag to spin</span></div>
       </div>
-      <div class="stage" id="stage"><canvas role="img" aria-label="The Earth, turning"></canvas></div>
-    </section>
-    ${ev ? `<a class="nextup" href="#countdown"><span>Next up: <strong>${esc(ev.label)}</strong></span><b id="mini">${shortSpan(new Date(ev.at) - Date.now())}</b></a>` : ''}
-    <section class="band">
+      ${ev ? `<a class="nextup" href="#countdown"><span class="nu-what">Next up <strong>${esc(ev.label)}</strong></span><b id="mini">${shortSpan(new Date(ev.at) - Date.now())}</b><span class="nu-go">Schedule ${icon('next', 16)}</span></a>` : ''}
+    </div></section>
+    <section class="band ground-deep"><div class="wrap">
       <h2>From your classroom to Team Bangladesh</h2>
-      <div class="trail">
-        <svg class="river" viewBox="0 0 28 400" preserveAspectRatio="none" aria-hidden="true"><path d="M14 0C30 50 -2 100 14 150S30 250 14 300S-2 370 14 400"/><path class="flow" d="M14 0C30 50 -2 100 14 150S30 250 14 300S-2 370 14 400"/></svg>
+      <div class="trail" id="trail">
+        <svg class="river river-v" viewBox="0 0 28 400" preserveAspectRatio="none" aria-hidden="true"><path d="M14 0C30 50 -2 100 14 150S30 250 14 300S-2 370 14 400"/></svg>
+        <svg class="river river-v lit" viewBox="0 0 28 400" preserveAspectRatio="none" aria-hidden="true"><path d="M14 0C30 50 -2 100 14 150S30 250 14 300S-2 370 14 400"/></svg>
+        <svg class="river river-h" viewBox="0 0 400 28" preserveAspectRatio="none" aria-hidden="true"><path d="M0 14C50 30 100 -2 150 14S250 30 300 14S370 -2 400 14"/></svg>
+        <svg class="river river-h lit" viewBox="0 0 400 28" preserveAspectRatio="none" aria-hidden="true"><path d="M0 14C50 30 100 -2 150 14S250 30 300 14S370 -2 400 14"/></svg>
         ${STEPS.map((s, i) => `<div class="stop"><i>${i + 1}</i><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}
       </div>
-    </section>
-    <div class="tropic"><b>Tropic of Cancer, 23.4° N</b><p>This line of latitude runs right across the middle of Bangladesh.</p></div>
-    <section class="band">
-      <div class="between"><h2>Latest notices</h2><a class="btn btn-ghost btn-sm" href="#notices">All notices</a></div>
-      <div class="sheet" style="margin-top:18px">${notices.map(noticeRow).join('') || '<p class="empty">No notices yet.</p>'}</div>
-    </section>
-    ${news.length ? `<section class="band">
-      <h2>News</h2>
-      <div class="newsgrid" id="newsgrid">${news.map((n, i) => newsCard(n, i >= 6)).join('')}</div>
-      ${news.length > 6 ? '<div style="margin-top:16px"><button type="button" class="btn btn-ghost btn-sm" id="news-more">Show older news</button></div>' : ''}
-    </section>` : ''}
-    <section class="band">
+      <div class="tropic"><b>Tropic of Cancer, 23.4° N</b><p>This line of latitude runs right across the middle of Bangladesh.</p></div>
+    </div></section>
+    <section class="band ground-light"><div class="wrap">
+      <div class="between"><h2>Latest notices</h2><a class="btn btn-quiet btn-sm" href="#notices">All notices ${icon('next', 16)}</a></div>
+      <div class="sheet" style="margin-top:22px">${notices.map(noticeRow).join('') || '<p class="empty">No notices yet.</p>'}</div>
+      ${news.length ? `<div class="sub">
+        <h2>News</h2>
+        <div class="newsgrid" id="newsgrid">${news.map((n, i) => newsCard(n, i >= 6)).join('')}</div>
+        ${news.length > 6 ? '<div style="margin-top:16px"><button type="button" class="btn btn-quiet btn-sm" id="news-more">Show older news</button></div>' : ''}
+      </div>` : ''}
+    </div></section>
+    <section class="band"><div class="wrap">
       <h2>Learn and take part</h2>
       <div class="doors doors-2">
-        <a class="door door-a" href="#${me ? (me.role === 'admin' ? 'admin' : 'dashboard') : 'login'}"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#04214f" stroke-width="3" opacity=".3"><ellipse cx="70" cy="52" rx="54" ry="44"/><ellipse cx="72" cy="50" rx="40" ry="32"/><ellipse cx="74" cy="48" rx="26" ry="20"/><ellipse cx="76" cy="46" rx="12" ry="9"/></g></svg><h3>Participant dashboard</h3><p>${me ? 'Your admit card, online exams and study resources.' : 'Registered students log in here for their admit card, online exams and study resources.'}</p></a>
-        <a class="door door-c" href="#explore"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#04214f" stroke-width="3" opacity=".3"><circle cx="68" cy="52" r="46"/><ellipse cx="68" cy="52" rx="20" ry="46"/><path d="M22 52h92M30 28h76M30 76h76"/></g></svg><h3>Explore the Earth</h3><p>Open to everyone: quick facts, small labs and a five-question quiz.</p></a>
+        <a class="door" href="#${me ? (me.role === 'admin' ? 'admin' : 'dashboard') : 'login'}"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke-width="3"><ellipse cx="70" cy="52" rx="54" ry="44"/><ellipse cx="72" cy="50" rx="40" ry="32"/><ellipse cx="74" cy="48" rx="26" ry="20"/><ellipse cx="76" cy="46" rx="12" ry="9"/></g></svg><h3>Participant dashboard</h3><p>${me ? 'Your admit card, online exams and study resources.' : 'Registered students log in here for their admit card, online exams and study resources.'}</p><span class="door-go">${me ? 'Open the dashboard' : 'Log in'} ${icon('next', 16)}</span></a>
+        <a class="door" href="#explore"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke-width="3"><circle cx="68" cy="52" r="46"/><ellipse cx="68" cy="52" rx="20" ry="46"/><path d="M22 52h92M30 28h76M30 76h76"/></g></svg><h3>Explore the Earth</h3><p>Open to everyone: quick facts, small labs and a five-question quiz.</p><span class="door-go">Start exploring ${icon('next', 16)}</span></a>
       </div>
-    </section>
-    ${gallery.length ? `<section class="band reel-wrap"><h2>Photos and videos</h2><div class="reel media-reel" tabindex="0" aria-label="Photos and videos" style="margin-top:18px">${gallery.join('')}</div></section>` : ''}
+      ${gallery.length ? `<div class="sub reel-wrap"><h2>Photos and videos</h2><div class="reel media-reel" tabindex="0" aria-label="Photos and videos" style="margin-top:22px">${gallery.join('')}</div></div>` : ''}
+    </div></section>
     </div>`,
     mount(v) {
-      onLeave(mountHeroStage($('#stage', v)));
+      const stage = $('#stage', v); if (!document.body.classList.contains('intro-globe')) stage.classList.add('settle');
+      onLeave(mountHeroStage(stage));
+      /* the one moving moment below the hero: the river fills, and each stop lights up, as this section is scrolled through */
+      const trail = $('#trail', v), stops = $$('.stop', trail), marks = [0.03, 0.36, 0.68, 0.97];
+      const fill = () => {
+        const r = trail.getBoundingClientRect(), vh = window.innerHeight, p = reducedMotion() ? 1 : Math.max(0, Math.min(1, (vh * 0.82 - r.top) / (r.height + vh * 0.22)));
+        trail.style.setProperty('--p', p.toFixed(3)); stops.forEach((st, i) => st.classList.toggle('on', p >= marks[i]));
+      };
+      let waiting = false; const onScroll = () => { if (waiting) return; waiting = true; requestAnimationFrame(() => { waiting = false; if (trail.isConnected) fill(); }); };
+      fill(); window.addEventListener('scroll', onScroll, { passive: true }); window.addEventListener('resize', onScroll);
+      onLeave(() => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); });
       const ng = $('#newsgrid', v);
       if (ng) {
         ng.addEventListener('click', e => { const b = e.target.closest('[data-news]'); if (b) { const n = Store.get('news', b.dataset.news); if (n) newsDialog(n); } });
@@ -3797,6 +3888,11 @@ async function cardBlob(u, kind) {
 }
 /* a one-page A4 PDF: the card at the top, what to do on the day below it. The page is
    drawn as a picture and wrapped in the few lines a PDF file needs, so no library is loaded. */
+/* the admit card as a PDF, straight from a button: the National card once a student is selected, the Regional one before that */
+function downloadMyCard(btn) {
+  const u = Store.me(); if (!u || u.role !== 'participant' || !Store.db.settings.cardsOpen) { go(u ? 'dashboard' : 'login'); return null; }
+  return busy(btn, async () => { const kind = hasNationalCard(u) ? 'national' : 'regional'; await saveAndTell(`BGeO-${kind === 'national' ? 'national-' : ''}admit-card-${u.regNo}.pdf`, await cardPdf(u, kind)); });
+}
 async function cardPdf(u, kind) {
   await cardReady();
   const T = CARD_THEME[kind === 'national' ? 'national' : 'regional'], PW = 1240, PH = 1754, c = document.createElement('canvas'); c.width = PW; c.height = PH;
@@ -3916,7 +4012,7 @@ function renderDash(name) {
     <main id="dash-view"></main>`;
   $('#logout', root).onclick = async () => { await Store.signOut(); toast('You are logged out'); go('home'); };
   /* one tap downloads the admit card as a PDF: the National round card if the student has one, otherwise the Regional round card */
-  const dc = $('#dash-card', root); if (dc) dc.onclick = () => busy(dc, async () => { const kind = hasNationalCard(u) ? 'national' : 'regional'; saveAndTell(`BGeO-${kind === 'national' ? 'national-' : ''}admit-card-${u.regNo}.pdf`, await cardPdf(u, kind)); });
+  const dc = $('#dash-card', root); if (dc) dc.onclick = () => downloadMyCard(dc);
   const cur = $('.dash-tabs [aria-current]', root); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
   const page = isExam ? pageExam(name.slice(5)) : DASH[tab]();
   const holder = document.createElement('div'); holder.innerHTML = page.html; $('#dash-view', root).replaceChildren(holder);
