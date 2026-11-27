@@ -373,11 +373,24 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .msg.sel{background:#e6f7e0;border-left:6px solid var(--leaf)}
 
 /* footer, compass, toasts, dialogs */
-.foot{background:#052057;padding:34px 0 40px}
-.foot img{height:74px;width:auto}
-.foot small{color:#a9c0e4;display:block;margin-top:10px}
-.foot-base{display:flex;flex-wrap:wrap;gap:4px 24px;justify-content:space-between;margin-top:26px;padding-top:16px;border-top:1px solid rgba(255,255,255,.14)}
-.foot-base small{margin-top:0;font-size:.85rem}
+/* the footer, from the Figma: the page's blue with faint upright bands, the committee's details on the left, links on the right */
+.foot{position:relative;background:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 64px,rgba(255,255,255,0) 64px 128px),linear-gradient(90deg,#01296f,#17498e 52%,#336eb4);border-top:1px solid rgba(255,255,255,.16);padding:48px 0 34px;color:#fff}
+.foot-grid{display:grid;gap:34px}
+.foot img{height:86px;width:auto;margin-left:-4px}
+.foot h2{font:700 1.3rem/1.25 var(--body);color:#fff;margin:22px 0 12px}
+.foot-main p{margin:0 0 7px;max-width:36ch;font-size:1.06rem;line-height:1.45;color:#e6effc}
+.foot-main p strong{color:#fff;font-weight:700}
+.foot a{color:inherit;text-decoration:none}
+.foot-main p a{text-decoration:underline;text-decoration-color:rgba(255,255,255,.4);text-underline-offset:4px}
+.foot-social{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px !important;max-width:none !important}
+.foot-social[hidden]{display:none}
+.foot-social a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid rgba(255,255,255,.5);border-radius:999px;font-weight:600;font-size:.98rem;text-decoration:none !important}
+.foot-links h2{margin-top:0}
+.foot-links a{display:block;padding:9px 0;font-size:1.1rem;color:#e6effc}
+.foot small{color:#c4d6f2;display:block}
+.foot-base{display:flex;flex-wrap:wrap;gap:4px 24px;justify-content:space-between;margin-top:34px;padding-top:16px;border-top:1px solid rgba(255,255,255,.18)}
+.foot-base small{font-size:.85rem}
+@media(min-width:740px){.foot{padding:64px 0 36px}.foot-grid{grid-template-columns:minmax(0,1fr) auto;gap:40px 80px}.foot-links{padding-top:118px;min-width:190px}}
 .north{position:fixed;right:14px;bottom:calc(18px + var(--tab-h));z-index:35;width:54px;height:54px;border-radius:50%;border:0;background:#fff;color:var(--abyss);box-shadow:0 10px 26px -8px rgba(0,0,0,.6);cursor:pointer;display:grid;place-content:center}
 .north svg{transform:rotate(var(--turn,0deg))}
 #toasts{position:fixed;left:0;right:0;bottom:calc(18px + var(--tab-h));z-index:90;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
@@ -540,10 +553,33 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 /* opening animation, page wipe, admin entry */
 .intro{position:fixed;inset:0;z-index:120;cursor:pointer;background:#17498e}
 .intro.landing{background:transparent;pointer-events:none}
-.gate{position:absolute;left:0;right:0;top:calc(46% + min(31vw,31vh) + 34px);margin:0;text-align:center;font:600 1.08rem/1 var(--body);letter-spacing:.02em;color:#fff;pointer-events:none;animation:gateIn .6s var(--ease) .15s both,breathe 2.4s ease-in-out 1s infinite;transition:opacity .28s var(--ease),transform .28s var(--ease)}
+/* the title screen: lettering at the top, the Earth in the middle (drawn on the canvas), "Tap to enter" at the bottom, framed like a map sheet */
+.gate-ui{position:absolute;inset:0;pointer-events:none;transition:opacity .2s var(--ease)}
+.intro.going .gate-ui{opacity:0}
+.gate-title{position:absolute;left:50%;top:max(7vh,30px);top:max(7svh,30px);width:min(74vw,340px,42vh);transform:translateX(-50%)}
+.gate-mark{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 6px 18px rgba(1,20,60,.35))}
+.gate-mark .ln{transform-box:fill-box;animation:lineUp .7s var(--ease-enter) .1s both}
+.gate-mark g:nth-of-type(2) .ln{animation-delay:.18s}
+.gate-mark g:nth-of-type(3) .ln{animation-delay:.26s}
+.gate{position:absolute;left:0;right:0;bottom:max(8vh,48px);bottom:max(8svh,48px);margin:0;display:grid;justify-items:center;gap:14px;font:600 1.12rem/1 var(--body);letter-spacing:.02em;color:#fff;animation:gateIn .6s var(--ease) .5s both;transition:opacity .2s var(--ease),transform .2s var(--ease)}
+.gate-ring{position:relative;width:46px;height:46px;border-radius:50%;border:1.5px solid rgba(255,255,255,.9);background:rgba(255,255,255,.08)}
+.gate-ring::before{content:"";position:absolute;inset:14px;border-radius:50%;background:var(--lime)}
+.gate-ring::after{content:"";position:absolute;inset:-1.5px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7);animation:ripple 1.9s var(--ease) infinite}
+@keyframes ripple{from{transform:scale(1);opacity:.9}to{transform:scale(2.1);opacity:0}}
 @keyframes gateIn{from{opacity:0;transform:translateY(8px)}}
-@keyframes breathe{50%{opacity:.55}}
 .gate.gone{opacity:0;transform:translateY(-6px);animation:none}
+.gate-pin{position:absolute;left:0;top:0;width:0;height:0;animation:gateIn .6s var(--ease) .7s both;transition:opacity .25s var(--ease)}
+.gate-pin i{position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid #e2483d;box-shadow:0 0 0 1.5px rgba(3,24,70,.6)}
+.gate-pin i::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px solid #fff;animation:ripple 1.9s var(--ease) .4s infinite}
+.gate-pin span{position:absolute;left:22px;bottom:20px;padding:7px 11px 8px;border-radius:10px;background:rgba(3,24,70,.78);border:1px solid rgba(255,255,255,.28);color:#d5e4fb;font:500 .78rem/1.3 var(--body);white-space:nowrap;font-variant-numeric:tabular-nums}
+.gate-pin span::before{content:"";position:absolute;left:-19px;bottom:-15px;width:24px;height:1.5px;background:rgba(255,255,255,.7);transform:rotate(-40deg);transform-origin:left center}
+.gate-pin b{display:block;color:#fff;font-size:.92rem;font-weight:700}
+.gate-corner{position:absolute;width:22px;height:22px;border:1.5px solid rgba(255,255,255,.5)}
+.gate-corner.tl{left:14px;top:14px;border-right:0;border-bottom:0}.gate-corner.tr{right:14px;top:14px;border-left:0;border-bottom:0}
+.gate-corner.bl{left:14px;bottom:14px;border-right:0;border-top:0}.gate-corner.br{right:14px;bottom:14px;border-left:0;border-top:0}
+.gate-ui::before,.gate-ui::after{content:"";position:absolute;top:56px;bottom:56px;width:7px;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.42) 0 1px,transparent 1px 26px)}
+.gate-ui::before{left:14px}.gate-ui::after{right:14px}
+@media(max-height:520px){.gate{bottom:22px;gap:8px;grid-auto-flow:column;justify-content:center;align-items:center}.gate-ring{width:34px;height:34px}.gate-ring::before{inset:10px}.gate-title{top:16px;width:min(40vw,30vh,240px)}}
 .intro.skipping{opacity:0;pointer-events:none;transition:opacity .22s}
 .intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .intro-skip{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.72);font-size:.9rem;font-weight:500;pointer-events:none;transition:opacity .2s}
@@ -717,6 +753,10 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-mark .
   .news:hover{transform:translateY(-2px);border-color:#b9cbe4;box-shadow:0 16px 28px -22px rgba(10,35,80,.45)}
   .news:hover .news-pic img{transform:scale(1.03)}
   .nextup:hover strong{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+  .foot-links a,.foot-social a{transition:color var(--m-in) var(--ease),background-color var(--m-in) var(--ease),border-color var(--m-in) var(--ease)}
+  .foot-links a:hover{color:var(--lime)}
+  .foot-social a:hover{background:#fff;color:#0b3a85;border-color:#fff}
+  .foot-main p a:hover{text-decoration-color:#fff}
   /* a soft light follows the pointer across the cards */
   .door::before,.news::before,.dash-facts a::before,.xfacts > div::before,.glance div::before,.shuffle::before,.qf::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s var(--ease);background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(154,217,111,.2),transparent 62%)}
   .news::before{background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(47,109,184,.13),transparent 62%)}
@@ -776,7 +816,7 @@ const HERO_MARK = { w: 756, h: 284, lines: [
   { fill: '#9ad96f', top: 30, bottom: 181, d: 'M218.2 76.1Q215.2 78.2 211.8 82.5Q208.3 86.8 207.2 91.7Q206.0 96.5 205.9 101.5Q205.8 106.5 207.9 107.3Q210.0 108.2 219.2 108.1Q228.3 108.0 229.8 106.8Q231.2 105.7 231.2 102.6Q231.2 99.5 231.7 97.9Q232.2 96.3 234.6 93.9Q237.0 91.5 240.1 91.1Q243.2 90.7 246.8 92.2Q250.3 93.7 251.0 94.7Q251.7 95.7 252.4 99.7Q253.2 103.7 252.0 106.4Q250.8 109.2 248.3 110.5Q245.8 111.8 240.3 112.4Q234.8 113.0 233.8 113.7Q232.8 114.3 232.9 120.8Q233.0 127.3 234.2 129.2Q235.5 131.2 239.2 131.3Q242.8 131.5 247.1 132.4Q251.3 133.3 252.5 134.8Q253.7 136.3 253.6 137.8Q253.5 139.2 252.2 141.4Q250.8 143.7 248.2 144.7Q245.5 145.7 240.6 145.8Q235.7 145.8 232.6 145.2Q229.5 144.5 228.0 143.6Q226.5 142.7 223.8 139.8Q221.0 136.8 220.1 129.2Q219.2 121.7 218.6 120.8Q218.0 119.8 216.2 119.2Q214.5 118.5 206.5 118.5Q198.5 118.5 196.9 119.9Q195.3 121.3 195.3 125.2Q195.3 129.0 195.8 132.8Q196.3 136.7 198.3 142.4Q200.3 148.2 202.1 151.1Q203.8 154.0 207.4 156.6Q211.0 159.2 215.8 161.5Q220.7 163.8 226.2 165.2Q231.8 166.5 241.2 166.5Q250.5 166.5 254.1 165.9Q257.7 165.3 260.2 163.9Q262.8 162.5 265.2 162.0Q267.5 161.5 270.0 159.8Q272.5 158.2 274.6 155.7Q276.7 153.2 277.9 148.9Q279.2 144.7 279.1 141.8Q279.0 138.8 277.9 135.0Q276.8 131.2 274.2 128.7Q271.5 126.2 268.6 125.0Q265.7 123.8 264.8 122.9Q264.0 122.0 264.4 121.2Q264.8 120.3 267.7 118.8Q270.5 117.3 272.2 115.6Q274.0 113.8 275.8 110.2Q277.5 106.7 277.4 99.0Q277.3 91.3 276.2 88.7Q275.0 86.0 272.4 82.4Q269.8 78.8 266.3 76.7Q262.8 74.5 259.0 73.0Q255.2 71.5 246.1 70.9Q237.0 70.3 229.1 72.2Q221.2 74.0 218.2 76.1ZM612.3 74.6Q611.3 73.8 607.2 73.6Q603.0 73.3 537.7 73.5Q472.3 73.7 470.2 73.3Q468.2 73.0 467.8 70.8Q467.5 68.7 468.2 66.2Q469.0 63.7 471.7 61.1Q474.3 58.5 479.3 56.9Q484.3 55.3 495.7 54.9Q507.0 54.5 520.9 57.2Q534.8 60.0 536.9 59.8L539.0 59.7L538.3 51.6Q537.7 43.5 537.2 42.8Q536.8 42.0 529.6 39.8Q522.3 37.5 516.7 36.6Q511.0 35.7 503.2 35.2Q495.5 34.8 489.8 34.9Q484.0 35.0 477.9 35.8Q471.8 36.5 466.7 38.1Q461.5 39.7 458.8 41.2Q456.0 42.7 452.5 45.8Q449.0 49.0 446.8 52.3Q444.7 55.7 444.0 57.4Q443.3 59.2 442.8 64.6Q442.3 70.0 441.4 71.8Q440.5 73.5 434.6 73.5Q428.7 73.5 427.4 73.1Q426.2 72.7 395.6 72.8Q365.0 72.8 362.9 73.8Q360.8 74.7 360.8 78.2Q360.8 81.8 359.8 83.2L358.8 84.7L356.8 81.5Q354.8 78.3 351.0 76.0Q347.2 73.7 341.8 72.4Q336.5 71.2 330.5 71.2Q324.5 71.2 321.2 71.7Q318.0 72.2 313.2 74.8Q308.5 77.3 305.8 79.9Q303.2 82.5 300.9 86.9Q298.7 91.3 298.1 95.2Q297.5 99.0 297.2 106.1Q297.0 113.2 298.0 115.4Q299.0 117.7 310.2 117.8Q321.3 118.0 323.1 120.4Q324.8 122.8 324.4 124.1Q324.0 125.3 322.8 126.3Q321.5 127.3 319.2 127.3Q316.8 127.3 313.8 128.6Q310.7 129.8 310.4 131.1Q310.2 132.3 311.1 136.8Q312.0 141.3 312.0 143.7Q312.0 146.0 314.2 146.8Q316.3 147.5 323.8 147.2Q331.2 146.8 336.2 144.4Q341.2 142.0 343.1 139.6Q345.0 137.2 346.2 134.2Q347.5 131.3 347.8 129.2Q348.2 127.2 348.1 121.9Q348.0 116.7 347.5 114.6Q347.0 112.5 344.5 109.1Q342.0 105.7 338.5 103.6Q335.0 101.5 331.4 101.1Q327.8 100.7 326.1 99.5L324.3 98.3L325.0 97.2Q325.7 96.0 329.3 94.2Q333.0 92.3 337.1 92.3Q341.2 92.3 346.7 95.0Q352.2 97.7 354.2 100.1Q356.3 102.5 357.4 104.8Q358.5 107.0 358.8 131.8Q359.2 156.5 358.6 157.3Q358.0 158.2 357.2 158.3Q356.3 158.5 351.8 156.2Q347.3 154.0 332.1 153.9Q316.8 153.8 314.4 152.0Q312.0 150.2 311.2 148.4Q310.3 146.7 307.9 145.7Q305.5 144.7 297.7 145.2Q289.8 145.7 289.0 147.0Q288.2 148.3 288.2 151.1Q288.2 153.8 290.5 159.2Q292.8 164.7 297.3 168.1Q301.8 171.5 309.6 172.8Q317.3 174.2 335.0 174.2Q352.7 174.3 357.6 176.3Q362.5 178.3 372.3 178.2Q382.2 178.0 383.0 176.7Q383.8 175.3 383.5 173.4Q383.2 171.5 383.3 132.9Q383.5 94.3 384.9 92.9Q386.3 91.5 391.8 91.4Q397.2 91.3 398.7 92.8Q400.2 94.2 400.5 95.2Q400.8 96.3 400.4 98.2Q400.0 100.2 400.3 102.8Q400.7 105.3 400.5 134.5Q400.3 163.7 401.2 164.8Q402.2 165.8 403.3 166.1Q404.5 166.3 413.8 166.3Q423.2 166.3 424.2 164.3Q425.3 162.3 425.2 128.6Q425.0 94.8 426.2 93.1Q427.5 91.3 433.8 91.4Q440.0 91.5 441.1 92.2Q442.2 93.0 442.2 126.5Q442.2 160.0 442.5 162.2Q442.8 164.3 443.8 165.8Q444.8 167.2 454.4 167.3Q464.0 167.5 465.0 166.7Q466.0 165.8 466.5 164.2Q467.0 162.7 466.8 128.7Q466.5 94.7 467.8 93.2Q469.0 91.8 473.0 91.8Q477.0 91.8 478.5 93.5Q480.0 95.2 479.9 98.6Q479.8 102.0 480.6 103.6Q481.3 105.2 491.7 108.4Q502.0 111.7 503.1 112.8Q504.2 113.8 503.5 115.1Q502.8 116.3 498.3 118.0Q493.8 119.7 491.2 120.1Q488.7 120.5 486.6 121.6Q484.5 122.7 484.3 134.1Q484.2 145.5 485.1 147.6Q486.0 149.7 489.7 151.2Q493.3 152.8 517.6 159.8Q541.8 166.7 552.6 167.2Q563.3 167.7 564.4 166.6Q565.5 165.5 565.7 143.3Q565.8 121.2 567.1 120.2Q568.3 119.2 570.2 118.9Q572.2 118.7 574.9 119.2Q577.7 119.7 579.8 120.8Q582.0 122.0 582.3 124.3Q582.7 126.7 582.1 128.2Q581.5 129.8 580.5 130.7Q579.5 131.5 577.1 131.8Q574.7 132.2 573.5 133.2Q572.3 134.2 572.2 141.8Q572.2 149.5 572.6 150.3Q573.0 151.2 574.5 151.5Q576.0 151.8 581.8 151.6Q587.5 151.3 593.1 148.9Q598.7 146.5 600.8 144.3Q603.0 142.2 604.5 139.3Q606.0 136.5 606.5 130.1Q607.0 123.7 606.5 120.9Q606.0 118.2 604.7 114.8Q603.3 111.5 600.8 108.7Q598.3 105.8 594.9 104.3Q591.5 102.8 586.2 101.7Q581.0 100.5 563.2 100.2Q545.5 99.8 543.8 100.4Q542.0 101.0 541.6 101.7Q541.2 102.3 541.6 122.0Q542.0 141.7 541.3 143.3Q540.7 145.0 538.8 145.1Q536.8 145.2 524.8 141.7Q512.7 138.2 511.2 136.8Q509.7 135.5 510.7 134.1Q511.7 132.7 519.6 129.6Q527.5 126.5 528.7 124.8Q529.8 123.2 529.7 114.8Q529.5 106.5 521.3 100.9Q513.2 95.3 512.4 94.2L511.7 93.0L513.5 92.3Q515.3 91.7 563.0 91.7Q610.7 91.7 611.9 91.2Q613.2 90.8 613.5 90.2Q613.8 89.7 613.6 82.5Q613.3 75.3 612.3 74.6ZM9.6 81.9Q9.7 89.2 11.4 90.3Q13.2 91.5 15.9 91.2Q18.7 91.0 19.3 93.2Q20.0 95.3 19.9 129.3Q19.8 163.3 20.6 164.9Q21.3 166.5 32.0 166.5Q42.7 166.5 43.4 165.5Q44.2 164.5 44.5 128.8Q44.8 93.2 46.5 92.2Q48.2 91.3 69.8 91.5Q91.5 91.7 93.7 91.3Q95.8 91.0 96.4 91.3Q97.0 91.7 96.9 92.8Q96.8 94.0 94.5 97.7Q92.2 101.3 91.4 104.7Q90.7 108.0 90.9 113.9Q91.2 119.8 92.1 121.8Q93.0 123.8 95.3 126.8Q97.7 129.7 101.3 131.6Q105.0 133.5 110.0 134.2Q115.0 134.8 120.0 134.3Q125.0 133.8 125.8 135.4Q126.7 137.0 124.8 139.8Q123.0 142.5 118.4 144.1Q113.8 145.7 108.2 145.8Q102.5 145.8 97.7 144.2Q92.8 142.7 89.7 139.8Q86.5 136.8 84.9 132.4Q83.3 128.0 82.7 124.6Q82.0 121.2 81.8 114.0Q81.7 106.8 81.1 105.0Q80.5 103.2 78.9 102.4Q77.3 101.7 68.7 101.9Q60.0 102.2 59.2 102.7Q58.5 103.2 58.2 104.4Q57.8 105.7 57.8 113.5Q57.8 121.3 59.1 129.2Q60.3 137.0 63.2 143.0Q66.2 149.0 70.1 152.9Q74.0 156.8 78.6 159.4Q83.2 162.0 88.2 163.8Q93.3 165.7 102.9 166.2Q112.5 166.8 117.8 166.3Q123.0 165.8 126.1 164.8Q129.2 163.7 133.8 161.4Q138.5 159.2 141.9 156.2Q145.3 153.2 147.9 145.7Q150.5 138.2 150.5 130.8Q150.5 123.5 150.1 122.5Q149.7 121.5 141.5 117.2Q133.3 113.0 131.8 113.0Q130.2 113.0 128.3 114.0Q126.5 115.0 123.5 115.7Q120.5 116.3 118.5 116.0Q116.5 115.7 115.5 114.3Q114.5 113.0 115.1 109.3Q115.7 105.7 116.5 104.2Q117.3 102.8 119.6 100.7Q121.8 98.5 125.6 97.4Q129.3 96.3 135.2 102.5Q141.2 108.7 144.4 110.6Q147.7 112.5 152.6 114.5Q157.5 116.5 158.6 117.7Q159.7 118.8 158.9 128.8Q158.2 138.7 158.5 152.8Q158.8 166.8 160.2 167.6Q161.7 168.3 170.8 168.2Q179.8 168.2 181.1 167.4Q182.3 166.7 183.2 136.5Q184.2 106.3 183.2 105.6Q182.2 104.8 177.5 104.1Q172.8 103.3 168.2 101.5Q163.7 99.7 160.2 97.5Q156.8 95.3 156.2 93.8L155.5 92.2L164.5 91.7Q173.5 91.2 181.9 91.3Q190.3 91.5 192.7 90.9Q195.0 90.3 195.6 89.8Q196.2 89.2 195.7 81.6Q195.2 74.0 191.2 73.3Q187.3 72.7 154.6 72.8Q121.8 73.0 119.8 72.7Q117.7 72.3 115.8 72.8Q113.8 73.3 93.4 73.1Q73.0 72.8 65.2 73.2Q57.3 73.5 53.7 72.9Q50.0 72.3 47.7 72.5Q45.3 72.7 44.8 70.9Q44.3 69.2 45.9 65.8Q47.5 62.3 50.0 60.2Q52.5 58.0 56.8 56.4Q61.2 54.8 72.9 54.5Q84.7 54.2 96.0 56.0Q107.3 57.8 110.4 58.9Q113.5 60.0 114.8 59.4Q116.2 58.8 116.2 55.8Q116.3 52.8 115.5 47.5Q114.7 42.2 111.1 40.8Q107.5 39.3 101.9 38.0Q96.3 36.7 83.8 35.3Q71.3 34.0 66.6 34.2Q61.8 34.3 53.7 35.6Q45.5 36.8 39.5 39.7Q33.5 42.5 30.8 44.4Q28.2 46.3 24.6 52.8Q21.0 59.3 20.6 63.8Q20.2 68.2 19.5 70.2Q18.8 72.3 17.7 72.9Q16.5 73.5 14.6 73.3Q12.7 73.2 11.1 73.9Q9.5 74.7 9.6 81.9Z' },
   { fill: '#fff', top: 178, bottom: 284, d: 'M371.8 260.8Q370.3 261.3 369.0 262.8Q367.7 264.2 367.2 267.2Q366.8 270.3 367.6 272.0Q368.3 273.7 369.7 274.8Q371.0 276.0 373.8 276.4Q376.7 276.8 379.1 275.4Q381.5 274.0 382.2 272.8Q383.0 271.5 383.2 269.2Q383.3 266.8 381.7 264.2Q380.0 261.7 378.3 260.9Q376.7 260.2 375.0 260.2Q373.3 260.2 371.8 260.8ZM593.5 201.8Q589.0 204.5 586.2 208.8Q583.3 213.0 582.7 215.9Q582.0 218.8 582.0 222.9Q582.0 227.0 583.6 231.8Q585.2 236.5 588.1 239.8Q591.0 243.0 596.2 245.3Q601.5 247.7 607.6 247.8Q613.7 248.0 618.2 246.5Q622.8 245.0 626.4 241.9Q630.0 238.8 632.0 235.0Q634.0 231.2 634.5 225.6Q635.0 220.0 633.7 215.2Q632.3 210.3 629.2 206.6Q626.0 202.8 622.6 200.9Q619.2 199.0 614.5 198.2Q609.8 197.5 603.9 198.2Q598.0 199.0 593.5 201.8ZM607.8 209.9Q610.5 209.8 612.7 210.5Q614.8 211.2 617.4 214.1Q620.0 217.0 620.5 219.2Q621.0 221.3 620.8 223.8Q620.7 226.3 619.6 228.8Q618.5 231.2 616.4 233.0Q614.3 234.8 612.5 235.3Q610.7 235.8 607.4 235.6Q604.2 235.3 602.1 234.2Q600.0 233.2 598.4 231.0Q596.8 228.8 596.3 224.8Q595.8 220.8 596.4 218.6Q597.0 216.3 598.7 214.2Q600.3 212.2 602.7 211.1Q605.0 210.0 607.8 209.9ZM649.7 189.0Q649.0 189.7 648.7 191.2Q648.3 192.8 648.5 195.2Q648.7 197.5 649.5 199.6Q650.3 201.7 652.2 204.0Q654.2 206.3 661.4 211.8Q668.7 217.2 669.4 220.1Q670.2 223.0 669.8 224.3Q669.5 225.7 668.3 227.1Q667.2 228.5 664.8 229.2Q662.5 229.8 657.5 228.9Q652.5 228.0 648.2 225.6L643.8 223.2L643.8 230.8Q643.8 238.3 663.8 251.6L683.7 264.8L684.0 264.2Q684.3 263.7 684.2 256.8Q684.0 250.0 676.7 245.2L669.3 240.5L673.3 238.6Q677.3 236.7 679.7 234.2Q682.0 231.8 683.1 228.7Q684.2 225.5 684.1 222.2Q684.0 219.0 683.4 217.2Q682.8 215.3 680.1 211.5Q677.3 207.7 670.6 202.5Q663.8 197.3 662.9 195.8Q662.0 194.2 661.9 191.3L661.8 188.5L656.1 188.4Q650.3 188.3 649.7 189.0ZM537.8 191.2Q537.0 194.0 538.1 197.8Q539.2 201.5 541.8 204.4Q544.3 207.3 550.7 212.0Q557.0 216.7 557.9 218.2Q558.8 219.7 558.9 221.4Q559.0 223.2 558.7 224.4Q558.3 225.7 557.0 227.2Q555.7 228.7 553.9 229.2Q552.2 229.8 550.1 229.8Q548.0 229.8 544.5 228.8Q541.0 227.8 536.9 225.4L532.8 223.0L532.7 230.4Q532.5 237.8 552.5 251.2Q572.5 264.7 572.8 264.3Q573.2 264.0 573.1 257.2Q573.0 250.5 565.6 245.5L558.2 240.5L562.4 238.4Q566.7 236.3 568.7 234.1Q570.7 231.8 571.8 228.8Q572.8 225.8 572.8 222.9Q572.8 220.0 572.2 217.9Q571.7 215.8 568.8 211.8Q566.0 207.7 559.0 202.1Q552.0 196.5 551.3 195.0Q550.7 193.5 550.6 190.9L550.5 188.3L544.6 188.4Q538.7 188.5 537.8 191.2ZM699.8 195.8Q696.0 199.8 694.1 204.9Q692.2 210.0 692.2 214.5Q692.2 219.0 694.1 223.8Q696.0 228.5 698.8 231.1Q701.7 233.7 704.4 234.7Q707.2 235.7 714.7 235.8Q722.2 235.8 723.2 242.4Q724.2 249.0 726.1 251.8Q728.0 254.5 729.7 255.7Q731.3 256.8 735.2 257.8Q739.0 258.8 743.2 258.4Q747.3 258.0 747.4 251.8Q747.5 245.5 744.0 245.1Q740.5 244.7 739.4 243.7Q738.3 242.7 737.8 240.9Q737.2 239.2 737.1 220.8Q737.0 202.5 736.1 199.4Q735.2 196.3 732.2 193.3Q729.3 190.3 724.8 188.8Q720.2 187.3 715.4 187.8Q710.7 188.3 707.2 190.0Q703.7 191.7 699.8 195.8ZM718.5 200.2Q720.7 200.5 721.6 201.9Q722.5 203.3 722.6 212.4Q722.7 221.5 722.1 222.1Q721.5 222.7 716.8 222.7Q712.2 222.7 710.5 221.8Q708.8 220.8 707.8 219.1Q706.8 217.3 706.8 214.2Q706.8 211.0 707.4 209.1Q708.0 207.2 709.8 204.7Q711.7 202.2 714.0 201.1Q716.3 200.0 718.5 200.2ZM8.9 209.2Q9.2 213.8 9.7 214.5Q10.2 215.2 28.8 215.4L47.3 215.7L45.0 217.4Q42.7 219.2 41.2 221.0Q39.7 222.8 38.8 225.8Q38.0 228.8 38.2 232.5L38.5 236.2L45.7 236.1Q52.8 236.0 53.4 232.7Q54.0 229.3 55.5 228.1Q57.0 226.8 58.6 227.1Q60.2 227.3 61.1 228.5Q62.0 229.7 62.3 233.1Q62.7 236.5 61.1 239.0Q59.5 241.5 56.1 243.2Q52.7 245.0 47.8 245.0Q43.0 245.0 40.0 243.4Q37.0 241.8 35.2 239.6Q33.5 237.3 32.8 235.6Q32.0 233.8 31.2 228.1Q30.5 222.3 23.5 222.2Q16.5 222.2 16.2 222.5Q15.8 222.8 16.0 226.8Q16.2 230.8 17.2 235.7Q18.2 240.5 20.3 244.3Q22.5 248.2 25.8 251.0Q29.0 253.8 32.5 255.3Q36.0 256.8 41.5 257.5Q47.0 258.2 51.4 257.9Q55.8 257.7 61.6 256.2Q67.3 254.8 75.5 258.2Q83.7 261.7 92.1 262.5Q100.5 263.3 101.1 262.8Q101.7 262.3 101.7 239.3Q101.7 216.3 102.2 215.8Q102.8 215.2 106.7 215.2Q110.5 215.2 111.5 215.8Q112.5 216.3 112.5 239.4Q112.5 262.5 112.8 262.8Q113.2 263.0 120.2 263.0Q127.2 263.0 127.6 262.7Q128.0 262.3 128.0 239.6Q128.0 216.8 128.4 216.2Q128.8 215.5 152.7 215.2Q176.5 214.8 180.5 215.1Q184.5 215.3 185.1 215.9Q185.7 216.5 185.7 217.5Q185.7 218.5 184.6 219.2Q183.5 220.0 179.4 220.2Q175.3 220.3 173.7 221.5Q172.0 222.7 170.7 224.7L169.3 226.7L166.2 224.0Q163.0 221.3 159.7 220.3Q156.3 219.3 152.1 219.8Q147.8 220.3 144.5 222.4Q141.2 224.5 139.2 228.2Q137.2 231.8 136.8 235.9Q136.3 240.0 137.2 243.7Q138.2 247.3 140.1 250.0Q142.0 252.7 145.1 254.2Q148.2 255.8 153.8 256.4Q159.3 257.0 160.1 255.5Q160.8 254.0 161.2 249.8L161.5 245.5L158.9 245.1Q156.3 244.7 154.8 243.8Q153.3 243.0 152.7 241.2Q152.0 239.5 152.6 237.1Q153.2 234.7 154.7 233.8Q156.2 232.8 158.2 233.0Q160.2 233.2 161.5 234.7Q162.8 236.2 163.5 239.1Q164.2 242.0 169.5 242.2Q174.8 242.5 175.7 242.0Q176.5 241.5 177.3 237.9Q178.2 234.3 180.1 233.5Q182.0 232.7 182.9 233.6Q183.8 234.5 184.7 238.0Q185.5 241.5 185.3 251.9L185.2 262.3L192.8 262.6L200.5 262.8L200.8 239.4Q201.0 216.0 201.4 215.6Q201.8 215.2 206.6 215.2Q211.3 215.2 211.7 215.7Q212.0 216.2 212.0 239.2Q212.0 262.3 212.3 262.7Q212.7 263.0 219.8 262.9Q227.0 262.8 227.3 262.4Q227.7 262.0 227.7 239.0Q227.7 216.0 228.1 215.6Q228.5 215.2 232.3 215.3Q236.2 215.5 238.2 217.7Q240.3 219.8 241.9 220.6L243.5 221.3L240.8 225.2Q238.0 229.0 237.5 231.5Q237.0 234.0 237.0 236.6Q237.0 239.2 237.4 239.8Q237.8 240.3 244.8 240.3Q251.7 240.3 252.5 237.3Q253.3 234.3 254.5 233.7Q255.7 233.0 259.1 233.5Q262.5 234.0 269.1 236.4Q275.7 238.8 279.3 239.1Q283.0 239.3 285.8 238.5Q288.5 237.7 292.3 234.2Q296.2 230.7 300.9 233.8L305.7 237.0L300.8 240.5L296.0 244.0L300.5 248.0Q305.0 252.0 306.3 251.8Q307.7 251.7 319.9 244.9Q332.2 238.2 332.5 238.6Q332.8 239.0 332.8 250.7Q332.8 262.3 333.3 262.7Q333.8 263.0 340.6 263.0Q347.3 263.0 347.8 262.4Q348.3 261.8 348.2 239.2Q348.2 216.7 348.8 215.9Q349.3 215.2 351.2 215.2Q353.2 215.2 354.7 216.0Q356.2 216.8 356.6 220.2Q357.0 223.5 365.3 226.2L373.7 229.0L366.6 231.9Q359.5 234.8 359.3 242.2Q359.2 249.7 359.5 250.8Q359.8 252.0 374.2 256.4Q388.5 260.8 394.8 261.8Q401.2 262.8 405.7 263.0Q410.2 263.2 410.6 262.8Q411.0 262.3 411.0 239.3Q411.0 216.3 412.1 215.8Q413.2 215.2 417.2 215.2Q421.2 215.2 421.8 215.9Q422.3 216.7 422.4 239.6Q422.5 262.5 427.3 263.1Q432.2 263.7 434.7 263.6Q437.2 263.5 437.5 263.1Q437.8 262.7 438.0 239.4L438.2 216.2L453.0 216.0Q467.8 215.8 468.2 216.3Q468.7 216.8 468.8 223.6Q469.0 230.3 469.5 232.2Q470.0 234.0 471.3 236.1Q472.7 238.2 474.6 239.3Q476.5 240.5 478.6 241.0Q480.7 241.5 483.1 241.4Q485.5 241.3 489.5 240.3Q493.5 239.3 493.8 239.6Q494.2 239.8 493.9 241.4Q493.7 243.0 492.5 244.8Q491.3 246.5 488.5 248.2Q485.7 249.8 482.1 250.1Q478.5 250.3 475.4 249.7Q472.3 249.0 469.5 247.3Q466.7 245.7 465.3 243.9Q464.0 242.2 462.9 237.7Q461.8 233.2 461.6 228.2L461.3 223.2L454.1 222.9Q446.8 222.7 446.4 223.4Q446.0 224.2 446.2 228.4Q446.5 232.7 447.9 239.9Q449.3 247.2 451.9 251.1Q454.5 255.0 459.0 257.9Q463.5 260.8 467.7 261.9Q471.8 263.0 477.8 263.3Q483.7 263.7 488.8 262.8Q494.0 262.0 498.3 259.7Q502.7 257.3 505.2 254.0Q507.8 250.7 509.0 246.1Q510.2 241.5 510.1 236.5Q510.0 231.5 509.2 227.8Q508.5 224.0 502.2 223.2Q495.8 222.5 493.1 225.0Q490.3 227.5 488.4 227.7Q486.5 227.8 485.4 226.3Q484.3 224.8 484.2 220.6L484.2 216.3L500.0 216.1Q515.8 215.8 516.3 215.3Q516.8 214.8 516.5 209.9Q516.2 205.0 515.4 204.3Q514.7 203.7 425.6 203.5Q336.5 203.3 335.2 203.8Q333.8 204.3 333.6 208.2L333.3 212.0L329.8 208.2Q326.2 204.3 323.5 203.2Q320.8 202.2 317.6 202.0Q314.3 201.8 310.8 202.5Q307.2 203.2 303.6 204.6Q300.0 206.0 297.1 209.0L294.2 212.0L290.5 208.9Q286.8 205.8 283.5 204.9Q280.2 204.0 274.1 203.6Q268.0 203.2 248.4 203.3Q228.8 203.5 228.4 203.2Q228.0 202.8 228.1 199.8Q228.2 196.8 230.4 195.2Q232.7 193.7 235.7 192.8Q238.7 191.8 245.1 191.6Q251.5 191.3 262.5 193.2L273.5 195.0L273.0 189.6Q272.5 184.2 267.6 182.6Q262.7 181.0 244.8 181.0Q227.0 181.0 223.7 182.7Q220.3 184.3 217.8 187.2Q215.3 190.0 214.2 192.7Q213.0 195.3 212.4 199.0Q211.8 202.7 211.3 203.1Q210.8 203.5 170.2 203.4Q129.5 203.3 128.8 202.1Q128.2 200.8 129.2 198.4Q130.2 196.0 131.2 195.1Q132.2 194.2 135.1 193.0Q138.0 191.8 141.5 191.5Q145.0 191.2 150.4 191.5Q155.8 191.8 164.8 193.5Q173.8 195.2 174.1 194.5Q174.3 193.8 173.9 189.3Q173.5 184.8 172.7 183.9Q171.8 183.0 167.2 182.0Q162.7 181.0 145.4 181.0Q128.2 181.0 124.7 182.6Q121.2 184.2 119.2 186.1Q117.2 188.0 115.7 190.5Q114.2 193.0 113.2 197.8Q112.3 202.5 111.5 203.1Q110.7 203.7 69.6 203.6Q28.5 203.5 19.0 203.6Q9.5 203.7 9.1 204.1Q8.7 204.5 8.9 209.2ZM310.0 221.8Q310.0 220.8 310.8 219.6Q311.5 218.3 314.2 217.1Q316.8 215.8 319.3 215.8Q321.8 215.8 325.2 217.0Q328.7 218.2 330.0 219.6Q331.3 221.0 330.8 222.0Q330.3 223.0 324.8 226.2Q319.3 229.3 316.2 228.2Q313.2 227.0 311.6 224.9Q310.0 222.8 310.0 221.8ZM77.2 215.6L85.8 215.8L86.1 228.8Q86.3 241.8 85.9 244.6L85.5 247.3L81.4 245.8Q77.3 244.2 78.0 240.2Q78.7 236.3 78.2 231.8Q77.7 227.2 76.2 224.5Q74.7 221.8 71.4 219.1Q68.2 216.3 68.3 215.8Q68.5 215.3 77.2 215.6ZM385.6 215.5L395.3 215.7L395.6 232.6L395.8 249.5L388.4 247.6Q381.0 245.7 377.4 244.2L373.8 242.8L375.2 241.9Q376.5 241.0 381.1 239.5Q385.7 238.0 387.1 236.9Q388.5 235.8 388.2 229.9Q387.8 224.0 381.9 220.2Q376.0 216.3 375.9 215.8L375.8 215.3L385.6 215.5ZM256.7 215.4Q258.2 215.0 265.2 214.9Q272.2 214.8 274.4 215.4Q276.7 216.0 278.3 217.2Q280.0 218.5 280.0 221.8Q280.0 225.0 278.0 225.6Q276.0 226.2 272.2 225.0Q268.3 223.8 262.7 221.2Q257.0 218.7 256.1 217.2L255.2 215.8L256.7 215.4Z' },
 ] };
-const heroMark = () => `<svg class="hero-mark" viewBox="0 0 ${HERO_MARK.w} ${HERO_MARK.h}" aria-hidden="true" focusable="false"><defs>${HERO_MARK.lines.map((l, i) => `<clipPath id="hm${i}"><rect x="-4" y="${l.top}" width="${HERO_MARK.w + 8}" height="${l.bottom - l.top}"/></clipPath>`).join('')}</defs>${HERO_MARK.lines.map((l, i) => `<g clip-path="url(#hm${i})"><path class="ln" fill="${l.fill}" fill-rule="evenodd" d="${l.d}"/></g>`).join('')}</svg>`;
+const heroMark = (id = 'hm', cls = 'hero-mark') => `<svg class="${cls}" viewBox="0 0 ${HERO_MARK.w} ${HERO_MARK.h}" aria-hidden="true" focusable="false"><defs>${HERO_MARK.lines.map((l, i) => `<clipPath id="${id}${i}"><rect x="-4" y="${l.top}" width="${HERO_MARK.w + 8}" height="${l.bottom - l.top}"/></clipPath>`).join('')}</defs>${HERO_MARK.lines.map((l, i) => `<g clip-path="url(#${id}${i})"><path class="ln" fill="${l.fill}" fill-rule="evenodd" d="${l.d}"/></g>`).join('')}</svg>`;
 
 /* ---------- QR code generator ----------
    QRCode for JavaScript, Copyright (c) 2009 Kazuhiko Arase, http://www.d-project.com/
@@ -2124,56 +2164,112 @@ const icon = (n, s = 22) => `<svg class="ic" viewBox="0 0 24 24" width="${s}" he
 
 /* ---------- sound effects, made in the browser (no audio files) ---------- */
 const Sound = (() => {
-  let ctx = null, master = null, on = true;
+  /* Every sound here is made in the browser from tones and filtered noise; no audio files. Built to the rules of the UI Sound
+     Design skill: one shared audio context started by a tap, one clock reading per sound, fades that never reach zero,
+     quiet levels, noise for clicks and air, tones for anything with a pitch, and every noise player tidied away when it ends. */
+  let ctx = null, out = null, noiseBuf = null, on = true;
+  const LEVEL = 0.8, FLOOR = 0.001, NOISE_UP = 2.4;   // NOISE_UP: a filter throws most of the noise away, so noise is lifted to sit level with the tones
   try { if (localStorage.getItem('bgeo-sound') === 'off') on = false; } catch (e) { /* storage may be blocked */ }
+  /* the way out: one level control. (A limiter was tried and taken out: the browser's own one squashes short clicks to a third.)
+     Layered sounds are kept well under full scale instead; tools/sound_check.py measures every one. */
+  function chain(c) { const lvl = c.createGain(); lvl.gain.value = LEVEL; lvl.connect(c.destination); return lvl; }
   function ensure() {
     try {
-      if (!ctx) {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return false;
-        ctx = new AC(); master = ctx.createGain(); master.gain.value = 0.55; master.connect(ctx.destination);
-      }
+      if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false; ctx = new AC(); out = chain(ctx); }
       if (ctx.state === 'suspended') ctx.resume().catch(() => {});
       return true;
     } catch (e) { return false; }
   }
-  function tone({ f = 440, f2, t = 0.12, type = 'sine', g = 0.2, delay = 0 }) {
-    const t0 = ctx.currentTime + delay, o = ctx.createOscillator(), a = ctx.createGain();
-    o.type = type; o.frequency.setValueAtTime(f, t0);
-    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + t);
-    a.gain.setValueAtTime(0.0001, t0); a.gain.exponentialRampToValueAtTime(g, t0 + 0.008); a.gain.exponentialRampToValueAtTime(0.0001, t0 + t);
-    o.connect(a); a.connect(master); o.start(t0); o.stop(t0 + t + 0.03);
+  /* two seconds of white noise, made once and shared by every click, gust and rustle */
+  function noise() {
+    if (!noiseBuf || noiseBuf.sampleRate !== ctx.sampleRate) { const n = Math.floor(ctx.sampleRate * 2); noiseBuf = ctx.createBuffer(1, n, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; }
+    return noiseBuf;
   }
-  /* filtered noise: wind when it is band-passed, moving water when it is low-passed */
-  function wind({ t = 0.3, f = 500, f2 = 2200, g = 0.07, delay = 0, type = 'bandpass', peak = 0.35, fm = 0 }) {
-    const n = Math.floor(ctx.sampleRate * t), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
-    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), a = ctx.createGain(), t0 = ctx.currentTime + delay;
-    src.buffer = buf; bp.type = type; bp.Q.value = 0.9;
-    bp.frequency.setValueAtTime(f, t0);
-    if (fm) { bp.frequency.exponentialRampToValueAtTime(fm, t0 + t * peak); bp.frequency.exponentialRampToValueAtTime(f2, t0 + t); } else bp.frequency.exponentialRampToValueAtTime(f2, t0 + t);
-    a.gain.setValueAtTime(0.0001, t0); a.gain.exponentialRampToValueAtTime(g, t0 + t * peak); a.gain.exponentialRampToValueAtTime(0.0001, t0 + t);
-    src.connect(bp); bp.connect(a); a.connect(master); src.start(t0);
+  /* a pitched note: f, sliding to f2 when given. attack 0 is a struck note; a longer attack is a swell */
+  function tone(now, { f = 440, f2, t = 0.12, type = 'sine', g = 0.2, at = 0, attack = 0.006, peak }) {
+    const t0 = now + at, o = ctx.createOscillator(), a = ctx.createGain(), top = peak ? t * peak : attack;
+    o.type = type; o.frequency.setValueAtTime(f, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + t);
+    a.gain.setValueAtTime(FLOOR, t0); a.gain.exponentialRampToValueAtTime(g, t0 + top); a.gain.exponentialRampToValueAtTime(FLOOR, t0 + t);
+    o.connect(a); a.connect(out); o.start(t0); o.stop(t0 + t + 0.02);
   }
+  /* filtered noise: a click when it is very short, wind when it sweeps, water when it is low-passed */
+  function air(now, { t = 0.3, f = 500, f2, fm, q = 1, g = 0.1, at = 0, type = 'bandpass', peak = 0.3 }) {
+    const t0 = now + at, src = ctx.createBufferSource(), flt = ctx.createBiquadFilter(), a = ctx.createGain();
+    src.buffer = noise(); src.loop = true; flt.type = type; flt.Q.value = q; flt.frequency.setValueAtTime(f, t0);
+    if (fm) { flt.frequency.exponentialRampToValueAtTime(fm, t0 + t * peak); flt.frequency.exponentialRampToValueAtTime(f2 || f, t0 + t); } else if (f2) flt.frequency.exponentialRampToValueAtTime(f2, t0 + t);
+    const top = Math.min(0.8, g * NOISE_UP);
+    if (peak > 0) { a.gain.setValueAtTime(FLOOR, t0); a.gain.exponentialRampToValueAtTime(top, t0 + t * peak); } else a.gain.setValueAtTime(top, t0);
+    a.gain.exponentialRampToValueAtTime(FLOOR, t0 + t);
+    src.connect(flt); flt.connect(a); a.connect(out);
+    src.onended = () => { src.disconnect(); flt.disconnect(); a.disconnect(); };
+    src.start(t0, Math.random() * 1.5); src.stop(t0 + t + 0.02);
+  }
+  /* a long sound that follows a path: pts is a list of [seconds, level, pitch]. With `wave` it is a note; without, it is wind. */
+  function path(now, { at = 0, pts, wave, q = 0.7 }) {
+    const t0 = now + at, end = pts[pts.length - 1][0], a = ctx.createGain(), noisy = !wave, lift = noisy ? NOISE_UP : 1;
+    const src = noisy ? ctx.createBufferSource() : ctx.createOscillator(), flt = noisy ? ctx.createBiquadFilter() : null, freq = noisy ? flt.frequency : src.frequency;
+    if (noisy) { src.buffer = noise(); src.loop = true; flt.type = 'bandpass'; flt.Q.value = q; src.connect(flt); flt.connect(a); } else { src.type = wave; src.connect(a); }
+    pts.forEach(([t, g, f], i) => { const lv = Math.max(FLOOR, Math.min(0.8, g * lift)); if (!i) { a.gain.setValueAtTime(lv, t0 + t); freq.setValueAtTime(f, t0 + t); } else { a.gain.exponentialRampToValueAtTime(lv, t0 + t); freq.exponentialRampToValueAtTime(f, t0 + t); } });
+    a.connect(out);
+    if (noisy) { src.onended = () => { src.disconnect(); flt.disconnect(); a.disconnect(); }; src.start(t0 + pts[0][0], Math.random() * 1.5); } else src.start(t0 + pts[0][0]);
+    src.stop(t0 + end + 0.02);
+  }
+  /* a bell: one tone shaking the pitch of another */
+  function bell(now, { f = 660, ratio = 1.4, depth = 600, t = 0.6, g = 0.16, at = 0 }) {
+    const t0 = now + at, m = ctx.createOscillator(), mg = ctx.createGain(), c = ctx.createOscillator(), a = ctx.createGain();
+    m.frequency.setValueAtTime(f * ratio, t0); mg.gain.setValueAtTime(depth, t0); mg.gain.exponentialRampToValueAtTime(FLOOR, t0 + t * 0.8);
+    c.frequency.setValueAtTime(f, t0); a.gain.setValueAtTime(FLOOR, t0); a.gain.exponentialRampToValueAtTime(g, t0 + 0.004); a.gain.exponentialRampToValueAtTime(FLOOR, t0 + t);
+    m.connect(mg); mg.connect(c.frequency); c.connect(a); a.connect(out);
+    m.start(t0); c.start(t0); m.stop(t0 + t + 0.02); c.stop(t0 + t + 0.02);
+  }
+  /* a bird: two or three quick whistles that slide up and fall */
+  function bird(now, at, f, n = 2, g = 0.045) { for (let i = 0; i < n; i++) { tone(now, { f: f * (1 + i * 0.06), f2: f * 1.32, t: 0.075, g, at: at + i * 0.1, attack: 0.012 }); } }
   const lib = {
-    tap() { tone({ f: 540, f2: 330, t: 0.07, g: 0.15 }); },                       // pebble
-    pick() { tone({ f: 420, f2: 780, t: 0.09, g: 0.13 }); },                      // water drop
-    move() { wind({}); },                                                         // gust of wind between pages
-    open() { tone({ f: 330, f2: 520, t: 0.12, g: 0.1 }); },
-    good() { tone({ f: 784, t: 0.22, g: 0.15 }); tone({ f: 1047, t: 0.36, g: 0.15, delay: 0.11 }); },
-    bad() { tone({ f: 190, f2: 120, t: 0.22, g: 0.2, type: 'triangle' }); },
-    tick() { tone({ f: 1250, f2: 900, t: 0.035, g: 0.05, type: 'triangle' }); },
-    win() { [523, 659, 784, 1047].forEach((f, i) => tone({ f, t: 0.3, g: 0.14, delay: i * 0.1 })); },
-    /* the opening: wind builds through the flight over the land (2.6 s), then thins out as the camera climbs into space (1.3 s) */
-    /* the whole opening in one piece: a falling rush for the dive (1.4 s), wind building through the flight over the land (2.6 s), then thinning as the camera climbs to space */
-    opening() { wind({ t: 1.3, f: 3200, f2: 360, g: 0.11, peak: 0.8 }); tone({ f: 200, f2: 52, t: 1.25, g: 0.13 }); wind({ t: 2.6, f: 420, f2: 3000, g: 0.13, peak: 0.72, delay: 1.37 }); tone({ f: 62, f2: 150, t: 2.5, g: 0.14, delay: 1.37 }); wind({ t: 1.5, f: 2600, f2: 220, g: 0.1, delay: 3.82, peak: 0.2 }); tone({ f: 150, f2: 46, t: 1.4, g: 0.12, delay: 3.82 }); },
-    whoosh() { wind({ t: 2.6, f: 420, f2: 3000, g: 0.13, peak: 0.72 }); tone({ f: 62, f2: 150, t: 2.5, g: 0.14 }); wind({ t: 1.5, f: 2600, f2: 220, g: 0.1, delay: 2.45, peak: 0.2 }); tone({ f: 150, f2: 46, t: 1.4, g: 0.12, delay: 2.45 }); },
+    /* a pebble: a soft click with a little body under it */
+    tap(now) { air(now, { t: 0.045, f: 1700, q: 1.4, g: 0.22, peak: 0 }); tone(now, { f: 480, f2: 300, t: 0.06, g: 0.07, attack: 0.003 }); },
+    /* a drop of water */
+    pick(now) { tone(now, { f: 1350, f2: 520, t: 0.07, g: 0.16, attack: 0.003 }); },
+    /* a gust between pages */
+    move(now) { air(now, { t: 0.28, f: 500, f2: 3600, q: 1, g: 0.14, peak: 0.3 }); },
+    open(now) { tone(now, { f: 330, f2: 520, t: 0.13, g: 0.12 }); },
+    /* right: two notes going up a major third */
+    good(now) { tone(now, { f: 659, t: 0.14, g: 0.2, attack: 0.004 }); tone(now, { f: 824, t: 0.24, g: 0.2, at: 0.15, attack: 0.004 }); },
+    /* wrong: low and falling, with an octave on top so a phone's small speaker can play it */
+    bad(now) { tone(now, { f: 233, f2: 150, t: 0.24, g: 0.18, type: 'triangle', attack: 0.004 }); tone(now, { f: 466, f2: 300, t: 0.2, g: 0.07, attack: 0.004 }); },
+    tick(now) { air(now, { t: 0.03, f: 3200, q: 4, g: 0.16, peak: 0 }); },
+    win(now) { [523, 659, 784].forEach((f, i) => tone(now, { f, t: 0.26, g: 0.16, at: i * 0.1, attack: 0.004 })); bell(now, { f: 1047, t: 0.7, g: 0.18, depth: 500, at: 0.3 }); },
+    /* The opening, 4.1 seconds, in step with the picture. Its weight sits between 300 and 3000 Hz, where a phone's speaker
+       is strong; the deep notes underneath are for headphones and bigger speakers.
+       0.0   the tap: a soft pop, and a breath of air as the screen cuts to the forest
+       0.2   on the forest floor: leaves rustle, birds call
+       0.2 to 2.1   the flight out: wind builds as the land streams away, with a note rising under it
+       2.1 to 4.1   the climb to space: the wind thins and falls away, a clear high note rises toward the landing chime */
+    opening(now) {
+      tone(now, { f: 620, f2: 240, t: 0.12, g: 0.24, attack: 0.003 }); air(now, { t: 0.05, f: 1400, q: 1, g: 0.14, peak: 0 });
+      air(now, { t: 0.28, f: 4200, f2: 700, q: 0.8, g: 0.16, peak: 0.6 });
+      air(now, { t: 1.4, f: 5200, f2: 4400, q: 0.6, g: 0.035, at: 0.2, peak: 0.2 });
+      bird(now, 0.32, 2500, 3, 0.07); bird(now, 0.74, 3100, 2, 0.055); bird(now, 1.14, 2250, 2, 0.045);
+      /* the wind of the flight, as one breath: rising with the speed, held while the camera tips, thinning on the way to space */
+      path(now, { q: 0.6, pts: [[0.2, 0, 480], [0.34, 0.03, 520], [1.0, 0.08, 900], [1.9, 0.2, 2300], [2.7, 0.17, 2000], [3.3, 0.07, 1000], [4.1, 0, 320]] });
+      path(now, { wave: 'triangle', pts: [[0.2, 0, 196], [0.34, 0.02, 196], [1.9, 0.07, 392], [2.7, 0.06, 392], [3.4, 0.025, 262], [4.1, 0, 196]] });
+      path(now, { wave: 'sine', pts: [[0.2, 0, 73], [0.34, 0.03, 73], [1.9, 0.1, 147], [2.7, 0.09, 147], [4.1, 0, 49]] });
+      /* a clear note rising toward the landing chime */
+      path(now, { wave: 'sine', pts: [[2.82, 0, 660], [3.0, 0.012, 680], [3.85, 0.05, 960], [4.12, 0, 988]] });
+    },
     /* a tsunami: a deep surge that swells, breaks and hisses away */
-    wave() { wind({ t: 1.05, f: 140, fm: 1100, f2: 260, g: 0.3, type: 'lowpass', peak: 0.45 }); wind({ t: 0.7, f: 2400, f2: 5200, g: 0.05, delay: 0.38, peak: 0.25 }); tone({ f: 58, f2: 40, t: 0.9, g: 0.2 }); },
-    land() { tone({ f: 659, t: 0.5, g: 0.1 }); tone({ f: 988, t: 0.7, g: 0.1, delay: 0.12 }); },
+    wave(now) { air(now, { t: 1.05, f: 180, fm: 1300, f2: 300, q: 0.9, g: 0.2, type: 'lowpass', peak: 0.45 }); air(now, { t: 0.7, f: 2400, f2: 5200, q: 0.9, g: 0.06, at: 0.38, peak: 0.25 }); tone(now, { f: 58, f2: 40, t: 0.9, g: 0.16, peak: 0.3 }); },
+    /* the landing: two soft bells, a fifth apart */
+    land(now) { bell(now, { f: 659, t: 0.8, g: 0.2 }); bell(now, { f: 988, t: 1.05, g: 0.17, at: 0.16 }); },
   };
-  function play(name) { if (!on || !ctx) return; try { if (ctx.state === 'suspended') ctx.resume().catch(() => {}); lib[name] && lib[name](); } catch (e) { /* never let a sound break the page */ } }
-  function toggle() { on = !on; try { localStorage.setItem('bgeo-sound', on ? 'on' : 'off'); } catch (e) {} if (on && ensure()) lib.pick(); return on; }
+  function play(name) { if (!on || !ctx || !lib[name]) return; try { if (ctx.state === 'suspended') ctx.resume().catch(() => {}); lib[name](ctx.currentTime + 0.005); } catch (e) { /* never let a sound break the page */ } }
+  function toggle() { on = !on; try { localStorage.setItem('bgeo-sound', on ? 'on' : 'off'); } catch (e) {} if (on && ensure()) play('pick'); return on; }
+  /* for checking a sound without ears: draws it into memory and returns the samples */
+  async function render(name, secs) {
+    const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext, live = [ctx, out, noiseBuf], off = new AC(1, Math.ceil(44100 * secs), 44100);
+    try { ctx = off; out = chain(off); noiseBuf = null; lib[name](0.005); } finally { [ctx, out, noiseBuf] = live; }
+    return (await off.startRendering()).getChannelData(0);
+  }
+  if (window.__bgeoTest) window.__bgeoTest.sound = { render, names: Object.keys(lib) };
   return { play, toggle, unlock: ensure, ready: () => !!ctx && ctx.state === 'running', get on() { return on; } };
 })();
 
@@ -2910,7 +3006,9 @@ function paintEarth(g, W, H) {
 }
 
 /* ---------- entry animations ----------
-   Opening the site: the camera starts inside a forest, a few feet above the ground, looking
+   Opening the site: a title screen first. The Earth turns in the middle with a pin on Dhaka, satellites circle it, the
+   olympiad's lettering sits above and "Tap to enter" below. A tap cuts straight to the forest: no zoom into the globe.
+   Then the camera starts inside a forest, a few feet above the ground, looking
    straight down a path between the trunks, and it is already moving. In one unbroken movement
    it flies backwards and up, so everything streams away in front of it: the forest shrinks,
    then a river, farmland, desert and a coast slide out from under the camera. It never turns
@@ -2928,15 +3026,17 @@ const HeroSync = { rot: null, speed: 0, globe: null, live: false, kick: null };
 function siteIntro() {
   if (reducedMotion() || seenOnce('bgeo-intro') || routeName() !== 'home') return null;
   markSeen('bgeo-intro');
-  /* The opening starts on the Earth, turning slowly, with three words under it: Tap to enter. The tap is also what lets the
-     browser play sound. From there the camera dives into the Earth, down through the treetops to the forest floor, and the
-     flight back out begins. */
+  /* The title screen waits for a tap; the tap is also what lets the browser play sound. Then a quick wash of leaf-light
+     cuts to the forest floor and the flight out begins. */
   const el = document.createElement('div'); el.className = 'intro';
-  el.innerHTML = '<canvas aria-hidden="true"></canvas><p class="gate" role="button" tabindex="0">Tap to enter</p><p class="intro-skip">Tap to skip</p>';
+  el.innerHTML = `<canvas aria-hidden="true"></canvas><div class="gate-ui"><div class="gate-title" aria-hidden="true">${heroMark('gm', 'gate-mark')}</div>
+    <div class="gate-pin" aria-hidden="true"><i></i><span><b>Dhaka</b>23.8° N, 90.4° E</span></div>
+    <i class="gate-corner tl"></i><i class="gate-corner tr"></i><i class="gate-corner bl"></i><i class="gate-corner br"></i>
+    <p class="gate" role="button" tabindex="0"><i class="gate-ring" aria-hidden="true"></i>Tap to enter</p></div><p class="intro-skip">Tap to skip</p>`;
   document.body.appendChild(el); document.body.classList.add('intro-on', 'intro-globe');
-  const cv = el.firstChild, gate = el.querySelector('.gate'), g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+  const cv = el.firstChild, gate = el.querySelector('.gate'), gateUi = el.querySelector('.gate-ui'), pin = el.querySelector('.gate-pin'), g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
   /* the ground is drawn on a square sheet as wide as the screen's diagonal, then laid onto the screen */
-  const layer = document.createElement('canvas'), lg = layer.getContext('2d'), decal = document.createElement('canvas'), decalIn = document.createElement('canvas');
+  const layer = document.createElement('canvas'), lg = layer.getContext('2d'), decal = document.createElement('canvas');
   let W = 0, H = 0, D = 0, F = 0, DS = 0;
   let seed = 41; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
   const sin = Math.sin, clamp = x => Math.max(0, Math.min(1, x)), mix = (a, b, t) => a + (b - a) * t, smooth = p => p * p * (3 - 2 * p);
@@ -3035,7 +3135,7 @@ function siteIntro() {
 
   /* The flight, in seconds. RUN: backwards along the ground and up. TIP: still backing away and climbing, the camera tips
      down until it looks straight at the coast. OUT: straight up and away, until the whole turning Earth is in view. */
-  const DIVE = 0.95, PLUNGE = 0.42, LEAD = DIVE + PLUNGE, U_IN = 5.4, RUN = 1.9, TIP = 0.7, OUT = 1.3, U_START = 6.55, U_END = 25.6, V_END = 0.25, H0 = 0.036, H1 = 1.6, HX = 6;
+  const CUT = 0.22, LEAD = CUT, RUN = 1.9, TIP = 0.7, OUT = 1.3, U_START = 6.55, U_END = 25.6, V_END = 0.25, H0 = 0.036, H1 = 1.6, HX = 6;
   const runEase = p => 0.1 * p + 0.9 * Math.pow(p, 2.3), RUN_SLOPE = 0.1 + 0.9 * 2.3;   // not zero at the start: the camera is moving from the first frame
   const tipShare = RUN_SLOPE * TIP / (2 * RUN), U1 = (U_END + U_START * tipShare) / (1 + tipShare), SPEED1 = (U1 - U_START) * RUN_SLOPE / RUN;
   /* The place the flight ends over is a real spot on the globe: the coast of Bangladesh, land to the north and the Bay of Bengal
@@ -3056,14 +3156,13 @@ function siteIntro() {
   }
   const size = () => {
     W = window.innerWidth; H = window.innerHeight; D = Math.ceil(Math.hypot(W, H)); F = D * 0.62;
-    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); layer.width = layer.height = Math.round(D * dpr); paintDecal(decal, U_END, V_END); paintDecal(decalIn, U_IN, 0); place();
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); layer.width = layer.height = Math.round(D * dpr); paintDecal(decal, U_END, V_END); place();
   };
   /* how fast the Earth turns while the camera leaves (slow, then quick, then easing), and how far it has turned by each moment */
   const spinAt = r => 0.25 + 4.15 * smooth(clamp((r - 0.08) / 0.5)) - 1.8 * smooth(clamp((r - 0.62) / 0.38)), TURN = [0];
   for (let i = 1; i <= 65; i++) TURN.push(TURN[i - 1] + spinAt((i - 0.5) / 64) * OUT / 64);
-  let started = false, idle = 0, gateRot = -1.05, clock = 0, last = 0, raf = 0, rot = 0, extra = 0, spin = 0.25, target = null, landed = false, landT = 0, skipped = false, finished = false, revealed = false, tick = 0;
-  const Rf = () => Math.min(W, H) * 0.17, Rgate = () => Math.min(W, H) * 0.31;
-  const inOut = x => (x < 0.5 ? 8 * x * x * x * x : 1 - 8 * Math.pow(1 - x, 4));   // slow, then fast, then slow: a fall and a catch
+  let started = false, idle = 0, gateRot = -0.5, clock = 0, last = 0, raf = 0, rot = 0, extra = 0, spin = 0.25, target = null, landed = false, landT = 0, skipped = false, finished = false, revealed = false, tick = 0;
+  const Rf = () => Math.min(W, H) * 0.17, tall = () => H > W * 1.1, Rgate = () => (tall() ? Math.min(W * 0.36, H * 0.2) : Math.min(H * 0.25, W * 0.2)), gateY = () => H * (tall() ? 0.53 : 0.55);
   function place() {
     if (!landed) return;
     const st = document.querySelector('#stage'), b = st && st.getBoundingClientRect();
@@ -3092,6 +3191,36 @@ function siteIntro() {
       g.drawImage(pic, -DS / 2, -DS / 2); g.restore();
     }
   }
+  /* ---- the title screen: stars, the Earth with a glow round it, two satellites on their orbits, a pin on Dhaka ---- */
+  const stars = []; for (let i = 0; i < 90; i++) stars.push([R(), R(), 0.5 + R() * 1.1, R() * 6.28, 0.6 + R() * 1.4]);
+  const ORBITS = [{ rx: 1.46, ry: 0.4, tilt: -0.33, speed: 0.55, at: 0.6, color: '154,217,111' }, { rx: 1.78, ry: 0.56, tilt: 0.42, speed: -0.34, at: 3.4, color: '255,255,255' }];
+  const DHAKA = 23.8 * Math.PI / 180;
+  function drawGate() {
+    const cx = W / 2, cy = gateY(), Rg = Rgate();
+    g.clearRect(0, 0, W, H); drawSky(1);
+    for (const st of stars) { const x = st[0] * W, y = st[1] * H; if (Math.hypot(x - cx, y - cy) < Rg * 1.05) continue; g.globalAlpha = 0.2 + 0.5 * (0.5 + 0.5 * sin(idle * st[4] + st[3])); g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, st[2], 0, 6.2832); g.fill(); }
+    g.globalAlpha = 1;
+    const halo = g.createRadialGradient(cx, cy, Rg * 0.94, cx, cy, Rg * 1.36); halo.addColorStop(0, 'rgba(160,212,255,.4)'); halo.addColorStop(0.35, 'rgba(160,212,255,.14)'); halo.addColorStop(1, 'rgba(160,212,255,0)');
+    g.fillStyle = halo; g.beginPath(); g.arc(cx, cy, Rg * 1.36, 0, 6.2832); g.fill();
+    /* each orbit is drawn in two halves: the far half before the Earth, the near half after it */
+    const orbit = (o, near) => {
+      g.save(); g.translate(cx, cy); g.rotate(o.tilt);
+      g.strokeStyle = `rgba(${o.color},${near ? 0.5 : 0.22})`; g.lineWidth = 1.2; g.beginPath(); g.ellipse(0, 0, o.rx * Rg, o.ry * Rg, 0, near ? 0 : Math.PI, near ? Math.PI : 2 * Math.PI); g.stroke();
+      const a = (o.at + idle * o.speed) % 6.2832, th = a < 0 ? a + 6.2832 : a;
+      if ((th < Math.PI) === near) {
+        const x = o.rx * Rg * Math.cos(th), y = o.ry * Rg * sin(th);
+        for (let k = 1; k <= 10; k++) { const tk = th - Math.sign(o.speed) * k * 0.035; g.fillStyle = `rgba(${o.color},${0.34 * (1 - k / 11)})`; g.beginPath(); g.arc(o.rx * Rg * Math.cos(tk), o.ry * Rg * sin(tk), 1.6, 0, 6.2832); g.fill(); }
+        const glow = g.createRadialGradient(x, y, 0, x, y, 11); glow.addColorStop(0, `rgba(${o.color},.75)`); glow.addColorStop(1, `rgba(${o.color},0)`); g.fillStyle = glow; g.beginPath(); g.arc(x, y, 11, 0, 6.2832); g.fill();
+        g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, 2.6, 0, 6.2832); g.fill();
+      }
+      g.restore();
+    };
+    ORBITS.forEach(o => orbit(o, false));
+    globe.paint(gateRot); globe.drawTo(g, cx, cy, Rg, W, H);
+    ORBITS.forEach(o => orbit(o, true));
+    const d = globe.at(DHAKA, gateRot);
+    pin.style.transform = `translate(${(cx + d[0] * Rg).toFixed(1)}px,${(cy + d[1] * Rg).toFixed(1)}px)`; pin.style.opacity = d[2] > 0.25 ? '' : '0';
+  }
   const wash = a => { if (a > 0) { g.fillStyle = `rgba(226,244,206,${a})`; g.fillRect(0, 0, W, H); } };   // the light between the leaves
   function frame(now) {
     if (finished) return; raf = requestAnimationFrame(frame);
@@ -3099,21 +3228,13 @@ function siteIntro() {
     if (started) clock += dt; if (typeof window.__introT === 'number') clock = window.__introT;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (!started && typeof window.__introT !== 'number') {
-      /* waiting for the tap: the Earth turns gently back and forth, with Asia coming round */
-      idle += dt; gateRot = -1.05 + 0.3 * sin(idle * 0.5);
-      drawOrbit(Rgate(), gateRot, W / 2, H * 0.46, 0, 1, null, 0); return;
+      /* waiting for the tap: the Earth swings gently, Bangladesh in view */
+      idle += dt; gateRot = -0.5 + 0.26 * sin(idle * 0.45);
+      drawGate(); return;
     }
-    if (clock < DIVE) {
-      /* the dive: the Earth swings Bangladesh round to face us and rushes up, until one patch of forest fills the screen */
-      const d = clock / DIVE, z = inOut(d), Rg = Math.exp(mix(Math.log(Rgate()), Math.log(ZOOM * D), z)), r = 1 - z;
-      drawOrbit(Rg, gateRot * (1 - smooth(clamp(d / 0.8))), W / 2, mix(H * 0.46, H / 2, smooth(d)), 1 - smooth(clamp(r / 0.6)), 1, decalIn, smooth(clamp((d - 0.1) / 0.3)));
-      return;
-    }
-    if (clock < LEAD) {
-      /* the plunge: straight down onto the treetops, into the light between the leaves */
-      const q = (clock - DIVE) / PLUNGE;
-      drawScene({ u: U_IN, v: 0, h: HX * Math.pow(1.9 / HX, q * q * (1.6 - 0.6 * q)), pitch: Math.PI / 2 }); g.clearRect(0, 0, W, H); show(1);
-      wash(Math.pow(smooth(clamp((q - 0.25) / 0.75)), 1.4)); return;
+    if (clock < CUT) {
+      /* the cut: a quick wash of light, and the forest is there */
+      drawGate(); wash(smooth(clock / CUT)); return;
     }
     const t = clock - LEAD;
     if (t < RUN) {
@@ -3155,7 +3276,7 @@ function siteIntro() {
   const quit = () => { el.classList.add('skipping'); setTimeout(end, 240); };
   const skip = () => { if (skipped || finished || revealed) return; skipped = true; if (landed) quit(); };
   function begin() {
-    if (started) return; started = true; el.classList.add('going'); gate.classList.add('gone'); setTimeout(() => gate.remove(), 400);
+    if (started) return; started = true; el.classList.add('going'); gate.classList.add('gone'); setTimeout(() => gateUi.remove(), 400);
     Sound.unlock(); Sound.play('opening');
   }
   const press = () => (started ? skip() : begin());
@@ -3334,9 +3455,17 @@ function buildShell() {
     <a href="#countdown" data-nav="countdown">${icon('clock')}<span>Schedule</span></a>
     <a href="#login" id="tab-acct">${icon('account')}<span>Login</span></a>
   </nav>
-  <footer class="foot"><div class="wrap">
-    <img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263" draggable="false"><small>${CLOUD ? 'Bangladesh Geography Olympiad (BGeO)' : 'Preview build with sample data. Sign-ups made here stay in this browser only.'}</small>
-  </div><div class="wrap foot-base"><small>&copy; ${new Date().getFullYear()} Bangladesh Geography Olympiad. All rights reserved.</small></div></footer>`;
+  <footer class="foot"><div class="wrap foot-grid">
+    <div class="foot-main">
+      <img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263" draggable="false">
+      <h2>${ORG.name}</h2>
+      <p><strong>Address:</strong> <span id="foot-address"></span></p>
+      <p><strong>Email:</strong> <a id="foot-email"></a></p>
+      <p><strong>Phone:</strong> <a id="foot-phone"></a></p>
+      <p class="foot-social" id="foot-social" hidden></p>
+    </div>
+    <nav class="foot-links" aria-label="Organization"><h2>Organization</h2><a href="#team">About Us</a><a href="#about">About BdGeO</a></nav>
+  </div><div class="wrap foot-base"><small>&copy; ${new Date().getFullYear()} Bangladesh Geography Olympiad. All rights reserved.</small>${CLOUD ? '' : '<small>Preview build with sample data. Sign-ups made here stay in this browser only.</small>'}</div></footer>`;
   const sb = $('#sound-btn');
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
   paintSound(); sb.addEventListener('click', () => { Sound.toggle(); paintSound(); });
@@ -3369,7 +3498,21 @@ function arriveOnScroll(root) {
 }
 function openMenu() { $('#menu').hidden = false; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'true'); b.innerHTML = icon('close'); Sound.play('open'); }
 function closeMenu() { closeDrops(); const m = $('#menu'); if (!m || m.hidden) return; m.hidden = true; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'false'); b.innerHTML = icon('menu'); }
+/* the organisers' details. An admin can change the email, phone, address and social links under Admin, Site. */
+const ORG = { name: 'Bangladesh Geography Olympiad Committee', address: 'Prothom Alo Bhaban, 1st Floor, 19 Karwan Bazar, Dhaka, Bangladesh, 1215', email: 'support@geographyolympiad.org', phone: '+880 9638-713534' };
+const SOCIALS = [['facebook', 'Facebook'], ['instagram', 'Instagram'], ['x', 'X'], ['linkedin', 'LinkedIn']];
+function contactOf() {
+  const s = (Store.db && Store.db.settings) || {};
+  return { address: s.contactAddress || ORG.address, email: s.contactEmail || ORG.email, phone: s.contactPhone || ORG.phone, socials: SOCIALS.map(([k, label]) => [label, safeUrl(s[k])]).filter(x => x[1]) };
+}
+function fillFoot() {
+  const c = contactOf(), em = $('#foot-email'), ph = $('#foot-phone'), so = $('#foot-social'); if (!em) return;
+  $('#foot-address').textContent = c.address;
+  em.textContent = c.email; em.href = 'mailto:' + c.email; ph.textContent = c.phone; ph.href = 'tel:' + c.phone.replace(/[^+\d]/g, '');
+  so.hidden = !c.socials.length; so.innerHTML = c.socials.map(([label, url]) => `<a href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`).join('');
+}
 function syncChrome(name) {
+  fillFoot();
   $$('[data-nav]').forEach(a => { if (a.dataset.nav === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   $$('.dd').forEach(d => d.classList.toggle('here', !!$('[aria-current]', d)));
   const u = Store.me(), b = $('#acct-btn');
@@ -3873,12 +4016,13 @@ PAGES.faq = () => ({ html: `<div class="wrap">${pageHead('Questions and answers'
   <section class="sheet">${Store.all('faq').map(f => `<details class="qa"><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('') || '<p class="empty">No questions yet.</p>'}</section>
   <p class="note onblue" style="margin-top:16px">Still stuck? See the <a href="#contact">contact page</a>.</p></div>` });
 PAGES.contact = () => {
-  const s = Store.db.settings, fb = safeUrl(s.facebook), any = s.contactEmail || s.contactPhone || fb;
+  const c = contactOf();
   return { html: `<div class="wrap">${pageHead('Contact', 'Reach the organisers with questions about registration, rounds or results.')}
-    <section class="sheet">${any ? `<dl class="kv">
-      ${s.contactEmail ? `<dt>Email</dt><dd><a href="mailto:${esc(s.contactEmail)}">${esc(s.contactEmail)}</a></dd>` : ''}
-      ${s.contactPhone ? `<dt>Phone</dt><dd><a href="tel:${esc(s.contactPhone)}">${esc(s.contactPhone)}</a></dd>` : ''}
-      ${fb ? `<dt>Facebook</dt><dd><a href="${esc(fb)}" target="_blank" rel="noopener">${esc(fb)}</a></dd>` : ''}</dl>` : '<p class="empty">Contact details will be added here soon.</p>'}</section></div>` };
+    <section class="sheet"><h2 class="sub">${ORG.name}</h2><dl class="kv">
+      <dt>Address</dt><dd>${esc(c.address)}</dd>
+      <dt>Email</dt><dd><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></dd>
+      <dt>Phone</dt><dd><a href="tel:${esc(c.phone.replace(/[^+\d]/g, ''))}">${esc(c.phone)}</a></dd>
+      ${c.socials.map(([label, url]) => `<dt>${label}</dt><dd><a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a></dd>`).join('')}</dl></section></div>` };
 };
 
 /* ---------- log in, register, my account ---------- */
@@ -5005,7 +5149,7 @@ async function emailNoticeDialog(n) {
   busy(null, async () => { const k = await Store.queueMail(people, v.subject, v.body); const r = await sendAndTell(); if (r.preview) toast(`${plural(k, 'email')} listed in the Emails tab (preview)`, 'good'); });
 }
 ADMIN['admin-site'] = main => {
-  const s = Store.db.settings, cf = [{ key: 'contactEmail', label: 'Contact email', type: 'email' }, { key: 'contactPhone', label: 'Contact phone', type: 'tel' }, { key: 'facebook', label: 'Facebook page link', type: 'url', placeholder: 'https://' }];
+  const s = Store.db.settings, cf = [{ key: 'contactEmail', label: 'Contact email', type: 'email', placeholder: ORG.email }, { key: 'contactPhone', label: 'Contact phone', type: 'tel', placeholder: ORG.phone }, { key: 'contactAddress', label: 'Address', placeholder: ORG.address }, { key: 'facebook', label: 'Facebook page link', type: 'url', placeholder: 'https://' }, { key: 'instagram', label: 'Instagram link', type: 'url', placeholder: 'https://' }, { key: 'x', label: 'X (Twitter) link', type: 'url', placeholder: 'https://' }, { key: 'linkedin', label: 'LinkedIn link', type: 'url', placeholder: 'https://' }];
   const top = document.createElement('div'); top.className = 'stack'; top.style.gap = '16px';
   top.innerHTML = `<section class="panel"><h2>Switches</h2>
       <label class="check" for="sw-reg"><input type="checkbox" id="sw-reg"${s.regOpen ? ' checked' : ''}><span>Registration is open</span></label>
@@ -5013,7 +5157,7 @@ ADMIN['admin-site'] = main => {
       <label class="check" for="sw-split"><input type="checkbox" id="sw-split"${s.examSplit ? ' checked' : ''}><span>Students in the admit card districts sit the Regional round in person only (the E-Regional exam is closed to them)</span></label>
       <form class="form" id="cd" novalidate style="margin-top:14px"><div class="field"><label for="cd-list">Admit cards are only for these districts</label><input id="cd-list" name="list" value="${esc(Store.cardDistricts().join(', '))}" placeholder="Every district"><small>Write district names with commas between them, for example: Dhaka, Gazipur. Leave it empty to give the card to every district. A student selected for the National round always gets the National card.</small></div>
         <p class="err" role="alert" hidden></p><div><button class="btn btn-ocean btn-sm" type="submit">Save districts</button></div></form></section>
-    <section class="panel"><h2>Contact details</h2><form class="form" id="cf" novalidate>${cf.map(f => fieldHtml(f, s[f.key], 'cf')).join('')}<div><button class="btn btn-ocean btn-sm" type="submit">Save contact details</button></div></form></section>`;
+    <section class="panel"><h2>Contact details</h2><p class="muted">These show in the footer and on the Contact page. A social link appears in the footer once you paste it here. Leave email, phone or address empty to keep the ones shown in grey.</p><form class="form" id="cf" novalidate>${cf.map(f => fieldHtml(f, s[f.key], 'cf')).join('')}<div><button class="btn btn-ocean btn-sm" type="submit">Save contact details</button></div></form></section>`;
   main.appendChild(top);
   $('#sw-reg', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('regOpen', on); toast(on ? 'Registration is open' : 'Registration is closed', 'good'); });
   $('#sw-card', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('cardsOpen', on); toast(on ? 'Cards can be downloaded' : 'Cards are hidden', 'good'); });
