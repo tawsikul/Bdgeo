@@ -582,6 +582,12 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 @media(max-height:520px){.gate{bottom:22px;gap:8px;grid-auto-flow:column;justify-content:center;align-items:center}.gate-ring{width:34px;height:34px}.gate-ring::before{inset:10px}.gate-title{top:16px;width:min(40vw,30vh,240px)}}
 .intro.skipping{opacity:0;pointer-events:none;transition:opacity .22s}
 .intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* the filmed flight sits under the canvas: the title screen fades off it, and the canvas comes back for the landing */
+.intro video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none}
+.intro.video video{opacity:1}
+.intro.video canvas{opacity:0;transition:opacity .22s linear}
+.intro.video.out canvas{opacity:1;transition:none}
+.intro.video.out video{opacity:0}
 .intro-skip{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.72);font-size:.9rem;font-weight:500;pointer-events:none;transition:opacity .2s}
 .intro.landing .intro-skip,.intro:not(.going) .intro-skip{opacity:0}
 body.intro-on{overflow:hidden}
@@ -2167,7 +2173,7 @@ const Sound = (() => {
   /* Every sound here is made in the browser from tones and filtered noise; no audio files. Built to the rules of the UI Sound
      Design skill: one shared audio context started by a tap, one clock reading per sound, fades that never reach zero,
      quiet levels, noise for clicks and air, tones for anything with a pitch, and every noise player tidied away when it ends. */
-  let ctx = null, out = null, noiseBuf = null, on = true;
+  let ctx = null, out = null, noiseBuf = null, on = true, playing = null;
   const LEVEL = 0.8, FLOOR = 0.001, NOISE_UP = 2.4;   // NOISE_UP: a filter throws most of the noise away, so noise is lifted to sit level with the tones
   try { if (localStorage.getItem('bgeo-sound') === 'off') on = false; } catch (e) { /* storage may be blocked */ }
   /* the way out: one level control. (A limiter was tried and taken out: the browser's own one squashes short clicks to a third.)
@@ -2256,6 +2262,15 @@ const Sound = (() => {
       /* a clear note rising toward the landing chime */
       path(now, { wave: 'sine', pts: [[2.82, 0, 660], [3.0, 0.012, 680], [3.85, 0.05, 960], [4.12, 0, 988]] });
     },
+    /* what the site adds to the recorded wind of the filmed opening: the tap's pop and breath, leaves and birds in the forest,
+       and a clear note rising toward the landing chime */
+    enter(now) {
+      tone(now, { f: 620, f2: 240, t: 0.12, g: 0.24, attack: 0.003 }); air(now, { t: 0.05, f: 1400, q: 1, g: 0.14, peak: 0 });
+      air(now, { t: 0.28, f: 4200, f2: 700, q: 0.8, g: 0.16, peak: 0.6 });
+      air(now, { t: 1.4, f: 5200, f2: 4400, q: 0.6, g: 0.04, at: 0.15, peak: 0.2 });
+      bird(now, 0.3, 2500, 3, 0.08); bird(now, 0.72, 3100, 2, 0.06); bird(now, 1.12, 2250, 2, 0.05);
+      path(now, { wave: 'sine', pts: [[3.3, 0, 660], [3.5, 0.012, 680], [4.35, 0.05, 960], [4.65, 0, 988]] });
+    },
     /* a tsunami: a deep surge that swells, breaks and hisses away */
     wave(now) { air(now, { t: 1.05, f: 180, fm: 1300, f2: 300, q: 0.9, g: 0.2, type: 'lowpass', peak: 0.45 }); air(now, { t: 0.7, f: 2400, f2: 5200, q: 0.9, g: 0.06, at: 0.38, peak: 0.25 }); tone(now, { f: 58, f2: 40, t: 0.9, g: 0.16, peak: 0.3 }); },
     /* the landing: two soft bells, a fifth apart */
@@ -2263,6 +2278,20 @@ const Sound = (() => {
   };
   function play(name) { if (!on || !ctx || !lib[name]) return; try { if (ctx.state === 'suspended') ctx.resume().catch(() => {}); lib[name](ctx.currentTime + 0.005); } catch (e) { /* never let a sound break the page */ } }
   function toggle() { on = !on; try { localStorage.setItem('bgeo-sound', on ? 'on' : 'off'); } catch (e) {} if (on && ensure()) play('pick'); return on; }
+  /* a recorded sound (the wind of the filmed opening). `data` is the file's bytes, fetched ahead of time; it is unpacked and
+     started here, skipping however long the unpacking took so it stays in step with the picture. */
+  async function clip(data, g = 0.7) {
+    if (!on || !ctx || !data) return; const t0 = performance.now();
+    try {
+      const buf = await new Promise((ok, no) => { const p = ctx.decodeAudioData(data.slice(0), ok, no); if (p && p.catch) p.catch(no); });
+      const late = (performance.now() - t0) / 1000; if (late > buf.duration - 0.3) return;
+      const src = ctx.createBufferSource(), a = ctx.createGain(); src.buffer = buf; a.gain.setValueAtTime(Math.min(0.8, g), ctx.currentTime); src.connect(a); a.connect(out);
+      src.onended = () => { src.disconnect(); a.disconnect(); if (playing && playing.src === src) playing = null; };
+      src.start(0, late); playing = { src, a };
+    } catch (e) { /* the wind is an extra; the opening works without it */ }
+  }
+  /* fade the recorded sound away, for when the opening is skipped */
+  function hush() { if (!playing || !ctx) return; try { const now = ctx.currentTime, { src, a } = playing; a.gain.setValueAtTime(a.gain.value, now); a.gain.exponentialRampToValueAtTime(FLOOR, now + 0.25); src.stop(now + 0.27); } catch (e) {} playing = null; }
   /* for checking a sound without ears: draws it into memory and returns the samples */
   async function render(name, secs) {
     const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext, live = [ctx, out, noiseBuf], off = new AC(1, Math.ceil(44100 * secs), 44100);
@@ -2270,7 +2299,7 @@ const Sound = (() => {
     return (await off.startRendering()).getChannelData(0);
   }
   if (window.__bgeoTest) window.__bgeoTest.sound = { render, names: Object.keys(lib) };
-  return { play, toggle, unlock: ensure, ready: () => !!ctx && ctx.state === 'running', get on() { return on; } };
+  return { play, clip, hush, toggle, unlock: ensure, ready: () => !!ctx && ctx.state === 'running', get on() { return on; } };
 })();
 
 /* ---------- the data layer ----------
@@ -3008,7 +3037,11 @@ function paintEarth(g, W, H) {
 /* ---------- entry animations ----------
    Opening the site: a title screen first. The Earth turns in the middle with a pin on Dhaka, satellites circle it, the
    olympiad's lettering sits above and "Tap to enter" below. A tap cuts straight to the forest: no zoom into the globe.
-   Then the camera starts inside a forest, a few feet above the ground, looking
+   The flight itself is a short film (media/intro-wide.mp4, or intro-tall.mp4 on an upright screen): out of the forest,
+   over farmland, desert, coast and sea, up into cloud. In the cloud the film hands over to the site's own Earth, which
+   pulls away, turns, and settles into its place on the page. The film's wind is media/intro.mp3.
+   If the film has not loaded by the time of the tap (or cannot play), the same journey is drawn instead:
+   the camera starts inside a forest, a few feet above the ground, looking
    straight down a path between the trunks, and it is already moving. In one unbroken movement
    it flies backwards and up, so everything streams away in front of it: the forest shrinks,
    then a river, farmland, desert and a coast slide out from under the camera. It never turns
@@ -3029,12 +3062,12 @@ function siteIntro() {
   /* The title screen waits for a tap; the tap is also what lets the browser play sound. Then a quick wash of leaf-light
      cuts to the forest floor and the flight out begins. */
   const el = document.createElement('div'); el.className = 'intro';
-  el.innerHTML = `<canvas aria-hidden="true"></canvas><div class="gate-ui"><div class="gate-title" aria-hidden="true">${heroMark('gm', 'gate-mark')}</div>
+  el.innerHTML = `<video muted playsinline preload="auto" aria-hidden="true" tabindex="-1" disablepictureinpicture></video><canvas aria-hidden="true"></canvas><div class="gate-ui"><div class="gate-title" aria-hidden="true">${heroMark('gm', 'gate-mark')}</div>
     <div class="gate-pin" aria-hidden="true"><i></i><span><b>Dhaka</b>23.8° N, 90.4° E</span></div>
     <i class="gate-corner tl"></i><i class="gate-corner tr"></i><i class="gate-corner bl"></i><i class="gate-corner br"></i>
     <p class="gate" role="button" tabindex="0"><i class="gate-ring" aria-hidden="true"></i>Tap to enter</p></div><p class="intro-skip">Tap to skip</p>`;
   document.body.appendChild(el); document.body.classList.add('intro-on', 'intro-globe');
-  const cv = el.firstChild, gate = el.querySelector('.gate'), gateUi = el.querySelector('.gate-ui'), pin = el.querySelector('.gate-pin'), g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+  const cv = el.querySelector('canvas'), vid = el.querySelector('video'), gate = el.querySelector('.gate'), gateUi = el.querySelector('.gate-ui'), pin = el.querySelector('.gate-pin'), g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
   /* the ground is drawn on a square sheet as wide as the screen's diagonal, then laid onto the screen */
   const layer = document.createElement('canvas'), lg = layer.getContext('2d'), decal = document.createElement('canvas');
   let W = 0, H = 0, D = 0, F = 0, DS = 0;
@@ -3191,6 +3224,23 @@ function siteIntro() {
       g.drawImage(pic, -DS / 2, -DS / 2); g.restore();
     }
   }
+  /* ---- the film. It is fetched whole while the title screen waits, so that it starts the instant the screen is tapped.
+          VCUT: the moment in the film when the picture has gone to cloud-white. V_R0: how far into its pull-away the site's
+          own Earth is when it appears out of that cloud. ---- */
+  const VCUT = 3.7, V_R0 = 0.34, MEDIA = 'media/';
+  let vidOK = false, mode = 'canvas', vOut = false, washT = 0, windData = null, lastVt = -1, stall = 0;
+  (function loadFilm() {
+    const conn = navigator.connection; if (conn && conn.saveData) return;   // the visitor asked to save data: draw the journey instead
+    const file = MEDIA + (window.innerWidth / window.innerHeight < 0.8 ? 'intro-tall.mp4' : 'intro-wide.mp4');
+    const direct = () => { try { vid.addEventListener('canplaythrough', () => { vidOK = true; }, { once: true }); vid.src = file; vid.load(); } catch (e) { /* no film */ } };
+    try {
+      vid.muted = true;
+      if (location.protocol === 'file:') { direct(); return; }   // opened straight from a folder: fetching is not allowed there
+      fetch(file).then(r => { if (!r.ok) throw 0; return r.blob(); }).then(b => { vid.addEventListener('loadeddata', () => { vidOK = true; }, { once: true }); vid.src = URL.createObjectURL(b); vid.load(); }).catch(direct);
+      fetch(MEDIA + 'intro.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { windData = b; }).catch(() => {});
+    } catch (e) { direct(); }
+  })();
+  const toDrawn = () => { if (mode !== 'video' || vOut || finished) return; mode = 'canvas'; clock = 0; el.classList.remove('video'); Sound.hush(); Sound.play('opening'); };
   /* ---- the title screen: stars, the Earth with a glow round it, two satellites on their orbits, a pin on Dhaka ---- */
   const stars = []; for (let i = 0; i < 90; i++) stars.push([R(), R(), 0.5 + R() * 1.1, R() * 6.28, 0.6 + R() * 1.4]);
   const ORBITS = [{ rx: 1.46, ry: 0.4, tilt: -0.33, speed: 0.55, at: 0.6, color: '154,217,111' }, { rx: 1.78, ry: 0.56, tilt: 0.42, speed: -0.34, at: 3.4, color: '255,255,255' }];
@@ -3232,6 +3282,12 @@ function siteIntro() {
       idle += dt; gateRot = -0.5 + 0.26 * sin(idle * 0.45);
       drawGate(); return;
     }
+    if (mode === 'video' && !vOut) {
+      /* the film is playing under the canvas. When it reaches the cloud (or stops for any reason) the site's Earth takes over. */
+      const vt = vid.currentTime; stall = vt === lastVt ? stall + dt : 0; lastVt = vt;
+      if (vt >= VCUT || vid.ended || stall > 0.9) { vOut = true; el.classList.add('out'); clock = LEAD + RUN + TIP + OUT * V_R0; } else return;
+    }
+    if (vOut) washT += dt;
     if (clock < CUT) {
       /* the cut: a quick wash of light, and the forest is there */
       drawGate(); wash(smooth(clock / CUT)); return;
@@ -3258,7 +3314,8 @@ function siteIntro() {
       else { spin += (2.4 - spin) * Math.min(1, dt * 2); extra += dt * spin; rot = TURN[64] + extra; }
       /* the camera follows the place it left, then lets go and the globe moves to its place on the page */
       const go = target ? smooth(clamp((r - 0.5) / 0.5)) * b : 0, bx = target ? mix(W / 2, target.x, go) : W / 2, by = target ? mix(H / 2, target.y, go) : H / 2;
-      drawOrbit(Rg, rot, bx, by, 1 - smooth(clamp(r / 0.6)), 1 - Math.min(smooth(clamp((r - 0.72) / 0.28)), b), decal, 1);
+      drawOrbit(Rg, rot, bx, by, 1 - smooth(clamp(r / 0.6)), 1 - Math.min(smooth(clamp((r - 0.72) / 0.28)), b), vOut ? null : decal, 1);
+      if (vOut) { const a = 1 - smooth(clamp(washT / 0.6)); if (a > 0) { g.fillStyle = `rgba(238,243,246,${a})`; g.fillRect(0, 0, W, H); } }   // out of the cloud
       if (landed && r > 0.8) reveal();
       if (r >= 1 && landed && landT >= 1) { end(); return; }
       return;
@@ -3273,11 +3330,16 @@ function siteIntro() {
     /* the landing: the chime, and one ring of light leaving the globe as it settles */
     if (!skipped) { Sound.play('land'); const st = document.querySelector('#stage'); if (st && target) { st.classList.add('landed'); setTimeout(() => st.classList.remove('landed'), 900); } }
   }
-  const quit = () => { el.classList.add('skipping'); setTimeout(end, 240); };
+  const quit = () => { el.classList.add('skipping'); Sound.hush(); try { vid.pause(); } catch (e) {} setTimeout(end, 240); };
   const skip = () => { if (skipped || finished || revealed) return; skipped = true; if (landed) quit(); };
   function begin() {
     if (started) return; started = true; el.classList.add('going'); gate.classList.add('gone'); setTimeout(() => gateUi.remove(), 400);
-    Sound.unlock(); Sound.play('opening');
+    Sound.unlock();
+    if (vidOK && typeof window.__introT !== 'number') {
+      mode = 'video'; el.classList.add('video');
+      try { vid.currentTime = 0; const p = vid.play(); if (p && p.catch) p.catch(toDrawn); } catch (e) { toDrawn(); return; }
+      Sound.play('enter'); Sound.clip(windData, 0.7);
+    } else Sound.play('opening');
   }
   const press = () => (started ? skip() : begin());
   el.addEventListener('click', press);
