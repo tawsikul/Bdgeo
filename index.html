@@ -13,7 +13,7 @@
 <meta property="og:image" content="https://geographyolympiad.org/icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Baloo+Da+2:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Baloo+Da+2:wght@600;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   /* Layout idea: the logo's ocean is the page itself; anything you read closely or fill in sits on a white map sheet floating on it. */
@@ -292,9 +292,9 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .note{padding:12px 14px;border-radius:14px;background:#fff6d8;color:#5e4300;font-size:.96rem}
 .note.onblue{background:rgba(3,31,80,.55);color:#e2edfc;border:1px dashed rgba(255,255,255,.4)}
 .narrow{max-width:520px;margin-inline:auto}
-.cardprev{border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.cardprev{overflow:hidden}
 .cardprev canvas{display:block;width:100%;height:auto}
-.cardprev canvas + canvas{border-top:8px solid #fff}
+.cardprev canvas + canvas{margin-top:10px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
 .kv dt{color:var(--ink-soft)}
 .kv dd{margin:0;font-weight:600;overflow-wrap:anywhere}
@@ -2086,7 +2086,7 @@ const SUPA = { url: 'https://wbnrpdphtktkugyzmlce.supabase.co', key: 'sb_publish
 const WANT_CLOUD = SUPA.url.indexOf('https://') === 0;
 const CLOUD = WANT_CLOUD && !!(window.supabase && window.supabase.createClient);
 const sb = CLOUD ? window.supabase.createClient(SUPA.url, SUPA.key) : null;
-/* ID numbers are digits only: the year, the number of the olympiad, then the student's own serial */
+/* registration numbers are digits only: the year, the number of the olympiad, then the student's own serial */
 const REG_PREFIX = '202701';
 const regSerial = no => { const d = String(no || '').replace(/\D/g, ''); return +(d.length > 6 ? d.slice(6) : d) || 0; };
 const KINDS = ['notices', 'resources', 'events', 'team', 'faq', 'results', 'news'];
@@ -2346,7 +2346,7 @@ const Store = (() => {
     cardCode: u => 'BGEO1|' + u.regNo + '|' + String(u.id).slice(0, 8),
     findByCode(code) {
       const m = /^BGEO1\|([^|]+)\|([^|]+)$/.exec(String(code).trim()); if (!m) return null;
-      /* cards saved before the ID numbers changed still scan: the serial at the end is what has to match */
+      /* cards saved before the registration numbers changed still scan: the serial at the end is what has to match */
       return db.users.find(u => u.role === 'participant' && String(u.id).slice(0, 8) === m[2] && (u.regNo === m[1] || regSerial(u.regNo) === regSerial(m[1]))) || null;
     },
     /* attendance: returns 'new' the first time, 'already' if that student was marked before */
@@ -3525,16 +3525,16 @@ PAGES.register = () => {
 
 /* ---------- admit cards, drawn on a canvas so they can be saved as a picture or a PDF ----------
    Flat colours and plain type, like an official document. Each card carries a QR code
-   holding the student's ID number, so an admin can scan it at the venue. Every student
+   holding the student's registration number, so an admin can scan it at the venue. Every student
    gets the Regional round card; the National round card goes to the finalists. */
 const roundImg = new Image(); roundImg.src = LOGO_ROUND;
-const CARD_W = 1200, CARD_H = 756;
+const CARD_W = 1200, CARD_H = 756, CARD_FACE = '"Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const CARD_THEME = {
   regional: { round: 'Regional round', who: 'Participant', paper: '#ffffff', head: '#0b3d8f', headSoft: '#cfe0f7', accent: '#9ad96f', tagInk: '#04214f', ink: '#0a2350', soft: '#4b6088', line: '#dfe8f3', foot: '#f3f7fc', id: '#0b3d8f', qrEdge: '#c8d6e8', frame: '' },
   national: { round: 'National round', who: 'National finalist', paper: '#071a3e', head: '#04122b', headSoft: '#b9c9e6', accent: '#f2c14e', tagInk: '#04122b', ink: '#ffffff', soft: '#a9bfe3', line: 'rgba(255,255,255,.16)', foot: '#04122b', id: '#ffe29a', qrEdge: '#f2c14e', frame: '#f2c14e' },
 };
 function cardKit(g) {
-  const disp = '"Baloo Da 2", "Trebuchet MS", sans-serif', body = '"Anek Bangla", "Segoe UI", sans-serif';
+  const disp = CARD_FACE, body = CARD_FACE;   // one plain typeface for the whole card, like a printed document
   const fit = (text, maxW, size, weight, fam) => { let px = size; g.font = `${weight} ${px}px ${fam}`; while (g.measureText(text).width > maxW && px > 16) { px -= 2; g.font = `${weight} ${px}px ${fam}`; } };
   const box = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
   /* a long school name goes onto two lines instead of shrinking */
@@ -3556,19 +3556,18 @@ function drawCard(u, kind) {
   const T = CARD_THEME[kind === 'national' ? 'national' : 'regional'], W = CARD_W, H = CARD_H, c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d'), { disp, body, fit, box, twoLines, qr } = cardKit(g), X = 56, R = W - 56;
   const season = /^\d{6}/.test(String(u.regNo)) ? String(u.regNo).slice(0, 4) : '', ev = roundEvent(kind);
-  box(0, 0, W, H, 28); g.save(); g.clip();
+  g.save();
   g.fillStyle = T.paper; g.fillRect(0, 0, W, H);
   /* header: who issues the card, and for which round */
   g.fillStyle = T.head; g.fillRect(0, 0, W, 150); g.fillStyle = T.accent; g.fillRect(0, 150, W, 6);
   if (roundImg.complete && roundImg.naturalWidth) g.drawImage(roundImg, X, 23, 104, 104);
-  g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 3; g.beginPath(); g.arc(X + 52, 75, 52, 0, 6.2832); g.stroke();
-  g.font = `800 28px ${disp}`; const tw = g.measureText(T.round).width + 56;
-  g.fillStyle = T.accent; box(R - tw, 47, tw, 56, 28); g.fill(); g.fillStyle = T.tagInk; g.textAlign = 'center'; g.fillText(T.round, R - tw / 2, 85); g.textAlign = 'left';
-  g.fillStyle = '#ffffff'; fit('Bangladesh Geography Olympiad', R - tw - 40 - (X + 128), 36, 800, disp); g.fillText('Bangladesh Geography Olympiad', X + 128, 72);
-  g.fillStyle = T.headSoft; g.font = `500 24px ${body}`; g.fillText(`Admit card${season ? ', ' + season + ' season' : ''}`, X + 128, 110);
-  /* the QR code and the ID number under it */
+  g.font = `700 26px ${disp}`; const tw = g.measureText(T.round).width + 48;
+  g.fillStyle = T.accent; g.fillRect(R - tw, 49, tw, 52); g.fillStyle = T.tagInk; g.textAlign = 'center'; g.fillText(T.round, R - tw / 2, 84); g.textAlign = 'left';
+  g.fillStyle = '#ffffff'; fit('Bangladesh Geography Olympiad', R - tw - 40 - (X + 128), 34, 700, disp); g.fillText('Bangladesh Geography Olympiad', X + 128, 71);
+  g.fillStyle = T.headSoft; g.font = `500 23px ${body}`; g.fillText(`Admit card${season ? ', ' + season + ' season' : ''}`, X + 128, 108);
+  /* the QR code and the registration number under it */
   const Q = 250, qx = R - Q, qy = 190;
-  g.fillStyle = '#ffffff'; box(qx - 8, qy - 8, Q + 16, Q + 16, 14); g.fill(); g.strokeStyle = T.qrEdge; g.lineWidth = 2; g.stroke();
+  g.fillStyle = '#ffffff'; g.fillRect(qx - 8, qy - 8, Q + 16, Q + 16);
   qr(u, qx, qy, Q);
   g.textAlign = 'center'; g.fillStyle = T.ink; g.font = `700 26px ${body}`; g.fillText(String(u.regNo), qx + Q / 2, qy + Q + 46);
   g.fillStyle = T.soft; g.font = `500 20px ${body}`; g.fillText('Scan at the entrance', qx + Q / 2, qy + Q + 76); g.textAlign = 'left';
@@ -3576,10 +3575,10 @@ function drawCard(u, kind) {
   const FW = qx - 48 - X, label = (t, x, y) => { g.fillStyle = T.soft; g.font = `500 21px ${body}`; g.fillText(t, x, y); };
   const value = (t, x, y, maxW, size = 30, weight = 600, color = T.ink) => { g.fillStyle = color; fit(String(t), maxW, size, weight, body); g.fillText(String(t), x, y); };
   const rule = y => { g.fillStyle = T.line; g.fillRect(X, y, FW, 2); };
-  label(T.who, X, 204); g.fillStyle = T.ink; fit(u.name, FW, 54, 800, disp); g.fillText(u.name, X, 260);
+  label(T.who, X, 204); g.fillStyle = T.ink; fit(u.name, FW, 50, 700, disp); g.fillText(u.name, X, 258);
   rule(286);
   const c2 = X + 290, c3 = X + 560;
-  label('ID number', X, 322); value(u.regNo, X, 360, 270, 34, 700, T.id);
+  label('Registration number', X, 322); value(u.regNo, X, 360, 270, 34, 700, T.id);
   label('Category', c2, 322); value(u.category, c2, 360, 250);
   label('Class', c3, 322); value('Class ' + u.klass, c3, 360, FW - 560);
   rule(386);
@@ -3596,14 +3595,13 @@ function drawCard(u, kind) {
   g.fillText('Show this card, printed or on your phone, at the entrance.', X, 684);
   g.fillText('Dates and venues are published in Notices on geographyolympiad.org', X, 716);
   g.textAlign = 'right'; g.fillText(u.createdAt ? 'Registered ' + fmtDate(u.createdAt) : '', R, 716); g.textAlign = 'left';
-  if (T.frame) { g.strokeStyle = T.frame; g.lineWidth = 6; box(3, 3, W - 6, H - 6, 26); g.stroke(); }
   g.restore();
   return c;
 }
 const isNational = round => /national/i.test(round || '');
 const hasNationalCard = u => (u.selected || []).some(s => isNational(s.round));
 async function cardReady() {
-  try { if (document.fonts && document.fonts.load) await Promise.race([Promise.all([document.fonts.load('800 40px "Baloo Da 2"'), document.fonts.load('700 28px "Anek Bangla"'), document.fonts.load('600 28px "Anek Bangla"'), document.fonts.load('500 22px "Anek Bangla"')]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* fall back to the device's own fonts */ }
+  try { if (document.fonts && document.fonts.load) await Promise.race([Promise.all([500, 600, 700, 800].map(w => document.fonts.load(`${w} 28px "Inter"`))), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* fall back to the device's own fonts */ }
   if (!roundImg.complete) await new Promise(r => { roundImg.addEventListener('load', r, { once: true }); roundImg.addEventListener('error', r, { once: true }); setTimeout(r, 2500); });
 }
 const dataBytes = url => { const bin = atob(url.split(',')[1] || ''), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return bytes; };
@@ -3618,12 +3616,11 @@ async function cardBlob(u, kind) {
 async function cardPdf(u, kind) {
   await cardReady();
   const T = CARD_THEME[kind === 'national' ? 'national' : 'regional'], PW = 1240, PH = 1754, c = document.createElement('canvas'); c.width = PW; c.height = PH;
-  const g = c.getContext('2d'), body = '"Anek Bangla", "Segoe UI", sans-serif', disp = '"Baloo Da 2", "Trebuchet MS", sans-serif', X = 90;
+  const g = c.getContext('2d'), body = CARD_FACE, disp = CARD_FACE, X = 90;
   g.fillStyle = '#ffffff'; g.fillRect(0, 0, PW, PH);
-  g.fillStyle = '#0a2350'; g.font = `800 44px ${disp}`; g.fillText('Bangladesh Geography Olympiad', X, 130);
+  g.fillStyle = '#0a2350'; g.font = `700 42px ${disp}`; g.fillText('Bangladesh Geography Olympiad', X, 130);
   g.fillStyle = '#4b6088'; g.font = `500 28px ${body}`; g.fillText(`Admit card for the ${T.round}`, X, 176);
   const cw = PW - 2 * X, ch = Math.round(cw * CARD_H / CARD_W); g.drawImage(drawCard(u, kind), X, 220, cw, ch);
-  g.strokeStyle = '#c8d6e8'; g.lineWidth = 2; g.strokeRect(X, 220, cw, ch);
   let y = 220 + ch + 90;
   g.fillStyle = '#0a2350'; g.font = `700 32px ${body}`; g.fillText('On the day', X, y); y += 26;
   const steps = ['Bring this admit card with you, printed or saved on your phone.', 'At the entrance the organisers scan the QR code on the card to mark you present.', 'The date, time and venue of your round are published in Notices on geographyolympiad.org.', 'If any detail on this card is wrong, correct it under My details in your dashboard before the round.'];
@@ -3635,7 +3632,7 @@ async function cardPdf(u, kind) {
     lines.forEach((ln, k) => { g.fillText(ln, X + 56, y + k * 36); }); y += (lines.length - 1) * 36;
   });
   g.fillStyle = '#dfe8f3'; g.fillRect(X, PH - 150, cw, 2);
-  g.fillStyle = '#4b6088'; g.font = `500 22px ${body}`; g.fillText(`${u.name}, ID number ${u.regNo}`, X, PH - 104);
+  g.fillStyle = '#4b6088'; g.font = `500 22px ${body}`; g.fillText(`${u.name}, registration number ${u.regNo}`, X, PH - 104);
   g.textAlign = 'right'; g.fillText('geographyolympiad.org', PW - X, PH - 104); g.textAlign = 'left';
   const jpg = dataBytes(c.toDataURL('image/jpeg', 0.93)), enc = new TextEncoder(), parts = [], offs = []; let len = 0;
   const put = x => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; }, obj = (n, bodyText) => { offs[n] = len; put(`${n} 0 obj\n${bodyText}\nendobj\n`); };
@@ -3669,7 +3666,7 @@ DASH.dashboard = () => {
     html: `<div class="wrap">
       <header class="acct-head">
         <span class="avatar avatar-lg" aria-hidden="true">${esc(initials(u.name))}</span>
-        <div class="acct-who"><h1>${esc(u.name)}</h1><p>ID number ${esc(u.regNo)}, ${esc(u.category)}, Class ${esc(u.klass)}, ${esc(u.region)}</p>
+        <div class="acct-who"><h1>${esc(u.name)}</h1><p>Registration number ${esc(u.regNo)}, ${esc(u.category)}, Class ${esc(u.klass)}, ${esc(u.region)}</p>
           <div class="chips"><span class="chip chip-live">${icon('check', 14)} Registered</span>${(u.selected || []).map(x => `<span class="chip chip-soon">Selected: ${esc(x.round)}</span>`).join('')}${Store.all('attendance').filter(a => a.userId === u.id).map(a => `<span class="chip chip-live">Present: ${esc(a.session)}</span>`).join('')}</div></div>
       </header>
       <div class="dash-facts">
@@ -3694,8 +3691,7 @@ DASH.dashboard = () => {
       const show = (id, kind, file) => {
         const holder = $('#' + id, v); if (!holder) return;
         const paint = () => { holder.innerHTML = ''; holder.appendChild(drawCard(u, kind)); };
-        paint(); if (!roundImg.complete) roundImg.addEventListener('load', paint, { once: true });
-        if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (holder.isConnected) paint(); });
+        paint(); cardReady().then(() => { if (holder.isConnected) paint(); });   // drawn again once the card's typeface and the logo have loaded
         $('#' + id + '-dl', v).onclick = e => busy(e.currentTarget, async () => saveAndTell(file + '.png', await cardBlob(u, kind)));
         $('#' + id + '-pdf', v).onclick = e => busy(e.currentTarget, async () => saveAndTell(file + '.pdf', await cardPdf(u, kind)));
       };
@@ -3709,7 +3705,7 @@ DASH['dashboard-me'] = () => {
   const u = Store.me();
   return {
     html: `<div class="wrap narrow">${pageHead('My details', 'These details are printed on your admit card.')}
-      <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>ID number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Mobile</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Region</dt><dd>${esc(u.region)}</dd><dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
+      <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Registration number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Mobile</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Region</dt><dd>${esc(u.region)}</dd><dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
         <div style="margin-top:16px"><button type="button" class="btn btn-ocean" id="edit-me">${icon('edit', 18)} Edit details</button></div></section>
       <section class="sheet"><h2>Payment</h2><p class="muted" style="margin-top:8px">Online payment is not open yet. The organisers will announce it in Notices.</p></section>
     </div>`,
@@ -3935,8 +3931,8 @@ function personDialog(p, after) {
       <dt>Online exams</dt><dd>${tries.map(a => { const ex = Store.get('exams', a.examId); return ex ? `${esc(ex.title)}: ${a.score}/${ex.questions.length}` : ''; }).filter(Boolean).join('<br>') || 'None finished'}</dd></dl>
     <div class="cardprev" id="pd-card"></div>
     <div class="dlg-actions"><button type="button" class="btn btn-danger btn-sm" data-rm>Remove participant</button><button type="button" class="btn btn-quiet btn-sm" data-ed>Edit details</button><button type="button" class="btn btn-quiet btn-sm" data-att>Mark present</button>${(p.selected || []).length ? '<button type="button" class="btn btn-quiet btn-sm" data-unsel>Clear selection</button>' : ''}<button type="button" class="btn btn-ocean btn-sm" data-sel>Mark as selected</button></div>` });
-  if (hasNationalCard(p)) $('#pd-card', d).appendChild(drawCard(p, 'national'));
-  $('#pd-card', d).appendChild(drawCard(p, 'regional'));
+  const pdCard = $('#pd-card', d), paintCards = () => { pdCard.innerHTML = ''; if (hasNationalCard(p)) pdCard.appendChild(drawCard(p, 'national')); pdCard.appendChild(drawCard(p, 'regional')); };
+  paintCards(); cardReady().then(() => { if (pdCard.isConnected) paintCards(); });
   const att = $('#pd-att', d), drawAtt = () => { const rows = Store.all('attendance').filter(a => a.userId === p.id).sort((a, b) => new Date(a.at) - new Date(b.at)); att.innerHTML = rows.map(a => `${esc(a.session)} (${fmtDateTime(a.at)})`).join('<br>') || 'Not marked present yet'; };
   drawAtt();
   $('[data-att]', d).onclick = async () => {
@@ -4031,14 +4027,14 @@ async function readQrFromFile(file, read) {
     return await read(cv, cv.width, cv.height, 1600);
   } finally { URL.revokeObjectURL(url); }
 }
-/* the whole ID number, or just the serial at its end (7 finds 2027010007) */
+/* the whole registration number, or just the serial at its end (7 finds 2027010007) */
 const findByNumber = text => { const d = String(text).replace(/\D/g, ''); if (!d) return null; const ps = Store.participants(); return ps.find(p => String(p.regNo).replace(/\D/g, '') === d) || (d.length <= 5 ? ps.find(p => regSerial(p.regNo) === +d) : null) || null; };
 async function scanDialog(session, after) {
   const d = openDialog({ title: 'Scan cards', html: `<p class="muted">Attendance for <b>${esc(session)}</b>. Hold the QR code on a card in front of the camera, or upload a picture of the card.</p>
     <div class="scanbox"><video playsinline muted></video></div>
     <div class="scanres" id="sc-res" aria-live="assertive"><p>Starting the camera…</p></div>
     <div><button type="button" class="btn btn-quiet btn-sm" id="sc-up">${icon('image', 18)} Upload a card picture</button><input type="file" id="sc-file" accept="image/*" hidden></div>
-    <form class="form" id="sc-form" novalidate><div class="field"><label for="sc-num">Or type the ID number</label><input id="sc-num" placeholder="2027010007" autocomplete="off" inputmode="numeric"></div>
+    <form class="form" id="sc-form" novalidate><div class="field"><label for="sc-num">Or type the registration number</label><input id="sc-num" placeholder="2027010007" autocomplete="off" inputmode="numeric"></div>
     <div class="dlg-actions"><button type="button" class="btn btn-quiet btn-sm" data-close>Done</button><button type="submit" class="btn btn-ocean btn-sm">Mark present</button></div></form>` });
   const video = $('video', d), res = $('#sc-res', d), file = $('#sc-file', d); let stream = null, alive = true, last = '', lastAt = 0, readerP = null;
   const reader = () => (readerP = readerP || makeQrReader());
@@ -4088,7 +4084,7 @@ ADMIN['admin-attend'] = main => {
       <p class="muted">Each registration card has a QR code. Scan it when a student arrives and they are marked present. Inside the scanner you can also upload a picture of a card.</p>
       <div class="field"><label for="at-session">Taking attendance for</label><input id="at-session" list="at-known" value="${esc(attendSession)}"><datalist id="at-known">${known().map(k => `<option value="${esc(k)}"></option>`).join('')}</datalist><small>Pick a round, or type your own name for this session.</small></div>
       <div class="btnrow"><button type="button" class="btn btn-ocean" id="at-scan">${icon('check', 20)} Scan cards</button>${CLOUD ? '<button type="button" class="btn btn-quiet btn-sm" id="at-refresh">Load the latest</button>' : ''}<button type="button" class="btn btn-quiet btn-sm" id="at-csv">${icon('download', 18)} Export list</button></div>
-      <form class="field" id="at-form" novalidate><label for="at-num">Mark by ID number</label><div class="inrow"><input id="at-num" placeholder="2027010007" autocomplete="off" inputmode="numeric"><button type="submit" class="btn btn-quiet btn-sm">Mark present</button></div><small>For a student who has no card with them. The last digits are enough: 7 finds 2027010007.</small></form>
+      <form class="field" id="at-form" novalidate><label for="at-num">Mark by registration number</label><div class="inrow"><input id="at-num" placeholder="2027010007" autocomplete="off" inputmode="numeric"><button type="submit" class="btn btn-quiet btn-sm">Mark present</button></div><small>For a student who has no card with them. The last digits are enough: 7 finds 2027010007.</small></form>
       <div>${rows.map(x => `<div class="rowi"><span class="tick on">${icon('check', 18)}</span><div class="grow"><h3>${esc(x.u.name)}</h3><p>${esc(x.u.regNo)}, Class ${esc(x.u.klass)}, ${esc(x.u.institution)}</p><p>${fmtDateTime(x.a.at)}</p></div><div class="acts"><button type="button" class="mini del" data-undo="${x.u.id}" aria-label="Remove ${esc(x.u.name)} from the present list">${icon('close', 18)}</button></div></div>`).join('') || '<p class="empty">Nobody is marked present for this session yet.</p>'}</div></section>`;
     $('#at-session', main).addEventListener('change', e => { const v = e.target.value.trim(); if (!v || v === attendSession) return; attendSession = v; setTimeout(draw, 0); });
     $('#at-scan', main).onclick = () => scanDialog(attendSession, draw);
