@@ -24,7 +24,7 @@
   --sun:#ffc94d; --coral:#e8604c;
   --display:"Anek Bangla","Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
   --body:"Hind Siliguri","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --r-md:14px; --r-lg:22px; --bar-h:100px;
+  --r-md:14px; --r-lg:22px; --bar-h:62px;
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -54,34 +54,33 @@ body.is-admin .sea{display:none}
 body.is-admin{background:var(--foam);color:var(--ink)}
 
 /* top bar */
-/* Two rows on a phone (logo and buttons, then the page links, which scroll sideways); one row on a wide screen. */
-.bar{position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:40;display:flex;flex-wrap:wrap;align-items:center;align-content:center;gap:4px 10px;padding:0 14px;background:rgba(3,31,80,.96);border-bottom:1px solid rgba(255,255,255,.12)}
+/* One bar on every screen. On a tablet or computer it carries the page links between the logo and the buttons.
+   A phone is too narrow for six links, so there they are listed under the menu button instead. */
+.bar{position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:40;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(3,31,80,.96);border-bottom:1px solid rgba(255,255,255,.12)}
 .brand{display:flex;align-items:center;flex:none}
-.brand img{height:44px;width:auto;display:block}
-.bar-links{display:flex;align-items:center;gap:2px;min-width:0;order:3;flex:0 0 calc(100% + 28px);margin:0 -14px;padding:0 10px;overflow-x:auto;scrollbar-width:none;border-top:1px solid rgba(255,255,255,.1)}
-.bar-links::-webkit-scrollbar{display:none}
-.bar-links > a:not(.btn),.dd-btn{display:inline-flex;align-items:center;gap:4px;padding:8px 11px;border:0;border-radius:10px;background:none;text-decoration:none;font:600 .95rem/1.3 var(--body);white-space:nowrap;color:#fff;cursor:pointer}
-.bar-links .bar-admit{flex:none;margin-right:6px;min-height:32px}
-.bar-tools .bar-admit{display:none}
+.brand img{height:42px;width:auto;display:block}
+.bar-links{display:none;align-items:center;gap:0;min-width:0}
+.bar-links > a,.dd-btn{display:inline-flex;align-items:center;gap:4px;padding:8px clamp(6px,.95vw,12px);border:0;border-radius:10px;background:none;text-decoration:none;font:600 clamp(.9rem,1.75vw,.97rem)/1.3 var(--body);white-space:nowrap;color:#fff;cursor:pointer}
 .dd{position:relative;flex:none}
-.dd-btn[aria-expanded="true"],.dd-btn:hover{background:rgba(255,255,255,.1)}
+.dd-btn[aria-expanded="true"],.dd-btn:hover,.bar-links > a:hover{background:rgba(255,255,255,.1)}
 .dd.here .dd-btn{color:var(--lime)}
 .dd-btn[aria-expanded="true"] .ic{transform:rotate(180deg)}
-/* on a phone the list opens as a sheet under the bar; on a wide screen it hangs from its button */
-.dd-menu{position:fixed;left:10px;right:10px;top:calc(var(--bar-h) + 6px);z-index:45;display:grid;gap:2px;padding:8px;border-radius:14px;background:#fff;box-shadow:0 22px 50px -18px rgba(2,20,60,.75);animation:menuIn .18s ease both}
+.dd-menu{position:absolute;left:0;top:calc(100% + 12px);z-index:45;min-width:220px;display:grid;gap:2px;padding:8px;border-radius:14px;background:#fff;box-shadow:0 22px 50px -18px rgba(2,20,60,.75);animation:menuIn .18s ease both}
 .dd-menu a{padding:11px 12px;border-radius:9px;text-decoration:none;font-weight:600;color:var(--ink);white-space:nowrap}
 .dd-menu a:hover{background:var(--foam)}
 .dd-menu a[aria-current="page"]{background:#e6effd;color:var(--ocean)}
-.bar-links > a:not(.btn):hover{background:rgba(255,255,255,.1)}
-.bar-links > a:not(.btn)[aria-current="page"]{background:rgba(154,217,111,.22);color:var(--lime)}
-.bar-tools{margin-left:auto;display:flex;align-items:center;gap:8px}
+.bar-links > a[aria-current="page"]{background:rgba(154,217,111,.22);color:var(--lime)}
+.bar-tools{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+.bar-tools .bar-admit{display:none}
 .iconbtn{width:44px;height:44px;border-radius:12px;border:0;display:grid;place-content:center;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,background .2s}
 .iconbtn:active{transform:scale(.9)}
 .iconbtn.dark{background:var(--foam);color:var(--ink)}
 .iconbtn[aria-pressed="false"]{opacity:.7}
-@media(min-width:1100px){:root{--bar-h:68px}.bar{flex-wrap:nowrap;padding:0 max(14px,calc((100% - 1080px) / 2))}.bar-links{order:0;flex:0 1 auto;margin:0 0 0 22px;padding:0;overflow:visible;border-top:0;gap:6px}
-  .bar-links .bar-admit{display:none}.bar-tools .bar-admit{display:inline-flex}#menu-btn{display:none}
-  .dd-menu{position:absolute;left:0;right:auto;top:calc(100% + 10px);min-width:220px}}
+@media(max-width:380px){.bar{gap:6px;padding:0 10px}.bar-tools{gap:6px}.brand img{height:36px}.bar .iconbtn{width:40px;height:40px}}
+@media(min-width:740px){:root{--bar-h:66px}.bar{gap:clamp(6px,1.4vw,22px);padding:0 max(14px,calc((100% - 1080px) / 2))}.bar-links{display:flex}.bar .iconbtn{width:40px;height:40px}}
+@media(min-width:740px) and (max-width:859px){.brand img{height:38px}.bar{gap:8px}.bar-tools{gap:6px}.bar-links > a,.dd-btn{font-size:.875rem;padding-inline:5px}.bar .iconbtn{width:38px;height:38px}.bar .btn-sm{padding:0 10px}#acct-btn .ic{display:none}}
+.bar.bar-tight .bar-links{display:none}
+@media(min-width:1000px){.bar-links{gap:4px}.bar-tools .bar-admit{display:inline-flex}}
 
 .menu{position:fixed;inset:var(--bar-h) 0 0 0;z-index:39;background:#04214f;overflow:auto;padding:18px 16px 40px;animation:menuIn .26s ease both}
 @keyframes menuIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
@@ -89,6 +88,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .menu a{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.08);text-decoration:none;font:600 1.02rem/1.2 var(--body)}
 .menu a[aria-current="page"]{background:var(--lime);color:var(--abyss)}
 .menu a.wide{grid-column:1/-1}
+.menu a.menu-admit{background:var(--lime);color:var(--abyss);justify-content:center}
 
 /* buttons */
 /* Flat and even: one weight, a small radius, a hairline border. They darken on hover and dip a pixel when pressed. */
@@ -136,21 +136,24 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .empty{padding:26px 10px;text-align:center;color:var(--ink-soft)}
 
 /* home */
-.hero{padding:22px 0 10px;display:grid;gap:20px;align-items:center}
-.stage{position:relative;width:min(62%,260px);aspect-ratio:1;margin-inline:auto;order:-1}
+/* the headline on the left and the Earth beside it on the right, on every screen; on a phone the line of English and the buttons run underneath, full width */
+.hero{padding:22px 0 10px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 10px;align-items:center}
+.hero-copy{display:contents}
+.hero-copy > *{grid-column:1/-1}
+.hero-copy > .hero-title{grid-column:1;grid-row:1}
+.stage{position:relative;grid-column:2;grid-row:1;justify-self:end;width:min(100%,clamp(104px,33vw,300px));aspect-ratio:1}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%}
 /* the headline, as in the logo: white, then the big word in lime, then white with the year in teal */
-.hero-title{display:grid;font-family:var(--display);font-weight:800;line-height:1.16;letter-spacing:0}
-.ht-1{font-size:clamp(1.5rem,6vw,2.5rem);color:#fff;padding-left:.7em}
-.ht-2{font-size:clamp(3.3rem,15vw,6.6rem);color:var(--lime);line-height:1.08}
-.ht-3{font-size:clamp(2.2rem,9.6vw,4.4rem);color:#fff;line-height:1.12}
+.hero-title{display:grid;font-family:var(--display);font-weight:800;line-height:1.16;letter-spacing:0;white-space:nowrap}
+.ht-1{font-size:clamp(1.05rem,4.6vw,2.5rem);color:#fff;padding-left:.7em}
+.ht-2{font-size:clamp(2.3rem,11.4vw,6.6rem);color:var(--lime);line-height:1.08}
+.ht-3{font-size:clamp(1.55rem,7.3vw,4.4rem);color:#fff;line-height:1.12}
 .ht-3 b{color:var(--lagoon);font-weight:800}
 .learn{display:inline-flex;align-items:center;gap:6px;min-height:46px;padding:0 6px;color:var(--lime);font-weight:600;text-decoration:none}
 .learn:hover{text-decoration:underline;text-underline-offset:4px}
-.hero-copy{display:grid;gap:14px}
 .lede{font-size:1.16rem;color:#e2edfc;max-width:46ch}
 .lede strong{color:#fff;font-weight:600}
-@media(min-width:900px){.hero{grid-template-columns:1.25fr 1fr;padding:56px 0 34px}.stage{width:100%;max-width:400px;order:0}}
+@media(min-width:900px){.hero{grid-template-columns:1.25fr 1fr;padding:56px 0 34px;column-gap:20px}.hero-copy{display:grid;gap:14px}.hero-copy > .hero-title{grid-row:auto}.stage{grid-row:auto;width:100%;max-width:400px;justify-self:center}}
 .nextup{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;padding:14px 18px;border-radius:var(--r-md);background:rgba(3,31,80,.5);border:1.5px dashed rgba(255,255,255,.5);text-decoration:none}
 .nextup b{font:800 1.4rem/1 var(--display);color:var(--lime);font-variant-numeric:tabular-nums}
 .band{padding:44px 0 0}
@@ -491,21 +494,21 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 /* opening animation, page wipe, admin entry */
 .intro{position:fixed;inset:0;z-index:120;cursor:pointer;background:#0f4699}
 .intro.landing{background:transparent;pointer-events:none}
+.intro.skipping{opacity:0;pointer-events:none;transition:opacity .22s}
 .intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .intro-skip{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.72);font-size:.9rem;font-weight:500;pointer-events:none;transition:opacity .2s}
-.intro.landing .intro-skip,.intro.skipping .intro-skip{opacity:0}
+.intro.landing .intro-skip{opacity:0}
 body.intro-on{overflow:hidden}
-body.intro-on .stage canvas,body.intro-on .hero-copy > *,body.intro-on .hero-title > *{opacity:0;animation:none}
+body.intro-globe .stage canvas{opacity:0}
+body.intro-on .hero-copy > *,body.intro-on .hero-title > *{opacity:0;animation:none}
 body.intro-reveal .hero-title > *{animation:logoPop .7s cubic-bezier(.2,1.5,.4,1) both}
-body.intro-reveal .hero-title > :nth-child(2){animation-delay:.12s}
-body.intro-reveal .hero-title > :nth-child(3){animation-delay:.24s}
+body.intro-reveal .hero-title > :nth-child(2){animation-delay:.1s}
+body.intro-reveal .hero-title > :nth-child(3){animation-delay:.2s}
 body.intro-reveal .hero-copy > *{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
 body.intro-reveal .hero-copy > :nth-child(1){animation:none}
-body.intro-reveal .hero-copy > :nth-child(2){animation-delay:.5s}
-body.intro-reveal .hero-copy > :nth-child(3){animation-delay:.65s}
+body.intro-reveal .hero-copy > :nth-child(2){animation-delay:.38s}
+body.intro-reveal .hero-copy > :nth-child(3){animation-delay:.5s}
 @keyframes logoPop{from{opacity:0;transform:scale(.55) translateY(10px)}to{opacity:1;transform:none}}
-.intro.waiting .intro-skip{color:#fff;font-size:1rem;font-weight:600;animation:nudge 1.1s ease-in-out infinite}
-@keyframes nudge{50%{opacity:.45}}
 /* the tsunami between pages: foam first, then three bodies of water, each with a scalloped front */
 .tsu{position:fixed;inset:0;z-index:110;pointer-events:none;overflow:hidden}
 .tsu i{position:absolute;top:-4%;height:108%;left:0;width:185vw;transform:translateX(-200vw);animation:tsu .95s cubic-bezier(.5,.05,.4,1) both}
@@ -2507,15 +2510,26 @@ const Globe = (() => {
       }
       og.putImageData(img, 0, 0);
     }
-    /* draw onto another canvas as a clean-edged disc, with only a hint of shade on the side away from the light */
-    function drawTo(g, cx, cy, R) {
+    /* draw onto another canvas as a clean-edged disc, with only a hint of shade on the side away from the light.
+       When the disc is far bigger than the screen (vw by vh), only the part that is on screen is drawn. */
+    function drawTo(g, cx, cy, R, vw, vh) {
       g.save(); g.beginPath(); g.arc(cx, cy, R - 0.5, 0, 6.2832); g.clip();
-      g.drawImage(off, cx - R, cy - R, 2 * R, 2 * R);
+      if (vw && 2 * R > 1.5 * Math.max(vw, vh)) {
+        const k = S / (2 * R), x0 = cx - R, y0 = cy - R;
+        const sx0 = Math.max(0, Math.floor(-x0 * k) - 2), sy0 = Math.max(0, Math.floor(-y0 * k) - 2), sx1 = Math.min(S, Math.ceil((vw - x0) * k) + 2), sy1 = Math.min(S, Math.ceil((vh - y0) * k) + 2);
+        if (sx1 > sx0 && sy1 > sy0) g.drawImage(off, sx0, sy0, sx1 - sx0, sy1 - sy0, x0 + sx0 / k, y0 + sy0 / k, (sx1 - sx0) / k, (sy1 - sy0) / k);
+      } else g.drawImage(off, cx - R, cy - R, 2 * R, 2 * R);
       const sh = g.createRadialGradient(cx - R * 0.4, cy - R * 0.44, R * 0.5, cx - R * 0.08, cy - R * 0.08, R * 1.2);
       sh.addColorStop(0, 'rgba(8,40,90,0)'); sh.addColorStop(1, 'rgba(8,40,90,.2)');
-      g.fillStyle = sh; g.fillRect(cx - R, cy - R, 2 * R, 2 * R); g.restore();
+      g.fillStyle = sh; if (vw) g.fillRect(0, 0, vw, vh); else g.fillRect(cx - R, cy - R, 2 * R, 2 * R); g.restore();
     }
-    return { paint, drawTo, size: S };
+    /* where a place sits on the disc: latitude, and longitude counted from the middle of the side facing us (both in radians).
+       Returns [x, y, z] with the disc's radius as 1; z below 0 means it is round the back. */
+    function at(lat, lon) {
+      const cl = Math.cos(lat), x1 = cl * Math.sin(lon), y2 = -Math.sin(lat), z2 = cl * Math.cos(lon), y1 = y2 * ct + z2 * st;
+      return [x1 * cr - y1 * sr, x1 * sr + y1 * cr, -y2 * st + z2 * ct];
+    }
+    return { paint, drawTo, at, size: S };
   }
   /* run fn(dt, now) about 30 times a second while the element is on screen; returns stop() */
   function loop(el, fn) {
@@ -2540,21 +2554,23 @@ function mountHeroStage(stage) {
   let S = 0, g = null, globe = null, rot = reducedMotion() ? 0 : -2.0, speed = reducedMotion() ? 0 : 2.4;
   function setup() {
     const w = stage.clientWidth; if (!w) return;
-    S = Math.round(w * dpr); cv.width = cv.height = S; g = cv.getContext('2d'); globe = Globe.create(Math.min(560, S));
+    S = Math.round(w * dpr); cv.width = cv.height = S; g = cv.getContext('2d');
+    /* after the opening animation, keep using its globe instead of building a second one */
+    const want = Math.min(560, S); globe = HeroSync.globe && HeroSync.globe.size >= want * 0.8 ? HeroSync.globe : Globe.create(want);
   }
   function frame(dt) {
-    if (!g) return;
+    if (!g || HeroSync.live) return;   // while the opening animation runs, its own globe is the one on screen
     /* after the opening animation, carry on from where its globe stopped */
     if (HeroSync.rot !== null) { rot = HeroSync.rot; HeroSync.rot = null; speed = HeroSync.speed || 2.4; }
     speed += (0.16 - speed) * Math.min(1, dt * 1.1); rot += speed * dt;
     globe.paint(rot); g.clearRect(0, 0, S, S); globe.drawTo(g, S / 2, S / 2, S / 2);
   }
-  setup(); frame(0);
+  setup(); frame(0); HeroSync.kick = () => frame(0);
   let stop = () => {};
   if (!reducedMotion()) stop = Globe.loop(stage, frame);
   let rt = 0, lastW = stage.clientWidth; const onResize = () => { clearTimeout(rt); rt = setTimeout(() => { if (stage.clientWidth !== lastW) { lastW = stage.clientWidth; setup(); frame(0); } }, 200); };
   window.addEventListener('resize', onResize);
-  return () => { stop(); window.removeEventListener('resize', onResize); };
+  return () => { stop(); HeroSync.kick = null; window.removeEventListener('resize', onResize); };
 }
 
 /* a plain turning globe, used on the countdown page */
@@ -2666,34 +2682,35 @@ function makeClouds(W, H) {
 
 /* ---------- entry animations ----------
    Opening the site: the camera starts inside a forest, a few feet above the ground, looking
-   straight down a path between the trunks. In one unbroken movement it flies backwards and
-   up, so everything streams away in front of it: the forest shrinks, then a river, farmland,
-   desert and a beach slide out from under the camera. Over the beach it swings round and
-   tips down to look straight at the ground, keeps climbing, and the whole Earth comes into
-   view, turning the same way the land was moving, then slows as it settles into its place.
+   straight down a path between the trunks, and it is already moving. In one unbroken movement
+   it flies backwards and up, so everything streams away in front of it: the forest shrinks,
+   then a river, farmland, desert and a coast slide out from under the camera. It never turns
+   sideways; it only tips down until it looks straight at the ground, and keeps climbing. The
+   land it flew over stays where it is, on the Earth, and shrinks; the Earth's round edge closes
+   in from every side; the Earth turns and carries that land away round its edge, and the whole
+   globe settles into its place on the page.
    Between pages: a tsunami washes across the screen.
    Opening the admin portal: the logo appears, its Earth turns bluer, and "Admin" slides in. */
 const seenOnce = k => { try { return sessionStorage.getItem(k) === '1'; } catch (e) { return false; } };
 const markSeen = k => { try { sessionStorage.setItem(k, '1'); } catch (e) { /* storage may be blocked */ } };
-const HeroSync = { rot: null, speed: 0 };   // lets the home page's globe pick up exactly where the intro's globe stopped
+/* lets the home page's globe carry on from the opening animation's globe: the same sphere, the same turn, the same speed */
+const HeroSync = { rot: null, speed: 0, globe: null, live: false, kick: null };
 
 function siteIntro() {
   if (reducedMotion() || seenOnce('bgeo-intro') || routeName() !== 'home') return null;
   markSeen('bgeo-intro');
-  const el = document.createElement('div'); el.className = 'intro waiting'; el.innerHTML = '<canvas aria-hidden="true"></canvas><p class="intro-skip">Tap to start with sound</p>';
-  document.body.appendChild(el); document.body.classList.add('intro-on');
-  const cv = el.firstChild, g = cv.getContext('2d'), label = el.lastChild, dpr = Math.min(window.devicePixelRatio || 1, 1.25);
-  /* the scene is drawn on a square sheet big enough to be turned to any angle, then laid onto the screen */
-  const layer = document.createElement('canvas'), lg = layer.getContext('2d');
-  let W = 0, H = 0, M = 0, D = 0, F = 0; const size = () => { W = window.innerWidth; H = window.innerHeight; M = Math.max(W, H); D = Math.ceil(Math.hypot(W, H)); F = D * 0.62; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); layer.width = layer.height = Math.round(D * dpr); };
-  size(); window.addEventListener('resize', size);
-  const globe = Globe.create(Math.min(512, Math.round(Math.min(W, H) * dpr)));
+  const el = document.createElement('div'); el.className = 'intro'; el.innerHTML = '<canvas aria-hidden="true"></canvas><p class="intro-skip">Tap to skip</p>';
+  document.body.appendChild(el); document.body.classList.add('intro-on', 'intro-globe');
+  const cv = el.firstChild, g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+  /* the ground is drawn on a square sheet as wide as the screen's diagonal, then laid onto the screen */
+  const layer = document.createElement('canvas'), lg = layer.getContext('2d'), decal = document.createElement('canvas');
+  let W = 0, H = 0, D = 0, F = 0, DS = 0;
   let seed = 41; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const sin = Math.sin, clamp = x => Math.max(0, Math.min(1, x)), mix = (a, b, t) => a + (b - a) * t;
+  const sin = Math.sin, clamp = x => Math.max(0, Math.min(1, x)), mix = (a, b, t) => a + (b - a) * t, smooth = p => p * p * (3 - 2 * p);
 
   /* ---- the land the camera flies over, as a long map. u runs forward (the way the camera travels), v runs sideways.
           Going forward: jungle, a river, farmland, desert with a river through it, a green coast, a beach, the open sea. ---- */
-  const PPU = 48, V0 = -8, U0 = -4, TW = 16 * PPU, TL = 64 * PPU;
+  const PPU = 48, V0 = -8, U0 = -4, TW = 16 * PPU, TL = 64 * PPU, SEA = '#5589c0';
   const eJungle = v => 7.5 + 0.5 * sin(0.9 * v + 0.4) + 0.2 * sin(2.3 * v), river1 = v => 9.7 + 0.55 * sin(0.7 * v + 1) + 0.2 * sin(1.9 * v);
   const eDry = v => 12.6 + 0.6 * sin(0.8 * v + 2), river2 = v => 18.4 + 0.8 * sin(0.6 * v) + 0.25 * sin(1.7 * v + 2);
   const eCoast = v => 23.4 + 0.45 * sin(1.1 * v), eBeach = v => 25.5 + 0.3 * sin(0.8 * v + 1) + 0.12 * sin(2.6 * v);
@@ -2712,7 +2729,7 @@ function siteIntro() {
     across(river2, 1.05, '#7fbf5a'); across(river2, 0.4, '#5dc9d6'); across(river2, 0.18, '#3f86c4');
     zone(eCoast, 0, '#a9cf72'); zone(eCoast, 0.5, '#7dc65b');
     for (let i = 0; i < 420; i++) { const v = V0 + R() * 16, u = eCoast(v) + 0.3 + R() * (eBeach(v) - eCoast(v) - 0.35); c.fillStyle = R() < 0.5 ? '#3f9a4d' : '#57b05a'; c.beginPath(); c.arc(px(v), py(u), 2 + R() * 4, 0, 6.2832); c.fill(); }
-    zone(eBeach, 0, '#f3e6b4'); zone(eBeach, 0.34, '#f7fbfc'); zone(eBeach, 0.4, '#8ee0e3'); zone(eBeach, 0.9, '#3d9fda'); zone(eBeach, 1.7, '#1565b8'); zone(eBeach, 3.2, '#0f4fa2');
+    zone(eBeach, 0, '#f3e6b4'); zone(eBeach, 0.34, '#f7fbfc'); zone(eBeach, 0.4, '#a5e6e6'); zone(eBeach, 0.9, '#5dc9d6'); zone(eBeach, 1.7, '#5aa9cf'); zone(eBeach, 3.2, SEA);
     c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 1.2; c.lineCap = 'round';
     for (let i = 0; i < 700; i++) { const v = V0 + R() * 16, u = eBeach(v) + 0.7 + R() * 32, w = 4 + R() * 9; c.beginPath(); c.moveTo(px(v) - w, py(u)); c.quadraticCurveTo(px(v), py(u) - w * 0.35, px(v) + w, py(u)); c.stroke(); }
     /* the jungle from above: thousands of round crowns */
@@ -2721,7 +2738,7 @@ function siteIntro() {
     crowns.forEach(t => { c.fillStyle = TREE[t[3]]; c.beginPath(); c.arc(t[0], t[1], t[2], 0, 6.2832); c.fill(); });
     crowns.forEach(t => { c.fillStyle = LIGHT[t[3]]; c.beginPath(); c.arc(t[0] - t[2] * 0.25, t[1] - t[2] * 0.28, t[2] * 0.5, 0, 6.2832); c.fill(); });
   })();
-  const baseColor = (u, v) => (u < eJungle(v) ? '#1d6b34' : u < eDry(v) ? '#8fcf62' : u < eCoast(v) ? '#dcc083' : u < eBeach(v) ? '#7dc65b' : u < eBeach(v) + 0.4 ? '#f3e6b4' : u < eBeach(v) + 1.7 ? '#3d9fda' : '#0f4fa2');
+  const baseColor = (u, v) => (u < eJungle(v) ? '#1d6b34' : u < eDry(v) ? '#8fcf62' : u < eCoast(v) ? '#dcc083' : u < eBeach(v) ? '#7dc65b' : u < eBeach(v) + 0.4 ? '#f3e6b4' : u < eBeach(v) + 1.7 ? '#5dc9d6' : SEA);
   /* trees that stand up, for the part of the journey spent inside and just above the forest */
   const trees = [];
   for (let i = 0; i < 900; i++) { const v = -5 + R() * 10, u = 0.3 + R() * 7; if (Math.abs(v) < 0.3) continue; trees.push({ u, v, h: 0.27 + R() * 0.15, w: 0.014 + R() * 0.013, r: 0.09 + R() * 0.06, k: R() }); }
@@ -2772,84 +2789,117 @@ function siteIntro() {
     if (roof > 0) { const top = cy - D * 0.5, rg = c.createLinearGradient(0, top, 0, cy - D * 0.08); rg.addColorStop(0, `rgba(10,44,22,${0.9 * roof})`); rg.addColorStop(1, 'rgba(10,44,22,0)'); c.fillStyle = rg; c.fillRect(0, 0, D, cy); }
   }
   function drawSky(a) {
+    if (a <= 0) return;
     g.globalAlpha = a; const bg = g.createLinearGradient(W, 0, 0, H); bg.addColorStop(0, '#012a70'); bg.addColorStop(0.5, '#0f4699'); bg.addColorStop(1, '#2f6db8');
     g.fillStyle = bg; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
   }
-  const show = (yaw, alpha) => { g.save(); g.globalAlpha = alpha; g.translate(W / 2, H / 2); g.rotate(yaw); g.drawImage(layer, -D / 2, -D / 2, D, D); g.restore(); };
+  const show = alpha => { g.globalAlpha = alpha; g.drawImage(layer, (W - D) / 2, (H - D) / 2, D, D); g.globalAlpha = 1; };
 
-  /* the flight, in seconds from the start: RUN along the ground and up, TURN to look straight down, then pull OUT to space */
-  const RUN = 1.5, TURN = 0.65, OUT = 0.85, t0 = performance.now(), H0 = 0.036, H1 = 3.2, H2 = 10, H3 = 26, U1 = 24, TRAVEL = 3.4;
-  let phase = 'walk', goAt = 0, uGo = 6.55, rot = 1.2, spin = 7, last = t0, raf = 0, skipped = false, flyStart = 0, target = null, finished = false, autoGo = 0;
-  let resolveLanding; const untilLanding = new Promise(r => { resolveLanding = r; });
-  const Rf = () => Math.min(W, H) * 0.17, smooth = p => p * p * (3 - 2 * p);
+  /* The flight, in seconds. RUN: backwards along the ground and up. TIP: still backing away and climbing, the camera tips
+     down until it looks straight at the coast. OUT: straight up and away, until the whole turning Earth is in view. */
+  const RUN = 1.9, TIP = 0.7, OUT = 1.3, U_START = 6.55, U_END = 25.6, V_END = 0.25, H0 = 0.036, H1 = 1.6, HX = 6;
+  const runEase = p => 0.1 * p + 0.9 * Math.pow(p, 2.3), RUN_SLOPE = 0.1 + 0.9 * 2.3;   // not zero at the start: the camera is moving from the first frame
+  const tipShare = RUN_SLOPE * TIP / (2 * RUN), U1 = (U_END + U_START * tipShare) / (1 + tipShare), SPEED1 = (U1 - U_START) * RUN_SLOPE / RUN;
+  /* The place the flight ends over is a real spot on the globe: the coast of Bangladesh, land to the north and the Bay of Bengal
+     to the south. The last view of the ground is kept as a picture (the decal) that stays glued to that spot as the Earth shrinks and turns. */
+  const LAT = 21.4 * Math.PI / 180, ZOOM = 6.8;   // ZOOM: how many screen-diagonals wide the Earth's radius is when the camera starts to leave
+  const globe = Globe.create(Math.min(512, Math.round(Math.min(window.innerWidth, window.innerHeight) * dpr)));
+  const spot = lon => { const p = globe.at(LAT, lon), e = globe.at(LAT, lon + 0.001), n = globe.at(LAT + 0.001, lon); return [p[0], p[1], p[2], (e[0] - p[0]) * 1000, (e[1] - p[1]) * 1000, (n[0] - p[0]) * 1000, (n[1] - p[1]) * 1000]; };
+  const spot0 = spot(0), det0 = spot0[3] * spot0[6] - spot0[5] * spot0[4];
+  function paintDecal() {
+    DS = Math.min(1280, Math.round(1.5 * D * dpr)); decal.width = decal.height = DS;
+    const c = decal.getContext('2d'), sc = F / HX * DS / (1.5 * D);
+    for (let y = 0; y < DS; y += 2) { c.fillStyle = baseColor(U_END + (y + 1 - DS / 2) / sc, V_END); c.fillRect(0, y, DS, 2); }
+    c.drawImage(ground, DS / 2 + (V0 - V_END) * sc, DS / 2 + (U0 - U_END) * sc, 16 * sc, 64 * sc);
+    /* a soft round edge, so the picture melts into the globe around it */
+    c.globalCompositeOperation = 'destination-in';
+    const m = c.createRadialGradient(DS / 2, DS / 2, DS * 0.345, DS / 2, DS / 2, DS * 0.5); m.addColorStop(0, '#000'); m.addColorStop(0.45, 'rgba(0,0,0,.62)'); m.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = m; c.fillRect(0, 0, DS, DS);
+  }
+  const size = () => {
+    W = window.innerWidth; H = window.innerHeight; D = Math.ceil(Math.hypot(W, H)); F = D * 0.62;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); layer.width = layer.height = Math.round(D * dpr); paintDecal(); place();
+  };
+  /* how fast the Earth turns while the camera leaves (slow, then quick, then easing), and how far it has turned by each moment */
+  const spinAt = r => 0.25 + 4.15 * smooth(clamp((r - 0.08) / 0.5)) - 1.8 * smooth(clamp((r - 0.62) / 0.38)), TURN = [0];
+  for (let i = 1; i <= 65; i++) TURN.push(TURN[i - 1] + spinAt((i - 0.5) / 64) * OUT / 64);
+  let clock = 0, last = 0, raf = 0, rot = 0, extra = 0, spin = 0.25, target = null, landed = false, landT = 0, skipped = false, finished = false, revealed = false, tick = 0;
+  const Rf = () => Math.min(W, H) * 0.17;
+  function place() {
+    if (!landed) return;
+    const st = document.querySelector('#stage'), b = st && st.getBoundingClientRect();
+    target = b && b.width && b.top < H ? { x: b.left + b.width / 2, y: b.top + b.width / 2, r: b.width / 2 } : { x: W / 2, y: H / 2, r: Rf() };
+  }
+  size(); window.addEventListener('resize', size);
+  globe.paint(0);   // paints the map of the Earth now, before anything moves, so nothing has to wait for it later
+  HeroSync.globe = globe; HeroSync.live = true;
+  /* the page's own headline and buttons come in as the Earth arrives */
+  function reveal() {
+    if (revealed) return; revealed = true; el.classList.add('landing');
+    document.body.classList.remove('intro-on'); document.body.classList.add('intro-reveal'); setTimeout(() => document.body.classList.remove('intro-reveal'), 2200);
+  }
 
   function frame(now) {
     if (finished) return; raf = requestAnimationFrame(frame);
-    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const dt = last ? Math.min(0.045, (now - last) / 1000) : 0; last = now;
+    /* the clock only starts once two frames have been drawn, so the first movement is not lost while the page is still loading */
+    if (++tick > 2) clock += dt; if (typeof window.__introT === 'number') clock = window.__introT;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    if (phase === 'fly') {
-      const q = clamp((now - flyStart) / (skipped ? 200 : 800)), e = smooth(q);
-      spin += (2.4 - spin) * Math.min(1, dt * 3); rot += dt * spin;
-      g.clearRect(0, 0, W, H); drawSky(1 - e);
-      if (target && !skipped) { globe.paint(rot); globe.drawTo(g, W / 2 + (target.x - W / 2) * e, H / 2 + (target.y - H / 2) * e, Rf() + (target.r - Rf()) * e); }
-      if (q >= 1) end();
+    const t = clock;
+    if (t < RUN) {
+      /* faster and faster, backwards and up: the forest shrinks away ahead, then river, farmland and desert slide out from under the camera */
+      const p = t / RUN;
+      drawScene({ u: mix(U_START, U1, runEase(p)), v: V_END * p * p, h: H0 * Math.pow(H1 / H0, Math.pow(p, 1.2)), pitch: 0.25 * p * p });
+      show(1 - 0.45 * clamp(p * 1.4));
+    } else if (t < RUN + TIP) {
+      /* over the coast, still backing away and climbing, the camera tips down until it looks straight at the ground. It does not turn. */
+      const q = (t - RUN) / TIP;
+      drawScene({ u: U1 + SPEED1 * TIP * (q - q * q / 2), v: V_END, h: H1 * Math.pow(HX / H1, q), pitch: mix(0.25, Math.PI / 2, smooth(q)) });
+      show(0.55 + 0.45 * q);
+    } else {
+      /* straight up and away. The ground stays on the Earth and shrinks with it; the Earth's edge closes in; the Earth turns. */
+      const r = clamp((t - RUN - TIP) / OUT);
+      if (landed) landT = Math.min(1, landT + dt / 0.75); const b = smooth(landT);
+      const R0 = ZOOM * D, Rend = target ? mix(Rf(), target.r, b) : Rf(), span = Math.log(R0 / Rf());
+      const a = Math.max(0.25, Math.min(0.9, 1.9 * OUT / span)), f = a * r + (3 - 2 * a) * r * r + (a - 2) * r * r * r;   // leaves at the speed the climb already had, and comes to rest gently
+      const Rg = Math.exp(mix(Math.log(R0), Math.log(Rend), f));
+      if (r < 1) { const i = r * 64, j = Math.floor(i); spin = spinAt(r); rot = mix(TURN[j], TURN[j + 1], i - j); extra = 0; }
+      else { spin += (2.4 - spin) * Math.min(1, dt * 2); extra += dt * spin; rot = TURN[64] + extra; }
+      const s = spot(rot), Rs = 0.5 * Math.min(W, H), Reff = Rg * Rs / Math.pow(Math.pow(Rg, 4) + Math.pow(Rs, 4), 0.25), keep = 1 - smooth(clamp(r / 0.6));
+      /* the camera follows the place it left, then lets go and the globe moves to its place on the page */
+      const go = target ? smooth(clamp((r - 0.5) / 0.5)) * b : 0, bx = target ? mix(W / 2, target.x, go) : W / 2, by = target ? mix(H / 2, target.y, go) : H / 2;
+      const px = bx + (s[0] - spot0[0] * keep) * Reff, py = by + (s[1] - spot0[1] * keep) * Reff, gx = px - s[0] * Rg, gy = py - s[1] * Rg;
+      const sky = 1 - Math.min(smooth(clamp((r - 0.72) / 0.28)), b);
+      g.clearRect(0, 0, W, H); drawSky(sky);
+      globe.paint(rot); globe.drawTo(g, gx, gy, Rg, W, H);
+      if (s[2] > 0.02) {
+        const k = Rg / R0 * (1.5 * D) / DS;
+        g.save(); g.beginPath(); g.arc(gx, gy, Rg, 0, 6.2832); g.clip(); g.translate(px, py);
+        g.transform(k * (s[3] * spot0[6] - s[5] * spot0[4]) / det0, k * (s[4] * spot0[6] - s[6] * spot0[4]) / det0, k * (s[5] * spot0[3] - s[3] * spot0[5]) / det0, k * (s[6] * spot0[3] - s[4] * spot0[5]) / det0, 0, 0);
+        g.drawImage(decal, -DS / 2, -DS / 2); g.restore();
+      }
+      if (landed && r > 0.8) reveal();
+      if (r >= 1 && landed && landT >= 1) { end(); return; }
       return;
     }
-    if (phase === 'hold') { spin += (3 - spin) * Math.min(1, dt * 2); rot += dt * spin; drawSky(1); globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Rf()); return; }
-    if (phase === 'walk') {
-      /* a few feet above the ground, looking down a path between the trunks and backing slowly away */
-      const tw = (now - t0) / 1000; uGo = 6.55 + 0.3 * tw;
-      drawScene({ u: uGo, v: 0.02 * sin(tw * 4.5), h: H0 + 0.004 * sin(tw * 9), pitch: 0 }); show(0, 1); return;
-    }
-    const t = (now - goAt) / 1000;
-    if (t < RUN) {
-      /* faster and faster, backwards and up: the forest shrinks away ahead, then river, farmland, desert and coast slide out from under the camera */
-      const p = t / RUN, e = Math.pow(p, 2.3);
-      drawScene({ u: mix(uGo, U1, e), v: 0.5 * sin(p * 2.2), h: H0 * Math.pow(H1 / H0, Math.pow(p, 1.2)), pitch: 0.25 * p * p });
-      show(0, 1 - 0.45 * clamp(p * 1.4));
-    } else if (t < RUN + TURN) {
-      /* over the beach, still backing away and climbing, the camera swings round and tips down until it looks straight at the ground.
-         It ends turned so that the land drifts to the right, the same way the Earth below is about to be seen turning. */
-      const q = (t - RUN) / TURN, e = smooth(q);
-      drawScene({ u: U1 + TRAVEL * (1 - Math.pow(1 - q, 2.2)), v: 0.5 * sin(2.2), h: H1 * Math.pow(H2 / H1, q), pitch: mix(0.25, Math.PI / 2, e) });
-      show(1.5708 * e, 0.62);
-    } else {
-      /* straight up and away: the ground shrinks, and the whole turning Earth comes into view */
-      const r = clamp((t - RUN - TURN) / OUT), eo = 1 - Math.pow(1 - r, 3), aW = clamp(1 - (r - 0.12) / 0.33), Rbig = M * 2.4, Rg = Math.exp(Math.log(Rbig) + (Math.log(Rf()) - Math.log(Rbig)) * eo);
-      spin += (4.2 - spin) * Math.min(1, dt * 1.2); rot += dt * spin;
-      drawSky(1); g.globalAlpha = clamp((r - 0.08) / 0.3); globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Rg); g.globalAlpha = 1;
-      if (aW > 0) { drawScene({ u: U1 + TRAVEL + 1.5 * r, v: 0.5 * sin(2.2), h: H2 * Math.pow(H3 / H2, clamp(r / 0.45)), pitch: Math.PI / 2 }); show(1.5708 + 0.5 * r, aW * 0.85); }
-      if (r >= 1) { phase = 'hold'; resolveLanding(); }
-    }
-    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.hypot(W, H) * 0.65); vg.addColorStop(0, 'rgba(2,11,36,0)'); vg.addColorStop(1, 'rgba(2,11,36,.32)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
-  }
-  function start() {
-    if (phase !== 'walk') return; clearTimeout(autoGo);
-    phase = 'run'; goAt = performance.now(); el.classList.remove('waiting'); label.textContent = 'Tap to skip';
-    Sound.unlock(); Sound.play('whoosh');
+    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.hypot(W, H) * 0.65); vg.addColorStop(0, 'rgba(2,11,36,0)'); vg.addColorStop(1, 'rgba(2,11,36,.3)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
   }
   function end() {
-    if (finished) return; finished = true; cancelAnimationFrame(raf); clearTimeout(autoGo); window.removeEventListener('resize', size);
-    if (target && !skipped) { HeroSync.rot = rot; HeroSync.speed = spin; }
-    el.remove(); document.body.classList.remove('intro-on');
-    if (!skipped) { document.body.classList.add('intro-reveal'); setTimeout(() => document.body.classList.remove('intro-reveal'), 2200); Sound.play('land'); }
+    if (finished) return; finished = true; cancelAnimationFrame(raf); window.removeEventListener('resize', size);
+    if (!skipped && target) { HeroSync.rot = rot; HeroSync.speed = spin; }
+    HeroSync.live = false; if (HeroSync.kick) HeroSync.kick();   // the page's globe draws itself in the same place, at the same turn, before this one goes
+    document.body.classList.remove('intro-on', 'intro-globe'); el.remove();
+    if (!skipped) Sound.play('land');
   }
-  const skip = () => { if (skipped || phase === 'fly') return; skipped = true; el.classList.add('skipping'); if (phase !== 'hold') { phase = 'hold'; resolveLanding(); } };
-  /* the first tap starts the flight with sound (browsers only allow sound after a tap); a tap after that skips */
-  el.addEventListener('click', () => (phase === 'walk' ? start() : skip()));
-  window.addEventListener('keydown', () => (phase === 'walk' ? start() : skip()), { once: true });
-  autoGo = setTimeout(start, Sound.ready() ? 250 : 900);
+  const quit = () => { el.classList.add('skipping'); setTimeout(end, 240); };
+  const skip = () => { if (skipped || finished || revealed) return; skipped = true; if (landed) quit(); };
+  el.addEventListener('click', skip); window.addEventListener('keydown', skip, { once: true });
+  Sound.unlock(); Sound.play('whoosh');   // plays if this browser already allows sound; a first visit is usually silent
   raf = requestAnimationFrame(frame);
   return {
-    untilLanding,
-    /* the page is drawn underneath now: fly the Earth to its place in the logo and fade away */
-    land() {
-      if (finished) return;
-      const st = document.querySelector('#stage');
-      if (st) { const b = st.getBoundingClientRect(); if (b.width && b.top < H) target = { x: b.left + b.width / 2, y: b.top + b.width / 2, r: b.width / 2 }; }
-      el.classList.add('landing'); phase = 'fly'; flyStart = performance.now();
-    },
-    cancel() { skipped = true; resolveLanding(); end(); },
+    /* the page is drawn underneath now, so the Earth knows where its place is */
+    land() { if (finished) return; landed = true; place(); if (skipped) quit(); },
+    cancel() { skipped = true; end(); },
   };
 }
 
@@ -2979,11 +3029,12 @@ async function saveAndTell(filename, blob) {
 
 /* ---------- the public shell: top bar, menu, footer ---------- */
 const NAV = [
-  ['home', 'Home', 'compass'], ['about', 'About', 'flag'], ['notices', 'Notices', 'mail'], ['countdown', 'Countdown', 'clock'],
+  ['home', 'Home', 'compass'], ['about', 'About', 'flag'], ['notices', 'Notice', 'mail'], ['countdown', 'Schedule', 'clock'],
   ['explore', 'Explore the Earth', 'globe'], ['results', 'Results', 'trophy'],
   ['team', 'Team', 'people'], ['faq', 'Questions', 'help'], ['contact', 'Contact', 'pin'],
 ];
-/* the top bar: two drop-down groups, then the pages people open most */
+/* the links on the top bar of a tablet or computer: two drop-down groups, then the pages people open most.
+   On a phone the bar keeps only the logo and buttons, and every page is listed under the menu button. */
 const BAR_MENU = [
   { label: 'About', items: [['about', 'About the olympiad'], ['team', 'Team and partners'], ['faq', 'Questions and answers'], ['contact', 'Contact']] },
   { label: 'Resources', items: [['explore', 'Explore the Earth'], ['dashboard-resources', 'Study resources'], ['dashboard-exams', 'Online exams']] },
@@ -2995,7 +3046,6 @@ function buildShell() {
   <header class="bar">
     <a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, home"><img src="${LOGO_FULL}" alt="" width="560" height="263"></a>
     <nav class="bar-links" aria-label="Main">
-      <a class="btn btn-lime btn-sm bar-admit" href="#dashboard">Admit card ${icon('download', 16)}</a>
       ${BAR_MENU.map((m, i) => (m.items ? `<div class="dd"><button type="button" class="dd-btn" aria-expanded="false" data-dd="${i}">${m.label} ${icon('down', 14)}</button><div class="dd-menu" hidden>${m.items.map(x => `<a href="#${x[0]}" data-nav="${x[0]}">${x[1]}</a>`).join('')}</div></div>` : `<a href="#${m.to}" data-nav="${m.to}">${m.label}</a>`)).join('')}
     </nav>
     <div class="bar-tools">
@@ -3006,7 +3056,9 @@ function buildShell() {
     </div>
   </header>
   <div class="menu" id="menu" hidden><nav class="menu-grid" aria-label="All pages">
+    <a class="wide menu-admit bar-admit" href="#dashboard">${icon('download')}<span>Admit card</span></a>
     ${NAV.map(n => `<a href="#${n[0]}" data-nav="${n[0]}">${icon(n[2])}<span>${n[1]}</span></a>`).join('')}
+    <a href="#register" data-nav="register">${icon('edit')}<span>Registration</span></a>
     <a href="#dashboard" data-nav="dashboard">${icon('user')}<span>Dashboard</span></a>
   </nav></div>
   <main id="view" tabindex="-1"></main>
@@ -3023,18 +3075,28 @@ function buildShell() {
     closeDrops(); if (b && !open) { b.setAttribute('aria-expanded', 'true'); b.nextElementSibling.hidden = false; Sound.play('open'); }
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrops(); });
+  let ft = 0; window.addEventListener('resize', () => { clearTimeout(ft); ft = setTimeout(fitBar, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitBar);
+}
+/* If the links do not fit beside the logo and buttons (a narrow tablet, or a wider font), the bar falls back to the phone layout
+   rather than letting anything overlap. */
+function fitBar() {
+  const bar = $('.bar'), links = $('.bar-links'); if (!bar || !links) return;
+  bar.classList.remove('bar-tight');
+  if (links.offsetParent && (links.scrollWidth > links.clientWidth + 1 || bar.scrollWidth > bar.clientWidth + 1)) { closeDrops(); bar.classList.add('bar-tight'); }
 }
 function openMenu() { $('#menu').hidden = false; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'true'); b.innerHTML = icon('close'); Sound.play('open'); }
 function closeMenu() { closeDrops(); const m = $('#menu'); if (!m || m.hidden) return; m.hidden = true; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'false'); b.innerHTML = icon('menu'); }
 function syncChrome(name) {
   $$('[data-nav]').forEach(a => { if (a.dataset.nav === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   $$('.dd').forEach(d => d.classList.toggle('here', !!$('[aria-current]', d)));
-  const here = $('.bar-links [aria-current]'), strip = $('.bar-links'); if (here && strip && strip.scrollWidth > strip.clientWidth) strip.scrollLeft = here.offsetLeft - (strip.clientWidth - here.offsetWidth) / 2;
   const u = Store.me(), b = $('#acct-btn');
   b.innerHTML = `${icon('user', 16)} ${u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login'}`; b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
   const hasCard = !!(u && u.role === 'participant' && Store.db.settings.cardsOpen);
-  $$('.bar .bar-admit').forEach(a => { a.hidden = !hasCard; });
-  $$('.bar [data-nav="register"]').forEach(a => { a.hidden = !!u; });
+  $$('.bar-admit').forEach(a => { a.hidden = !hasCard; });
+  $$('[data-nav="register"]').forEach(a => { a.hidden = !!u; });
+  $$('.menu [data-nav="dashboard"]').forEach(a => { a.hidden = !!(u && u.role === 'admin'); });
+  fitBar();
 }
 
 /* ---------- router: one plain #name per page ---------- */
@@ -4644,8 +4706,7 @@ async function boot() {
     requestAnimationFrame(() => { queued = false; const y = window.scrollY || 0; north.hidden = y < 500 || document.body.classList.contains('is-admin'); north.style.setProperty('--turn', ((y * 0.3) % 360) + 'deg'); });
   }, { passive: true });
   north.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' }));
-  /* the page is drawn only once the opening animation has pulled back to the whole Earth */
-  if (intro) await intro.untilLanding;
+  /* the page is drawn underneath the opening animation, which then brings the Earth down to its place on it */
   if (!drawn) { render(); if (intro) intro.land(); }
   if (Store.recovery) recoveryDialog();
 }
