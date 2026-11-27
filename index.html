@@ -306,6 +306,8 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .foot nav{display:grid;gap:8px;align-content:start}
 .foot nav a{text-decoration:none;color:#d6e5fb;min-height:30px}
 .foot small{color:#a9c0e4;display:block;margin-top:10px}
+.foot-base{display:flex;flex-wrap:wrap;gap:4px 24px;justify-content:space-between;margin-top:26px;padding-top:16px;border-top:1px solid rgba(255,255,255,.14)}
+.foot-base small{margin-top:0;font-size:.85rem}
 .north{position:fixed;right:14px;bottom:18px;z-index:35;width:54px;height:54px;border-radius:50%;border:0;background:#fff;color:var(--abyss);box-shadow:0 10px 26px -8px rgba(0,0,0,.6);cursor:pointer;display:grid;place-content:center}
 .north svg{transform:rotate(var(--turn,0deg))}
 #toasts{position:fixed;left:0;right:0;bottom:18px;z-index:90;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
@@ -2493,7 +2495,7 @@ function buildShell() {
     <div><img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263"><small>${CLOUD ? 'Bangladesh Geography Olympiad (BGeO)' : 'Preview build with sample data. Sign-ups made here stay in this browser only.'}</small></div>
     <nav aria-label="Olympiad"><a href="#about">About the olympiad</a><a href="#notices">Notices</a><a href="#countdown">Key dates</a><a href="#results">Results</a></nav>
     <nav aria-label="Help"><a href="#faq">Questions and answers</a><a href="#team">Team and partners</a><a href="#contact">Contact</a></nav>
-  </div><div class="wrap"><small>Website by Tawsikul Islam</small></div></footer>`;
+  </div><div class="wrap foot-base"><small>&copy; ${new Date().getFullYear()} Bangladesh Geography Olympiad. All rights reserved.</small><small>Designed and developed by Tawsikul Islam</small></div></footer>`;
   const sb = $('#sound-btn');
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
   paintSound(); sb.addEventListener('click', () => { Sound.toggle(); paintSound(); });
