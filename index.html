@@ -24,7 +24,7 @@
   --sun:#ffc94d; --coral:#e8604c;
   --display:"Anek Bangla","Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
   --body:"Hind Siliguri","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --r-md:14px; --r-lg:22px; --bar-h:62px;
+  --r-md:14px; --r-lg:22px; --bar-h:62px; --tab-h:0px;
   /* motion: one ease-out for the interface, one for things arriving; nothing bounces or overshoots */
   --ease:cubic-bezier(.23,1,.32,1); --ease-enter:cubic-bezier(.23,1,.32,1); --ease-io:cubic-bezier(.77,0,.175,1); --m-in:.15s; --m-out:.12s; --m-press:.1s; --m-quick:.16s; --m-std:.24s; --m-slow:.52s;
   color-scheme:light;
@@ -202,7 +202,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .stop p{color:#d6e5fb;margin-top:4px}
 .stop.on i{background:var(--lime);color:var(--abyss);border-color:var(--lime);transform:none}
 .stop.on h3,.stop.on p{opacity:1}
-@media(min-width:860px){.trail{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;padding:66px 0 0;max-width:none}
+@media(min-width:740px){.trail{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;padding:66px 0 0;max-width:none}
   .trail .river-v{display:none}.trail .river-h{display:block;left:22px;top:8px;width:calc(75% + 16.5px);height:28px}
   .trail .river-h.lit{clip-path:inset(-12px calc((1 - var(--p)) * 100%) -12px -6px)}
   .stop i{left:0;top:-66px}.stop p{max-width:26ch}}
@@ -378,9 +378,9 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .foot small{color:#a9c0e4;display:block;margin-top:10px}
 .foot-base{display:flex;flex-wrap:wrap;gap:4px 24px;justify-content:space-between;margin-top:26px;padding-top:16px;border-top:1px solid rgba(255,255,255,.14)}
 .foot-base small{margin-top:0;font-size:.85rem}
-.north{position:fixed;right:14px;bottom:18px;z-index:35;width:54px;height:54px;border-radius:50%;border:0;background:#fff;color:var(--abyss);box-shadow:0 10px 26px -8px rgba(0,0,0,.6);cursor:pointer;display:grid;place-content:center}
+.north{position:fixed;right:14px;bottom:calc(18px + var(--tab-h));z-index:35;width:54px;height:54px;border-radius:50%;border:0;background:#fff;color:var(--abyss);box-shadow:0 10px 26px -8px rgba(0,0,0,.6);cursor:pointer;display:grid;place-content:center}
 .north svg{transform:rotate(var(--turn,0deg))}
-#toasts{position:fixed;left:0;right:0;bottom:18px;z-index:90;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
+#toasts{position:fixed;left:0;right:0;bottom:calc(18px + var(--tab-h));z-index:90;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
 .toast{background:var(--abyss);color:#fff;padding:12px 18px;border-radius:14px;font-weight:600;box-shadow:0 14px 34px -10px rgba(0,0,0,.6);transition:opacity var(--m-std) var(--ease),transform var(--m-std) var(--ease);animation:toastIn var(--m-std) var(--ease) both;max-width:520px;border:1px solid rgba(255,255,255,.2)}
 .toast.good{border-left:6px solid var(--leaf)}
 .toast.bad{border-left:6px solid var(--coral)}
@@ -645,6 +645,67 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-mark .
 .dash-facts span{color:#d6e5fb;font-size:.95rem}
 @media(min-width:760px){.doors.doors-2{grid-template-columns:1fr 1fr}}
 
+/* =====================================================================================================
+   One site, three ways to hold it.
+   PHONE (under 740px): a tall screen and a thumb. The globe rises big behind the first screen, rows of cards swipe
+   sideways, the next date rides in a thin strip under the top bar, a bar of four links sits at the bottom, and
+   sections arrive as you scroll.
+   TABLET (740px and up, touch): the computer's layout, sized for fingers. No pointer effects.
+   COMPUTER (a mouse): everything answers the pointer.
+   ===================================================================================================== */
+.tabbar,.nextstrip{display:none}
+@media(max-width:739px){
+  body:not(.is-admin):not(.is-dash){--tab-h:calc(60px + env(safe-area-inset-bottom,0px))}
+  /* the bottom bar */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:38;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tab-h);padding-bottom:env(safe-area-inset-bottom,0px);background:#052057;border-top:1px solid rgba(255,255,255,.14)}
+  .tabbar a{display:grid;justify-items:center;align-content:center;gap:3px;text-decoration:none;color:#b9cdee;font-size:.75rem;font-weight:600;-webkit-tap-highlight-color:transparent;transition:color var(--m-in) var(--ease),transform var(--m-press) var(--ease)}
+  .tabbar a:active{transform:scale(.94)}
+  .tabbar a[aria-current="page"]{color:var(--lime)}
+  .tabbar a .ic{width:22px;height:22px}
+  #site #acct-btn{display:none}
+  .foot{padding-bottom:calc(40px + var(--tab-h))}
+  .menu{inset:var(--bar-h) 0 var(--tab-h) 0}
+  /* the next date, in a thin strip that stays under the top bar */
+  .nextstrip{position:sticky;top:var(--bar-h);z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:38px;padding:0 16px;background:#031c4e;border-bottom:1px solid rgba(255,255,255,.12);color:#d6e5fb;font-size:.9rem;text-decoration:none;white-space:nowrap}
+  .nextstrip span{overflow:hidden;text-overflow:ellipsis}
+  .nextstrip strong{color:#fff;font-weight:600;margin-left:4px}
+  .nextstrip b{flex:none;color:var(--lime);font-weight:700;font-variant-numeric:tabular-nums}
+  .hero-screen .nextup{display:none}
+  /* the first screen: the lettering and the buttons at the top, the Earth rising big from the bottom edge */
+  .hero-screen{position:relative;overflow:hidden}
+  .hero-screen > .wrap{display:block;min-height:calc(100vh - var(--bar-h) - var(--tab-h) - 38px);min-height:calc(100svh - var(--bar-h) - var(--tab-h) - 38px);padding-top:clamp(22px,5svh,44px)}
+  .hero{display:block;padding:0}
+  .hero-copy{display:grid;gap:14px;position:relative;z-index:2}
+  .hero-copy > .hero-title{width:min(88vw,430px)}
+  .hero .lede{font-size:1.1rem;max-width:34ch}
+  .stage{position:absolute;z-index:1;left:50%;bottom:0;width:min(128vw,74svh,640px);max-width:none;transform:translate(-50%,47%)}
+  /* rows that swipe: one card in view, the next one showing at the edge */
+  .home .ground-light .sheet,.home .newsgrid,.home .doors{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:16px;margin-inline:-16px;padding:2px 16px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .home .ground-light .sheet::-webkit-scrollbar,.home .newsgrid::-webkit-scrollbar,.home .doors::-webkit-scrollbar{display:none}
+  .home .ground-light .sheet{background:none;border:0;border-radius:0}
+  .home .notice{flex:0 0 84%;scroll-snap-align:start;align-content:start;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff}
+  .home .notice:first-child{padding-top:16px}
+  .home .ground-light .sheet > .empty{flex:1}
+  .home .news{flex:0 0 80%;scroll-snap-align:start}
+  .home .door{flex:0 0 82%;scroll-snap-align:start}
+  /* sections arrive as they are scrolled to */
+  .arrive{opacity:0;transform:translateY(18px);transition:opacity var(--m-slow) var(--ease),transform var(--m-slow) var(--ease)}
+  .arrive.seen{opacity:1;transform:none}
+  /* a finger gets a press: things dip under it */
+  .notice:active,.res:active,.dash-facts a:active{transform:scale(.99)}
+}
+/* tablet: the computer's layout with room for fingers */
+@media(min-width:740px) and (max-width:899px){.hero-copy > .hero-title{width:min(52vw,520px)}.stage{width:min(100%,42vw,420px)}.hero{gap:22px 10px}.hero .lede{font-size:1.24rem}}
+@media(min-width:740px) and (max-width:1099px){
+  .stop p{max-width:none;font-size:.98rem}
+  .hero .btn{min-height:50px}
+  .bar-links > a,.dd-btn{min-height:44px}
+}
+/* computer: the hero leans toward the pointer */
+@media(min-width:900px) and (hover:hover) and (pointer:fine){
+  .hero-title{transform:translate(calc(var(--px,0) * -10px),calc(var(--py,0) * -8px));transition:transform .5s var(--ease)}
+  .stage{translate:calc(var(--px,0) * 18px) calc(var(--py,0) * 14px);transition:translate .5s var(--ease)}
+}
 /* pointing at things (mouse or trackpad only): buttons step up a pixel, linked cards lift two, arrows lean, pictures ease in */
 @media(hover:hover) and (pointer:fine){
   .btn:hover{transform:translateY(-1px)}
@@ -656,6 +717,21 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-mark .
   .news:hover{transform:translateY(-2px);border-color:#b9cbe4;box-shadow:0 16px 28px -22px rgba(10,35,80,.45)}
   .news:hover .news-pic img{transform:scale(1.03)}
   .nextup:hover strong{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+  /* a soft light follows the pointer across the cards */
+  .door::before,.news::before,.dash-facts a::before,.xfacts > div::before,.glance div::before,.shuffle::before,.qf::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s var(--ease);background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(154,217,111,.2),transparent 62%)}
+  .news::before{background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(47,109,184,.13),transparent 62%)}
+  .news,.dash-facts a,.xfacts > div,.glance div,.shuffle,.qf{position:relative}
+  .door:hover::before,.news:hover::before,.dash-facts a:hover::before,.xfacts > div:hover::before,.glance div:hover::before,.shuffle:hover::before,.qf:hover::before{opacity:1}
+  .page-light tbody tr{transition:background-color var(--m-in) var(--ease)}
+  .page-light tbody tr:hover{background:#f3f7fd}
+  .notice h3,.res h3{transition:color var(--m-in) var(--ease)}
+  .notice:hover h3,.res:hover h3{color:var(--ocean)}
+  .stop{transition:transform var(--m-std) var(--ease)}
+  .stop:hover{transform:translateY(-2px)}
+  .stop:hover i{border-color:var(--lime)}
+  .chips button:hover,.tabs button:hover{border-color:#9db4d6}
+  .textlink{transition:color var(--m-in) var(--ease)}
+  .textlink:hover{color:var(--ocean)}
   .opt:not([disabled]):hover{border-color:#aebfd8;background:#f6f9fd}
   .opt[aria-checked="true"]:hover{border-color:var(--ocean);background:#e6effd}
   .dash-facts a:hover b{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
@@ -3252,6 +3328,12 @@ function buildShell() {
     <a href="#dashboard" data-nav="dashboard">${icon('user')}<span>Dashboard</span></a>
   </nav></div>
   <main id="view" tabindex="-1"></main>
+  <nav class="tabbar" aria-label="Quick links">
+    <a href="#home" data-nav="home">${icon('compass')}<span>Home</span></a>
+    <a href="#notices" data-nav="notices">${icon('mail')}<span>Notice</span></a>
+    <a href="#countdown" data-nav="countdown">${icon('clock')}<span>Schedule</span></a>
+    <a href="#login" id="tab-acct">${icon('account')}<span>Login</span></a>
+  </nav>
   <footer class="foot"><div class="wrap">
     <img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263" draggable="false"><small>${CLOUD ? 'Bangladesh Geography Olympiad (BGeO)' : 'Preview build with sample data. Sign-ups made here stay in this browser only.'}</small>
   </div><div class="wrap foot-base"><small>&copy; ${new Date().getFullYear()} Bangladesh Geography Olympiad. All rights reserved.</small></div></footer>`;
@@ -3276,6 +3358,15 @@ function fitBar() {
   bar.classList.remove('bar-tight');
   if (links.offsetParent && (links.scrollWidth > links.clientWidth + 1 || bar.scrollWidth > bar.clientWidth + 1)) { closeDrops(); bar.classList.add('bar-tight'); }
 }
+/* On a phone a page is one long column, so each section slides into place the first time it is scrolled into view.
+   Wider screens show whole pages at once and leave them still. Nothing is hidden unless this code is running. */
+function arriveOnScroll(root) {
+  if (reducedMotion() || !('IntersectionObserver' in window) || !window.matchMedia('(max-width: 739px)').matches) return;
+  const parts = $$('.band > .wrap > *, .page-light > .wrap > .sheet, .page-light > .wrap > section, .page-light .acct-grid .sheet', root); if (!parts.length) return;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  parts.forEach(p => { p.classList.add('arrive'); io.observe(p); });
+  onLeave(() => io.disconnect());
+}
 function openMenu() { $('#menu').hidden = false; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'true'); b.innerHTML = icon('close'); Sound.play('open'); }
 function closeMenu() { closeDrops(); const m = $('#menu'); if (!m || m.hidden) return; m.hidden = true; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'false'); b.innerHTML = icon('menu'); }
 function syncChrome(name) {
@@ -3283,6 +3374,8 @@ function syncChrome(name) {
   $$('.dd').forEach(d => d.classList.toggle('here', !!$('[aria-current]', d)));
   const u = Store.me(), b = $('#acct-btn');
   const what = u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login';
+  const ta = $('#tab-acct'); ta.lastElementChild.textContent = what; ta.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
+  if (name === 'login' || name === 'register') ta.setAttribute('aria-current', 'page'); else ta.removeAttribute('aria-current');
   b.innerHTML = `${icon('account', 18)}<span>${what}</span>`; b.setAttribute('aria-label', what); b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
   const hasCard = cardOpenFor(u);
   $$('.bar-admit').forEach(a => { a.hidden = !hasCard; }); $('.bar').classList.toggle('has-card', hasCard);
@@ -3317,6 +3410,7 @@ function render() {
   /* every page but the home page and the countdown is a blue title band over a pale body */
   const holder = document.createElement('div'); holder.className = name === 'countdown' || !(isDashRoute(name) || (PAGES[name] && name !== 'home')) ? 'page' : 'page page-light'; holder.innerHTML = page.html; view.replaceChildren(holder);
   if (page.mount) page.mount(holder);
+  arriveOnScroll(holder);
   syncChrome(isDashRoute(name) ? (DASH_ALIAS[name] || name) : PAGES[name] ? name : 'home');
   const label = (NAV.find(n => n[0] === name) || [])[1];
   document.title = label && name !== 'home' ? `${label} | Bangladesh Geography Olympiad` : 'Bangladesh Geography Olympiad';
@@ -3376,6 +3470,7 @@ PAGES.home = () => {
   const year = REG_PREFIX.slice(0, 4), bn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
   return {
     html: `<div class="home">
+    ${ev ? `<a class="nextstrip" href="#countdown"><span>Next up <strong>${esc(ev.label)}</strong></span><b data-mini>${shortSpan(new Date(ev.at) - Date.now())}</b></a>` : ''}
     <section class="hero-screen"><div class="wrap">
       <div class="hero">
         <div class="hero-copy">
@@ -3385,7 +3480,7 @@ PAGES.home = () => {
         </div>
         <div class="stage" id="stage" tabindex="0" role="img" aria-label="The Earth, turning. Drag it, or press the left and right arrow keys, to spin it."><canvas aria-hidden="true"></canvas><span class="stage-hint" aria-hidden="true">Drag to spin</span></div>
       </div>
-      ${ev ? `<a class="nextup" href="#countdown"><span class="nu-what">Next up <strong>${esc(ev.label)}</strong></span><b id="mini">${shortSpan(new Date(ev.at) - Date.now())}</b><span class="nu-go">Schedule ${icon('next', 16)}</span></a>` : ''}
+      ${ev ? `<a class="nextup" href="#countdown"><span class="nu-what">Next up <strong>${esc(ev.label)}</strong></span><b id="mini" data-mini>${shortSpan(new Date(ev.at) - Date.now())}</b><span class="nu-go">Schedule ${icon('next', 16)}</span></a>` : ''}
     </div></section>
     <section class="band ground-deep"><div class="wrap">
       <h2>From your classroom to Team Bangladesh</h2>
@@ -3434,7 +3529,7 @@ PAGES.home = () => {
         ng.addEventListener('click', e => { const b = e.target.closest('[data-news]'); if (b) { const n = Store.get('news', b.dataset.news); if (n) newsDialog(n); } });
         const more = $('#news-more', v); if (more) more.onclick = () => { $$('[data-news][hidden]', ng).forEach(b => { b.hidden = false; }); more.remove(); };
       }
-      if (ev) { const el = $('#mini', v), t = setInterval(() => { el.textContent = shortSpan(new Date(ev.at) - Date.now()); }, 1000); onLeave(() => clearInterval(t)); }
+      if (ev) { const els = $$('[data-mini]', v), t = setInterval(() => { const left = shortSpan(new Date(ev.at) - Date.now()); els.forEach(el => { el.textContent = left; }); }, 1000); onLeave(() => clearInterval(t)); }
     },
   };
 };
@@ -4163,6 +4258,7 @@ function renderDash(name) {
   const page = DASH[tab]();
   const holder = document.createElement('div'); holder.className = 'page page-light'; holder.innerHTML = page.html; $('#dash-view', root).replaceChildren(holder);
   if (page.mount) page.mount(holder);
+  arriveOnScroll(holder);
   document.title = `${DASH_TABS.find(t => t[0] === tab)[1]} | BGeO dashboard`;
 }
 /* what a visitor sees if they open a dashboard address without being logged in */
@@ -4960,6 +5056,21 @@ async function boot() {
     if (reducedMotion() || isAdminRoute(to) || (inDash(to) && inDash(from))) { Sound.play('tap'); render(); return; }
     Sound.play('wave'); pageWave(); swapT = setTimeout(render, WAVE_SWAP);
   });
+  /* With a mouse: a soft light follows the pointer across cards, and the hero's lettering and globe lean a little toward it.
+     Touch screens get none of this; they get the press instead. */
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reducedMotion()) {
+    let lastMove = null, waiting = false;
+    document.addEventListener('pointermove', e => {
+      lastMove = e; if (waiting) return; waiting = true;
+      requestAnimationFrame(() => {
+        waiting = false; const ev = lastMove; if (!ev || !ev.target || !ev.target.closest) return;
+        const card = ev.target.closest('.door, .news, .dash-facts a, .xfacts > div, .glance div, .shuffle, .qf');
+        if (card) { const r = card.getBoundingClientRect(); card.style.setProperty('--mx', (ev.clientX - r.left).toFixed(0) + 'px'); card.style.setProperty('--my', (ev.clientY - r.top).toFixed(0) + 'px'); }
+        const hero = ev.target.closest('.hero-screen');
+        if (hero && !document.body.classList.contains('intro-globe')) { hero.style.setProperty('--px', (ev.clientX / window.innerWidth - 0.5).toFixed(3)); hero.style.setProperty('--py', (ev.clientY / window.innerHeight - 0.5).toFixed(3)); }
+      });
+    }, { passive: true });
+  }
   /* the logo, the headline and the globe cannot be copied or saved with a long press or a right click */
   document.addEventListener('contextmenu', e => { if (e.target.closest('.brand, .hero-title, .foot img, .stage, .intro, .aintro, .dash-top .brand')) e.preventDefault(); });
   document.addEventListener('dragstart', e => { if (e.target.closest('.brand, .foot, .hero-title')) e.preventDefault(); });
