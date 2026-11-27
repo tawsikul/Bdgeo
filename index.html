@@ -13,7 +13,7 @@
 <meta property="og:image" content="https://geographyolympiad.org/icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600&family=Baloo+Da+2:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Baloo+Da+2:wght@600;800&display=swap" rel="stylesheet">
 <style>
 :root{
   /* Layout idea: the logo's ocean is the page itself; anything you read closely or fill in sits on a white map sheet floating on it. */
@@ -22,7 +22,7 @@
   --sun:#ffc94d; --coral:#e8604c;
   --display:"Baloo Da 2","Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
   --body:"Anek Bangla","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --r-md:18px; --r-lg:28px; --bar-h:60px;
+  --r-md:14px; --r-lg:22px; --bar-h:60px;
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -32,13 +32,13 @@ body{margin:0;font-family:var(--body);font-size:1.0625rem;line-height:1.55;color
 h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.08;margin:0;text-wrap:balance}
 h1{font-size:clamp(2.1rem,7.4vw,3.6rem)}
 h2{font-size:clamp(1.55rem,5vw,2.3rem)}
-h3{font-size:1.22rem;line-height:1.2}
+h3{font:700 1.14rem/1.25 var(--body);letter-spacing:-.005em}
 p{margin:0}
 a{color:inherit}
 img{max-width:100%}
 small{font-size:.875rem}
 button{font:inherit}
-:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
 .wrap{width:min(100% - 32px,1080px);margin-inline:auto}
 .muted{color:var(--ink-soft)}
 .onsea{color:#d6e5fb}
@@ -56,11 +56,11 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .brand{display:flex;align-items:center;flex:none}
 .brand img{height:44px;width:auto;display:block}
 .bar-links{display:none;gap:2px;margin-left:10px;min-width:0}
-.bar-links a{padding:8px 11px;border-radius:999px;text-decoration:none;font-weight:600;font-size:.98rem;white-space:nowrap}
+.bar-links a{padding:8px 11px;border-radius:10px;text-decoration:none;font-weight:600;font-size:.98rem;white-space:nowrap}
 .bar-links a:hover{background:rgba(255,255,255,.1)}
 .bar-links a[aria-current="page"]{background:rgba(154,217,111,.22);color:var(--lime)}
 .bar-tools{margin-left:auto;display:flex;align-items:center;gap:8px}
-.iconbtn{width:44px;height:44px;border-radius:50%;border:0;display:grid;place-content:center;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,background .2s}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:0;display:grid;place-content:center;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,background .2s}
 .iconbtn:active{transform:scale(.9)}
 .iconbtn.dark{background:var(--foam);color:var(--ink)}
 .iconbtn[aria-pressed="false"]{opacity:.7}
@@ -69,21 +69,25 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .menu{position:fixed;inset:var(--bar-h) 0 0 0;z-index:39;background:#04214f;overflow:auto;padding:18px 16px 40px;animation:menuIn .26s ease both}
 @keyframes menuIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:640px;margin-inline:auto}
-.menu a{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.08);text-decoration:none;font:800 1.08rem/1.15 var(--display)}
+.menu a{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.08);text-decoration:none;font:600 1.02rem/1.2 var(--body)}
 .menu a[aria-current="page"]{background:var(--lime);color:var(--abyss)}
 .menu a.wide{grid-column:1/-1}
 
 /* buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:999px;border:0;font:800 1.0625rem/1 var(--display);text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s ease,box-shadow .1s ease,background .2s;white-space:nowrap}
-.btn-lime{background:var(--lime);color:var(--abyss);box-shadow:0 4px 0 #5aa544}
-.btn-ocean{background:var(--ocean);color:#fff;box-shadow:0 4px 0 var(--abyss)}
-.btn-lime:active,.btn-ocean:active{transform:translateY(3px);box-shadow:0 1px 0 #5aa544}
-.btn-ocean:active{box-shadow:0 1px 0 var(--abyss)}
-.btn-ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.75)}
-.btn-quiet{background:var(--foam);color:var(--ink)}
-.btn-danger{background:#fff;color:#b93a26;box-shadow:inset 0 0 0 2px var(--coral)}
-.btn-ghost:active,.btn-quiet:active,.btn-danger:active{transform:scale(.96)}
-.btn-sm{min-height:40px;padding:0 16px;font-size:.95rem}
+/* Flat and even: one weight, a small radius, a hairline border. They darken on hover and dip a pixel when pressed. */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:12px;border:1px solid transparent;font:600 1rem/1 var(--body);letter-spacing:.005em;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s,box-shadow .15s,transform .08s;white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn-lime{background:var(--lime);color:var(--abyss);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 8px 18px -10px rgba(0,0,0,.55)}
+.btn-lime:hover{background:#a9e381}
+.btn-ocean{background:var(--ocean);color:#fff;box-shadow:0 1px 2px rgba(4,33,79,.25)}
+.btn-ocean:hover{background:#0a3580}
+.btn-ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.5)}
+.btn-ghost:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.85)}
+.btn-quiet{background:#fff;color:var(--ink);border-color:#c8d6e8}
+.btn-quiet:hover{background:var(--foam);border-color:#aebfd8}
+.btn-danger{background:#fff;color:#b3261e;border-color:#ecb9b0}
+.btn-danger:hover{background:#fdf0ed}
+.btn-sm{min-height:38px;padding:0 14px;font-size:.92rem;border-radius:10px}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
 .btnrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .textlink{font-weight:600;text-underline-offset:3px}
@@ -99,18 +103,18 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .pagehead p{max-width:60ch;color:#d6e5fb;font-size:1.12rem}
 .sheet{background:var(--sheet);color:var(--ink);border-radius:var(--r-lg);padding:22px 20px;box-shadow:0 18px 40px -20px rgba(2,20,60,.6)}
 .sheet + .sheet{margin-top:16px}
-.sheet h2{font-size:1.5rem}
+.sheet h2{font:700 1.3rem/1.2 var(--body);letter-spacing:-.01em}
 .stack{display:grid;gap:14px}
 .stack > *,.stack-lg > *,.form > *,.form-2 > *,.lab > *,.sky > *,.sheet > *{min-width:0}
 .stack-lg{display:grid;gap:24px}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:999px;font-size:.84rem;font-weight:600;background:var(--foam);color:var(--ink);white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:.82rem;font-weight:600;background:var(--foam);color:var(--ink);white-space:nowrap}
 .chip-live{background:#dcf5d4;color:#1c6522}
 .chip-soon{background:#fff0c4;color:#775000}
 .chip-done{background:#e6ebf3;color:#4b6088}
 .chip-sample{background:#fde6e1;color:#9c3523}
 .chip-sea{background:rgba(255,255,255,.14);color:#fff}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chips button{border:0;cursor:pointer;min-height:38px;padding:0 14px;border-radius:999px;font-weight:600;background:rgba(255,255,255,.12);color:#fff}
+.chips button{border:0;cursor:pointer;min-height:38px;padding:0 14px;border-radius:10px;font-weight:600;background:rgba(255,255,255,.12);color:#fff}
 .chips button[aria-pressed="true"]{background:var(--lime);color:var(--abyss)}
 .empty{padding:26px 10px;text-align:center;color:var(--ink-soft)}
 
@@ -165,6 +169,8 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .notice details p{margin-top:6px;white-space:pre-line}
 .notice-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .attach{display:grid;gap:10px;margin-top:12px;justify-items:start}
+.notice-pic{display:block;margin-top:10px}
+.notice-pic img{display:block;width:100%;max-width:520px;max-height:340px;object-fit:cover;border-radius:12px;background:var(--foam)}
 .attach img,.attach video{width:100%;max-width:520px;height:auto;border-radius:14px;display:block;background:var(--foam)}
 .media-reel figure{flex:0 0 min(86%,440px);scroll-snap-align:start;margin:0;display:grid;gap:8px;align-content:start}
 .frame16{aspect-ratio:16/10;border-radius:22px 22px 22px 6px;overflow:hidden;background:var(--abyss);border:1px solid rgba(255,255,255,.16)}
@@ -241,10 +247,10 @@ tr.me td{background:#eef8e8}
 .people{display:grid;gap:12px}
 @media(min-width:640px){.people{grid-template-columns:1fr 1fr}}
 .person{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;padding:12px;border-radius:16px;background:var(--foam)}
-.avatar{width:52px;height:52px;border-radius:50%;display:grid;place-content:center;background:var(--ocean);color:#fff;font:800 1.2rem/1 var(--display)}
+.avatar{width:52px;height:52px;border-radius:50%;display:grid;place-content:center;background:var(--ocean);color:#fff;font:700 1.15rem/1 var(--body)}
 details.qa{border-top:1px solid var(--line);padding:4px 0}
 details.qa:first-of-type{border-top:0}
-details.qa summary{cursor:pointer;font:800 1.12rem/1.3 var(--display);padding:12px 30px 12px 0;list-style:none;position:relative}
+details.qa summary{cursor:pointer;font:700 1.08rem/1.3 var(--body);padding:12px 30px 12px 0;list-style:none;position:relative}
 details.qa summary::-webkit-details-marker{display:none}
 details.qa summary::after{content:"+";position:absolute;right:4px;top:8px;font-size:1.5rem;color:var(--ocean);transition:transform .2s}
 details.qa[open] summary::after{transform:rotate(45deg)}
@@ -257,10 +263,10 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .lab svg circle{cursor:pointer;transition:transform .35s cubic-bezier(.3,1.4,.5,1);transform-origin:160px 160px}
 .lab svg circle.on{transform:scale(1.035)}
 .tabs{display:flex;flex-wrap:wrap;gap:8px}
-.tabs button{border:0;min-height:40px;padding:0 14px;border-radius:999px;background:var(--foam);color:var(--ink);font-weight:600;cursor:pointer}
+.tabs button{border:0;min-height:40px;padding:0 14px;border-radius:10px;background:var(--foam);color:var(--ink);font-weight:600;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--ocean);color:#fff}
 .fact{min-height:8.5em}
-.fact b{font:800 1.3rem var(--display);display:block}
+.fact b{font:700 1.2rem var(--body);display:block}
 .fact em{font-style:normal;color:var(--ocean);font-weight:600;display:block;margin:2px 0 6px}
 .sky{display:grid;grid-template-columns:minmax(0,150px) 1fr;gap:16px}
 .sky-col{position:relative;display:grid;border-radius:18px;overflow:hidden;min-height:340px}
@@ -280,9 +286,9 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 @media(min-width:640px){.form-2{grid-template-columns:1fr 1fr}}
 .field{display:grid;gap:6px;min-width:0}
 .field label{font-weight:600;font-size:.96rem}
-.field input,.field select,.field textarea{width:100%;min-height:48px;padding:10px 14px;border-radius:12px;border:1.5px solid #b6c9e1;background:#fff;color:var(--ink);font:inherit}
+.field input,.field select,.field textarea{width:100%;min-height:46px;padding:10px 14px;border-radius:10px;border:1px solid #b6c6dc;background:#fff;color:var(--ink);font:inherit}
 .field textarea{resize:vertical}
-.field input:focus,.field select:focus,.field textarea:focus{outline:3px solid var(--lagoon);outline-offset:1px;border-color:var(--ocean)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--azure);box-shadow:0 0 0 3px rgba(47,109,184,.22)}
 .field small{color:var(--ink-soft)}
 .check{display:flex;gap:10px;align-items:center;min-height:44px;font-weight:600;cursor:pointer}
 .check input{width:22px;height:22px;accent-color:var(--ocean)}
@@ -292,6 +298,7 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .narrow{max-width:520px;margin-inline:auto}
 .cardprev{border-radius:16px;overflow:hidden;border:1px solid var(--line)}
 .cardprev canvas{display:block;width:100%;height:auto}
+.cardprev canvas + canvas{border-top:8px solid #fff}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
 .kv dt{color:var(--ink-soft)}
 .kv dd{margin:0;font-weight:600;overflow-wrap:anywhere}
@@ -320,28 +327,28 @@ dialog.dlg{border:0;border-radius:22px;padding:0;width:min(580px,calc(100% - 24p
 dialog.dlg::backdrop{background:rgba(2,18,52,.62)}
 dialog.dlg[open]{animation:rise .3s ease both}
 .dlg-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 4px}
-.dlg-head h2{font-size:1.35rem}
+.dlg-head h2{font:700 1.25rem/1.2 var(--body);letter-spacing:-.01em}
 .dlg-body{padding:10px 18px 18px;display:grid;gap:14px}
 .dlg-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding-top:6px}
 
 /* admin portal: a plain working surface, apart from the public site */
 #admin{min-height:100vh}
 .adm-top{position:sticky;top:0;z-index:30;background:var(--abyss);color:#fff;display:flex;align-items:center;gap:10px;padding:8px 14px;min-height:56px}
-.adm-top b{font:800 1.15rem var(--display)}
+.adm-top b{font:700 1.08rem var(--body);letter-spacing:.01em}
 .adm-top .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
 .adm-tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:56px;z-index:29;scrollbar-width:none}
 .adm-tabs::-webkit-scrollbar{display:none}
-.adm-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;text-decoration:none;font-weight:600;color:var(--ink-soft);white-space:nowrap}
+.adm-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;text-decoration:none;font-weight:600;color:var(--ink-soft);white-space:nowrap}
 .adm-tabs a[aria-current="page"]{background:var(--ocean);color:#fff}
 .adm-main{padding:18px 14px 90px;max-width:1100px;margin-inline:auto;display:grid;gap:16px}
 .adm-main > *{min-width:0}
 .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:12px;min-width:0}
-.panel h2{font-size:1.3rem}
+.panel h2{font:700 1.2rem/1.2 var(--body);letter-spacing:-.01em}
 .panel-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
 .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 @media(min-width:760px){.tiles{grid-template-columns:repeat(4,1fr)}}
 .tile{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:2px}
-.tile b{font:800 2.1rem/1 var(--display);color:var(--ocean);font-variant-numeric:tabular-nums}
+.tile b{font:700 2rem/1 var(--body);color:var(--ocean);font-variant-numeric:tabular-nums}
 .tile span{color:var(--ink-soft);font-weight:600;font-size:.95rem}
 .bars{display:grid;gap:8px}
 .barrow{display:grid;grid-template-columns:minmax(0,130px) 1fr auto;gap:10px;align-items:center;font-size:.96rem}
@@ -353,7 +360,7 @@ dialog.dlg[open]{animation:rise .3s ease both}
 .rowi .acts{display:flex;gap:6px;flex:none}
 .rowi h3{font-size:1.06rem;overflow-wrap:anywhere}
 .rowi p{color:var(--ink-soft);font-size:.96rem;overflow-wrap:anywhere}
-.mini{width:38px;height:38px;border-radius:12px;border:0;background:var(--foam);color:var(--ink);display:grid;place-content:center;cursor:pointer}
+.mini{width:38px;height:38px;border-radius:10px;border:0;background:var(--foam);color:var(--ink);display:grid;place-content:center;cursor:pointer}
 .mini.del{color:#b93a26}
 .filters{display:grid;gap:10px;grid-template-columns:1fr 1fr}
 .filters > :first-child{grid-column:1/-1}
@@ -375,6 +382,123 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 .bulk{position:sticky;bottom:12px;z-index:20;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--abyss);color:#fff;padding:12px 14px;border-radius:18px;box-shadow:0 14px 34px -10px rgba(0,0,0,.5)}
 .pcheck{width:24px;height:24px;margin-top:4px;accent-color:var(--ocean);flex:none}
 .plink{background:none;border:0;padding:0;text-align:left;color:inherit;cursor:pointer;font:inherit;width:100%}
+
+/* news on the home page */
+.newsgrid{display:grid;gap:14px;margin-top:18px}
+@media(min-width:700px){.newsgrid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.newsgrid{grid-template-columns:repeat(3,1fr)}}
+.news{display:grid;grid-template-rows:auto 1fr;text-align:left;padding:0;border:0;border-radius:18px;overflow:hidden;background:#fff;color:var(--ink);cursor:pointer;font:inherit;box-shadow:0 18px 40px -24px rgba(2,20,60,.7);transition:transform .15s}
+.news:hover{transform:translateY(-2px)}
+.news-pic{display:block;aspect-ratio:16/9;background:var(--abyss);overflow:hidden}
+.news-pic img{width:100%;height:100%;object-fit:cover;display:block}
+.news-pic.none{display:grid;place-content:center;color:var(--lagoon);background:linear-gradient(135deg,#04214f,#0f4699)}
+.news-body{display:grid;gap:6px;padding:14px 16px 16px;align-content:start}
+.news-body small{color:var(--ink-soft)}
+.news-body b{font-size:1.1rem;line-height:1.25}
+.news-snip{color:var(--ink-soft);font-size:.96rem;line-height:1.45}
+
+/* my account */
+.acct-head{display:grid;grid-template-columns:auto 1fr;gap:14px 16px;align-items:center;padding:28px 0 22px}
+.avatar-lg{width:72px;height:72px;font-size:1.55rem;background:var(--lime);color:var(--abyss)}
+.acct-who{display:grid;gap:6px;min-width:0}
+.acct-who h1{font-size:clamp(1.7rem,6vw,2.5rem);overflow-wrap:anywhere}
+.acct-who p{color:#d6e5fb}
+.acct-acts{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap}
+@media(min-width:760px){.acct-head{grid-template-columns:auto 1fr auto}.acct-acts{grid-column:auto}}
+.acct-grid{display:grid;gap:16px}
+.acct-main,.acct-side{display:grid;gap:16px;align-content:start;min-width:0}
+.acct-main > .sheet + .sheet,.acct-side > .sheet + .sheet{margin-top:0}
+@media(min-width:900px){.acct-grid{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);align-items:start}}
+.cardbox{display:grid;gap:12px}
+.inrow{display:flex;gap:8px;align-items:stretch}
+.inrow input{flex:1;min-width:0}
+.inrow .btn{min-height:46px}
+
+/* explore: fact shuffle, small figures, Bangladesh at a glance, quick fire */
+.shuffle{display:grid;gap:18px;padding:22px 20px;border-radius:var(--r-lg);background:rgba(3,31,80,.55);border:1px solid rgba(255,255,255,.14)}
+.shuffle > div > p{color:#d6e5fb;margin-top:4px}
+.deck{position:relative;max-width:520px;perspective:900px;margin:4px 6px 8px}
+.deck::before,.deck::after{content:"";position:absolute;inset:0;border-radius:18px}
+.deck::before{background:#8fb4e2;transform:rotate(-3deg) translateY(6px)}
+.deck::after{background:#c9dcf4;transform:rotate(2deg) translateY(3px)}
+.deck-card{position:relative;z-index:1;min-height:200px;display:grid;gap:12px;grid-template-rows:auto 1fr auto;padding:20px;border-radius:18px;background:#fff;color:var(--ink);box-shadow:0 14px 30px -16px rgba(0,0,0,.6)}
+.deck-card p{font-size:1.2rem;line-height:1.4;font-weight:500}
+.deck-card small{color:var(--ink-soft)}
+.deck-card .chip{justify-self:start;background:#e6effd;color:var(--ocean)}
+.deck-card.flip{animation:flip .42s ease both}
+@keyframes flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+.tl-fig:empty{display:none}
+.tl-fig svg{display:block;width:100%;max-width:300px;border-radius:16px}
+.swatch{display:block;height:12px;max-width:300px;border-radius:999px}
+.glance{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+@media(min-width:760px){.glance{grid-template-columns:repeat(3,1fr)}}
+.glance div{padding:16px;border-radius:16px;background:rgba(3,31,80,.6);border:1px solid rgba(255,255,255,.16);display:grid;gap:4px;align-content:start}
+.glance b{font:800 1.3rem/1.15 var(--display);color:var(--lime)}
+.glance span{color:#d6e5fb}
+.qf{padding:22px 20px;border-radius:var(--r-lg);background:linear-gradient(160deg,#04214f,#0b3d8f);border:1px solid rgba(255,255,255,.16);display:grid;gap:16px;box-shadow:0 24px 50px -30px rgba(0,0,0,.8)}
+.qf-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.qf-top p{color:#d6e5fb;margin-top:4px}
+.qf-score{font-weight:600;color:var(--lime);font-variant-numeric:tabular-nums}
+#qf{display:grid;gap:14px}
+.qf-steps{display:flex;gap:6px}
+.qf-steps i{flex:1;height:6px;border-radius:999px;background:rgba(255,255,255,.18)}
+.qf-steps i.now{background:#fff}
+.qf-steps i.ok{background:var(--lime)}
+.qf-steps i.no{background:var(--coral)}
+.qf-count{color:#a9c0e4;font-weight:600;font-size:.92rem}
+.qf .qtext{color:#fff;font-size:1.3rem}
+.qf .opt{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.22);color:#fff;border-radius:14px}
+.qf .opt:hover:not([disabled]){background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.5)}
+.qf .opt .key{background:rgba(255,255,255,.14);color:#fff;border-radius:10px}
+.qf .opt.right{background:rgba(154,217,111,.18);border-color:var(--lime)}
+.qf .opt.right .key{background:var(--lime);color:var(--abyss)}
+.qf .opt.wrong{background:rgba(232,96,76,.2);border-color:var(--coral)}
+.qf .opt.wrong .key{background:var(--coral);color:#fff}
+.qf-next{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;min-height:46px}
+.qf-next p{font-weight:600}
+.qf-next .yes{color:var(--lime)}
+.qf-next .nope{color:#ffc9bf}
+.qf-end{display:grid;gap:14px;justify-items:center;text-align:center;padding:6px 0}
+.qf-end .qf-steps{width:100%}
+.qf-ring{position:relative;width:150px;height:150px}
+.qf-ring svg{width:100%;height:100%}
+.qf-ring circle{fill:none;stroke-width:9}
+.qf-ring .track{stroke:rgba(255,255,255,.16)}
+.qf-ring .arc{stroke:var(--lime);stroke-linecap:round;animation:ring 1s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ring{from{stroke-dashoffset:327}}
+.qf-ring p{position:absolute;inset:0;display:grid;place-content:center;line-height:1}
+.qf-ring b{font:800 3rem/1 var(--display);color:#fff}
+.qf-ring span{color:#a9c0e4;font-size:.9rem;margin-top:4px}
+.qf-msg{color:#e2edfc;font-size:1.1rem}
+
+/* opening animation, page wipe, admin entry */
+.intro{position:fixed;inset:0;z-index:120;cursor:pointer;background:#0f4699}
+.intro.landing{background:transparent;pointer-events:none}
+.intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.intro-skip{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.72);font-size:.9rem;font-weight:500;pointer-events:none;transition:opacity .2s}
+.intro.landing .intro-skip,.intro.skipping .intro-skip{opacity:0}
+body.intro-on{overflow:hidden}
+body.intro-on .stage canvas,body.intro-on .stage img,body.intro-on .hero-copy > *{opacity:0;animation:none}
+body.intro-reveal .stage img{animation:logoPop .75s cubic-bezier(.2,1.5,.4,1) .05s both}
+body.intro-reveal .hero-copy > *{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+body.intro-reveal .hero-copy > :nth-child(1){animation-delay:.3s}
+body.intro-reveal .hero-copy > :nth-child(2){animation-delay:.45s}
+body.intro-reveal .hero-copy > :nth-child(3){animation-delay:.6s}
+@keyframes logoPop{from{opacity:0;transform:scale(.55) translateY(10px)}to{opacity:1;transform:none}}
+.sweep{position:fixed;inset:0;z-index:38;pointer-events:none;overflow:hidden}
+.sweep::before{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:60%;border-radius:0 50% 50% 0;background:linear-gradient(90deg,rgba(4,33,79,0),rgba(4,33,79,.92) 45%,rgba(11,61,143,.95));box-shadow:6px 0 0 var(--lime);transform:translateX(-120%);animation:sweep .6s cubic-bezier(.65,0,.3,1) both}
+@keyframes sweep{to{transform:translateX(190%)}}
+.aintro{position:fixed;inset:0;z-index:120;display:grid;place-content:center;background:radial-gradient(circle at 50% 40%,#0b3d8f,#020b24 75%);color:#fff;cursor:pointer;transition:opacity .4s}
+.aintro.bye{opacity:0}
+.aintro-in{display:grid;justify-items:center;gap:18px;padding:20px}
+.aintro canvas{width:min(46vw,220px);height:auto;aspect-ratio:1;transform:scale(.2);opacity:0;transition:transform .7s cubic-bezier(.2,1.5,.4,1),opacity .3s}
+.aintro.in canvas{transform:none;opacity:1}
+.aintro-name{display:grid;justify-items:center;gap:2px;opacity:0;transform:translateY(14px);transition:opacity .5s .25s,transform .5s .25s}
+.aintro.in .aintro-name{opacity:1;transform:none}
+.aintro-name span{font:600 1.05rem var(--body);color:#a9c0e4;letter-spacing:.02em}
+.aintro-row{display:flex;align-items:center;justify-content:center;font:800 clamp(2rem,9vw,3rem)/1.15 var(--display)}
+.aintro-a{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;color:var(--lime);transform:translateX(60px);margin-left:0;transition:max-width .6s cubic-bezier(.2,.8,.2,1),opacity .4s .1s,transform .6s cubic-bezier(.2,.8,.2,1),margin-left .6s}
+.aintro.admin .aintro-a{max-width:6em;opacity:1;transform:none;margin-left:.3em}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none !important;transition:none !important}
@@ -1708,6 +1832,7 @@ const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-red
 /* ---------- icons ---------- */
 const IC = {
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  shuffle: '<path d="M3 7h3c5 0 6 10 11 10h3M3 17h3c1.800 0 3-1.300 4.100-3M13.900 10c1.100-1.700 2.300-3 4.100-3h2M18 4l3 3-3 3M18 14l3 3-3 3"/>',
   close: '<path d="M6 6l12 12M18 6L6 18"/>',
   sound: '<path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>',
   mute: '<path d="M4 10v4h3l5 4V6L7 10H4z"/><path d="M16.5 9.5l5 5M21.5 9.500l-5 5"/>',
@@ -1782,6 +1907,8 @@ const Sound = (() => {
     bad() { tone({ f: 190, f2: 120, t: 0.22, g: 0.2, type: 'triangle' }); },
     tick() { tone({ f: 1250, f2: 900, t: 0.035, g: 0.05, type: 'triangle' }); },
     win() { [523, 659, 784, 1047].forEach((f, i) => tone({ f, t: 0.3, g: 0.14, delay: i * 0.1 })); },
+    whoosh() { wind({ t: 2.5, f: 3200, f2: 260, g: 0.1 }); tone({ f: 110, f2: 48, t: 2.3, g: 0.12 }); },   // the long pull-back from the ground to space
+    land() { tone({ f: 659, t: 0.5, g: 0.1 }); tone({ f: 988, t: 0.7, g: 0.1, delay: 0.12 }); },
   };
   function play(name) { if (!on || !ctx) return; try { if (ctx.state === 'suspended') ctx.resume().catch(() => {}); lib[name] && lib[name](); } catch (e) { /* never let a sound break the page */ } }
   function toggle() { on = !on; try { localStorage.setItem('bgeo-sound', on ? 'on' : 'off'); } catch (e) {} if (on && ensure()) lib.pick(); return on; }
@@ -1870,6 +1997,10 @@ function seed() {
       { id: uid('n'), title: 'Regional round: date and venues', body: 'The date, time and venue for each region will be published here.\n\nThis is a sample notice.', date: dAt(-3, 15), tag: 'Regional round', pinned: false, sample: true },
       { id: uid('n'), title: 'Practice quiz now live', body: 'A short practice quiz is open in the Online exams section. You can take it as many times as you like on your phone.\n\nThis is a sample notice.', date: dAt(-5, 11), tag: 'Online exam', pinned: false, sample: true },
     ],
+    news: [
+      { id: uid('w'), title: 'Bangladesh finishes second at the first MY-GEO', body: 'Team Bangladesh finished second overall at the first Multinational Youth Geography Olympiad (MY-GEO) in Russia. All five team members came home with medals.\n\nThis is a sample news item. Replace it from the admin portal.', date: dAt(-6, 10), sample: true },
+      { id: uid('w'), title: 'Regional rounds planned in all eight divisions', body: 'This season every division will host its own Regional round, so students can sit the first test close to home.\n\nThis is a sample news item.', date: dAt(-9, 16), sample: true },
+    ],
     resources: [
       { id: uid('r'), title: 'How to read a topographic map', desc: 'Contour lines, scale, grid references and symbols, with worked examples.', cat: 'Maps and skills', url: '', addedAt: dAt(-2), sample: true },
       { id: uid('r'), title: 'Rivers and deltas of Bangladesh', desc: 'How the Padma, Jamuna and Meghna built the Bengal Delta.', cat: 'Physical geography', url: '', addedAt: dAt(-4), sample: true },
@@ -1916,7 +2047,7 @@ const SUPA = { url: 'https://wbnrpdphtktkugyzmlce.supabase.co', key: 'sb_publish
 const WANT_CLOUD = SUPA.url.indexOf('https://') === 0;
 const CLOUD = WANT_CLOUD && !!(window.supabase && window.supabase.createClient);
 const sb = CLOUD ? window.supabase.createClient(SUPA.url, SUPA.key) : null;
-const KINDS = ['notices', 'resources', 'events', 'team', 'faq', 'results'];
+const KINDS = ['notices', 'resources', 'events', 'team', 'faq', 'results', 'news'];
 
 const Store = (() => {
   const KEY = 'bgeo-preview-db', SKEY = 'bgeo-preview-session';
@@ -1935,6 +2066,7 @@ const Store = (() => {
     if (/invalid login credentials/i.test(m)) return 'That email and password do not match. Check both and try again.';
     if (/already registered|already been registered/i.test(m)) return 'An account with this email already exists. Log in instead.';
     if (/email not confirmed/i.test(m)) return 'Confirm your email first: open the link that was sent to you, then log in.';
+    if (/content_kind_check/i.test(m)) return 'News needs a small database update before it can be saved. Ask the site developer to run it.';
     if (/rate limit/i.test(m)) return 'Too many tries in a short time. Wait a few minutes and try again.';
     if (/failed to fetch|networkerror|load failed/i.test(m)) return 'Could not reach the server. Check your internet and try again.';
     if (/database error saving new user/i.test(m)) return 'Registration could not be completed. It may be closed right now.';
@@ -1944,9 +2076,11 @@ const Store = (() => {
   const mapUser = p => ({ id: p.id, role: p.role, name: p.name, email: p.email, phone: p.phone, institution: p.institution, klass: p.klass, category: p.category, region: p.region, regNo: p.reg_no, createdAt: p.created_at, selected: p.selected || [] });
   const mapAttempt = a => ({ id: a.id, examId: a.exam_id, userId: a.user_id, startedAt: a.started_at, deadline: a.deadline, submittedAt: a.submitted_at, answers: a.answers || [], score: a.score, secs: a.secs });
   const mapMsg = m => ({ id: m.id, userId: m.user_id, title: m.title, body: m.body, kind: m.kind, at: m.at });
-  const mapMail = m => ({ id: m.id, to: m.to_email, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at, sentAt: m.sent_at, error: m.error });
+  const mapMail = m => ({ id: m.id, to: m.to_email, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at, sentAt: m.sent_at, error: m.error, cardUrl: m.card_url || '' });
   const mapAtt = a => ({ id: a.id, userId: a.user_id, session: a.session, at: a.marked_at, by: a.marked_by });
-  const mailRow = m => ({ id: m.id, to_email: m.to, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at });
+  const mailRow = m => ({ id: m.id, to_email: m.to, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at, ...(m.cardUrl ? { card_url: m.cardUrl } : {}) });
+  /* admit card emails: null until we know, false if this database does not have the feature yet */
+  let cardMail = null;
   async function fetchAll(table, cols) {
     const out = [];
     for (let from = 0; ; from += 1000) {
@@ -1960,12 +2094,13 @@ const Store = (() => {
     const sess = ok(await sb.auth.getSession()).session, authed = !!sess;
     const [settings, content, exams] = await Promise.all([sb.from('settings').select('data').eq('id', 1).maybeSingle().then(ok), fetchAll('content', ['kind', 'id']), fetchAll('exams', ['id'])]);
     const fresh = { v: 4, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
-      users: [], notices: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [] };
+      users: [], notices: [], news: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [] };
     content.forEach(r => { if (KINDS.includes(r.kind)) fresh[r.kind].push({ ...r.data, id: r.id }); });
-    let qs = [], keys = [];
+    let qs = [], keys = []; cardMail = null;
     if (authed) {
       const [users, attempts, messages, emails, q, k, att] = await Promise.all([fetchAll('profiles', ['id']), fetchAll('attempts', ['id']), fetchAll('messages', ['id']), fetchAll('emails', ['id']), fetchAll('exam_questions', ['exam_id']), fetchAll('exam_keys', ['exam_id']), fetchAll('attendance', ['id'])]);
       fresh.attendance = att.map(mapAtt);
+      try { const cm = await sb.from('card_mails').select('tries,sent_at').eq('user_id', sess.user.id).maybeSingle(); cardMail = cm.error ? false : (cm.data || { tries: 0, sent_at: null }); } catch (e) { cardMail = false; }
       fresh.users = users.map(mapUser); fresh.attempts = attempts.map(mapAttempt); fresh.messages = messages.map(mapMsg); fresh.emails = emails.map(mapMail); qs = q; keys = k;
     }
     fresh.exams = exams.map(e => {
@@ -1995,7 +2130,7 @@ const Store = (() => {
       if (CLOUD) return refresh();
       db = read(KEY);
       if (!db || db.v !== 4) { db = seed(); save(); }
-      db.attendance = db.attendance || [];
+      db.attendance = db.attendance || []; db.news = db.news || [];
       session = read(SKEY);
       if (session && !db.users.some(u => u.id === session)) session = null;
       return Promise.resolve();
@@ -2081,6 +2216,7 @@ const Store = (() => {
     },
 
     /* reads the pages use */
+    news: () => (db.news || []).slice().sort(byDateDesc('date')),
     notices: () => db.notices.slice().sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || new Date(b.date) - new Date(a.date)),
     events: () => db.events.slice().sort((a, b) => new Date(a.at) - new Date(b.at)),
     nextEvent() { const now = Date.now(); return this.events().find(e => new Date(e.at).getTime() > now) || null; },
@@ -2139,21 +2275,27 @@ const Store = (() => {
     },
 
     /* selection: marks people, drops a notice in their account and queues the email */
-    async select(ids, round, note) {
+    async select(ids, round, note, cardFor) {
       const at = new Date().toISOString(), msgs = [], mails = [], picked = [];
       ids.forEach(id => {
         const u = db.users.find(x => x.id === id); if (!u || u.role !== 'participant' || (u.selected || []).some(s => s.round === round)) return;
-        const title = `You are selected: ${round}`;
-        const body = (note || '').trim() || `Congratulations ${u.name}. You have been selected for the ${round} of the Bangladesh Geography Olympiad. Details will follow in Notices.`;
-        picked.push({ u, selected: [...(u.selected || []), { round, at }] });
-        msgs.push({ id: uid('m'), userId: u.id, title, body, at, kind: 'selected' });
-        mails.push({ id: uid('x'), to: u.email, name: u.name, subject: `BGeO: ${title}`, body, at, status: CLOUD ? 'queued' : 'preview' });
+        picked.push({ u, selected: [...(u.selected || []), { round, at }], cardUrl: '' });
       });
       if (!picked.length) return 0;
+      /* the admit card that goes with the email (the National round has its own card) */
+      if (cardFor) for (let i = 0; i < picked.length; i += 4) await Promise.all(picked.slice(i, i + 4).map(async p => { try { p.cardUrl = (await cardFor(p.u)) || ''; } catch (e) { p.cardUrl = ''; } }));
+      picked.forEach(({ u, cardUrl }) => {
+        const body = (note || '').trim() || `Congratulations ${u.name}. You have been selected for the ${round} of the Bangladesh Geography Olympiad. Details will follow in Notices.`;
+        msgs.push({ id: uid('m'), userId: u.id, title: `You are selected: ${round}`, body, at, kind: 'selected' });
+        mails.push({ id: uid('x'), to: u.email, name: u.name, subject: `Congratulations! You are selected for the ${round}`, body, at, status: CLOUD ? 'queued' : 'preview', cardUrl });
+      });
       if (CLOUD) {
         await Promise.all(picked.map(p => sb.from('profiles').update({ selected: p.selected }).eq('id', p.u.id).then(ok)));
         ok(await sb.from('messages').insert(msgs.map(m => ({ id: m.id, user_id: m.userId, title: m.title, body: m.body, kind: m.kind, at: m.at }))));
-        ok(await sb.from('emails').insert(mails.map(mailRow)));
+        let ins = await sb.from('emails').insert(mails.map(mailRow));
+        /* an older database has no place for the card yet: still send the email, without the card */
+        if (ins.error && /card_url/i.test(ins.error.message || '')) { mails.forEach(m => { m.cardUrl = ''; }); ins = await sb.from('emails').insert(mails.map(mailRow)); }
+        ok(ins);
       }
       picked.forEach(p => { p.u.selected = p.selected; }); db.messages.push(...msgs); db.emails.push(...mails);
       save(); return picked.length;
@@ -2179,6 +2321,22 @@ const Store = (() => {
       db.attendance = db.attendance.filter(a => !(a.userId === userId && a.session === session)); save();
     },
     async loadAttendance() { if (CLOUD) db.attendance = (await fetchAll('attendance', ['id'])).map(mapAtt); },
+    /* admit cards by email */
+    async uploadCard(blob, u, kind) {
+      if (!CLOUD) return 'preview';
+      const path = `cards/${String(u.id).slice(0, 8)}-${kind}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}.png`;
+      ok(await sb.storage.from('site-files').upload(path, blob, { cacheControl: '31536000', contentType: 'image/png' }));
+      return sb.storage.from('site-files').getPublicUrl(path).data.publicUrl;
+    },
+    /* true when this student has not been emailed their Regional round card yet */
+    cardMailDue() { const u = me(); return !!(CLOUD && u && u.role === 'participant' && db.settings.cardsOpen && cardMail && !cardMail.sent_at && (cardMail.tries || 0) < 3); },
+    async sendMyCard(pngBase64) {
+      if (!CLOUD) return 'off';
+      let r; try { r = await sb.functions.invoke('send-emails', { body: { action: 'card', png: pngBase64 } }); } catch (e) { r = { error: e }; }
+      const d = (!r.error && r.data) || {};
+      if (cardMail) { cardMail.tries = (cardMail.tries || 0) + 1; if (d.sent || d.skipped) cardMail.sent_at = new Date().toISOString(); }
+      return d.sent ? 'sent' : d.skipped ? 'skipped' : 'failed';
+    },
     /* upload a photo, PDF or video chosen by an admin; returns where it now lives */
     async upload(file, folder) {
       const kind = file.type.startsWith('image/') ? 'image' : file.type === 'application/pdf' ? 'pdf' : file.type.startsWith('video/') ? 'video' : '';
@@ -2322,7 +2480,7 @@ const Globe = (() => {
 function mountHeroStage(stage) {
   const cv = $('canvas', stage), img = $('img', stage);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  let W = 0, g = null, globe = null, moat = null, rot = 0.6, speed = reducedMotion() ? 0 : 2.4;
+  let W = 0, g = null, globe = null, moat = null, rot = 0.6, speed = reducedMotion() ? 0 : 2.4, moatA = 1;
   function setup() {
     W = stage.clientWidth; if (!W) return;
     cv.width = Math.round(W * dpr); cv.height = Math.round(W * 0.56 * dpr); g = cv.getContext('2d');
@@ -2339,11 +2497,14 @@ function mountHeroStage(stage) {
   }
   function frame(dt) {
     if (!g) return;
+    /* after the opening animation, carry on from where its globe stopped and let the lettering's outline fade in */
+    if (HeroSync.rot !== null) { rot = HeroSync.rot; HeroSync.rot = null; speed = 2.4; moatA = 0; }
+    moatA = Math.min(1, moatA + dt * 2.2);
     speed += (0.16 - speed) * Math.min(1, dt * 1.6); rot += speed * dt;
     const s = W * dpr; globe.paint(rot);
     g.clearRect(0, 0, cv.width, cv.height);
     globe.drawTo(g, 0.2675 * s, 0.2722 * s, 0.27 * s);
-    if (moat) { g.globalCompositeOperation = 'source-atop'; g.drawImage(moat, 0, 0); g.globalCompositeOperation = 'source-over'; }
+    if (moat) { g.globalCompositeOperation = 'source-atop'; g.globalAlpha = moatA; g.drawImage(moat, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; }
   }
   setup(); frame(0);
   let stop = () => {};
@@ -2381,6 +2542,159 @@ function drawContours(cv) {
       g.strokeStyle = `rgba(255,255,255,${index ? 0.13 : 0.07})`; g.lineWidth = index ? 1.6 : 1; g.stroke();
     }
   }
+}
+
+/* ---------- entry animations ----------
+   Opening the site: the camera starts close above a river delta and pulls back fast,
+   past the coastline, until the whole turning Earth is in view. The Earth then flies
+   to its place in the logo and the page appears. One tap skips it.
+   Opening the admin portal: the Earth spins up, turns bluer, and "Admin" slides in. */
+const seenOnce = k => { try { return sessionStorage.getItem(k) === '1'; } catch (e) { return false; } };
+const markSeen = k => { try { sessionStorage.setItem(k, '1'); } catch (e) { /* storage may be blocked */ } };
+const HeroSync = { rot: null };   // lets the home page's globe pick up exactly where the intro's globe stopped
+
+function siteIntro() {
+  if (reducedMotion() || seenOnce('bgeo-intro') || routeName() !== 'home') return null;
+  markSeen('bgeo-intro');
+  const el = document.createElement('div'); el.className = 'intro'; el.innerHTML = '<canvas aria-hidden="true"></canvas><p class="intro-skip">Tap to skip</p>';
+  document.body.appendChild(el); document.body.classList.add('intro-on');
+  const cv = el.firstChild, g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  let W = 0, H = 0, M = 0; const size = () => { W = window.innerWidth; H = window.innerHeight; M = Math.max(W, H) * 0.8; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); };
+  size(); window.addEventListener('resize', size);
+  const globe = Globe.create(Math.min(512, Math.round(Math.min(W, H) * dpr)));
+  let seed = 23; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const wobbly = (cx, cy, rx, ry, n = 40) => { const p = [R() * 6.283, R() * 6.283, R() * 6.283], pts = []; for (let i = 0; i < n; i++) { const t = i / n * 6.2832, k = 1 + 0.2 * Math.sin(2 * t + p[0]) + 0.12 * Math.sin(3 * t + p[1]) + 0.06 * Math.sin(5 * t + p[2]); pts.push([cx + Math.cos(t) * rx * k, cy + Math.sin(t) * ry * k]); } return pts; };
+  const path = (pts, close) => { g.beginPath(); pts.forEach((q, i) => (i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]))); if (close) g.closePath(); };
+  const meander = (x0, y0, x1, y1, amp, waves, ph) => { const pts = []; for (let i = 0; i <= 30; i++) { const t = i / 30, nx = -(y1 - y0), ny = x1 - x0, len = Math.hypot(nx, ny) || 1, w = Math.sin(t * waves * 6.2832 + ph) * amp * Math.sin(t * Math.PI * 0.9 + 0.15); pts.push([x0 + (x1 - x0) * t + nx / len * w, y0 + (y1 - y0) * t + ny / len * w]); } return pts; };
+  /* scene A, close to the ground: fields, a wide river and its branches */
+  const mainRiver = []; for (let i = 0; i <= 40; i++) { const y = -1.7 + i * 0.085; mainRiver.push([0.2 * Math.sin(y * 2.1 + 0.6) + 0.07 * Math.sin(y * 5.3), y]); }
+  const riverX = y => 0.2 * Math.sin(y * 2.1 + 0.6) + 0.07 * Math.sin(y * 5.3);
+  const branches = [[-0.5, 1, -1.25, 1.7, 0.06], [0.1, 1, 1.2, 1.6, 0.05], [0.55, -1, -1.3, 1.5, 0.045], [-1.1, -1, -1.6, -0.2, 0.04]].map(([y, side, ex, ey, w]) => ({ pts: meander(riverX(y), y, ex, ey, 0.09, 1.6, R() * 6), w }));
+  const GREENS = ['#8fd465', '#7ecb5f', '#a6de7c', '#6fc35c', '#9ad96f'], fields = [];
+  for (let i = -9; i <= 9; i++) for (let j = -9; j <= 9; j++) {
+    if (R() < 0.22) continue; const x = i * 0.19 + (R() - 0.5) * 0.03, y = j * 0.19 + (R() - 0.5) * 0.03;
+    fields.push([x, y, 0.15 + R() * 0.03, 0.15 + R() * 0.03, GREENS[Math.floor(R() * GREENS.length)]]);
+  }
+  /* scene B, higher up: the land, its hills and rivers, and the coast */
+  const land = wobbly(0, -0.1, 0.66, 0.6, 56), woods = Array.from({ length: 7 }, () => wobbly((R() - 0.5) * 0.8, -0.1 + (R() - 0.5) * 0.7, 0.07 + R() * 0.1, 0.05 + R() * 0.08, 24));
+  const hills = Array.from({ length: 4 }, () => ({ x: (R() - 0.5) * 0.7, y: -0.5 + R() * 0.25, r: 0.06 + R() * 0.05 }));
+  const bigRivers = [meander(0.08, -0.62, 0, 0, 0.05, 2, 1), meander(0, 0, 0.03, 0.62, 0.035, 2.2, 2), meander(-0.5, -0.3, 0, -0.05, 0.04, 1.6, 3), meander(0.52, -0.25, 0.01, 0.1, 0.04, 1.5, 4), meander(-0.42, 0.2, 0.01, 0.3, 0.03, 1.4, 5)];
+  const clouds = Array.from({ length: 7 }, () => [R() * 6.283, 0.25 + R() * 0.6, 0.5 + R() * 0.6]);
+  const streaks = Array.from({ length: 44 }, () => [R() * 6.283, R(), 0.6 + R() * 0.8]);
+
+  const T = 2800, t0 = performance.now(); let rot = 1.2, last = t0, raf = 0, phase = 'zoom', skipped = false, flyStart = 0, target = null, finished = false;
+  let resolveLanding; const untilLanding = new Promise(r => { resolveLanding = r; });
+  const ease = p => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2), clamp = x => Math.max(0, Math.min(1, x));
+  const Rf = () => Math.min(W, H) * 0.17, Lend = () => Math.log(M * 19.8 / Rf());
+
+  function drawBg(a) {
+    g.globalAlpha = a; const bg = g.createLinearGradient(W, 0, 0, H); bg.addColorStop(0, '#012a70'); bg.addColorStop(0.5, '#0f4699'); bg.addColorStop(1, '#2f6db8');
+    g.fillStyle = bg; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
+  }
+  function sceneB(px, a) {
+    g.save(); g.globalAlpha = a; g.translate(W / 2, H / 2); g.scale(px, px);
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    path(land, true); g.strokeStyle = '#2f86c9'; g.lineWidth = 0.09; g.stroke(); g.strokeStyle = '#5dc9d6'; g.lineWidth = 0.035; g.stroke();
+    g.fillStyle = '#9ad96f'; g.fill();
+    g.save(); path(land, true); g.clip();
+    g.fillStyle = '#65c65b'; woods.forEach(w => { path(w, true); g.fill(); });
+    g.strokeStyle = '#4ba646'; g.lineWidth = 0.004;
+    hills.forEach(h => { for (let k = 1; k <= 4; k++) { g.beginPath(); g.ellipse(h.x, h.y, h.r * k / 4, h.r * k / 4 * 0.78, 0.3, 0, 6.2832); g.stroke(); } });
+    bigRivers.forEach((r, i) => { path(r); g.strokeStyle = '#5dc9d6'; g.lineWidth = i < 2 ? 0.02 : 0.011; g.stroke(); if (i < 2) { g.strokeStyle = '#5480b0'; g.lineWidth = 0.008; g.stroke(); } });
+    g.restore(); g.restore();
+  }
+  function sceneA(px, a) {
+    g.save(); g.globalAlpha = a; g.translate(W / 2, H / 2); g.scale(px, px);
+    g.save(); g.rotate(0.2); fields.forEach(f => { g.fillStyle = f[4]; g.fillRect(f[0] - f[2] / 2, f[1] - f[3] / 2, f[2], f[3]); }); g.restore();
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    const band = (pts, w) => { path(pts); g.strokeStyle = '#9ad96f'; g.lineWidth = w * 1.5; g.stroke(); g.strokeStyle = '#5dc9d6'; g.lineWidth = w; g.stroke(); g.strokeStyle = '#5480b0'; g.lineWidth = w * 0.42; g.stroke(); };
+    branches.forEach(b => band(b.pts, b.w)); band(mainRiver, 0.17);
+    g.restore();
+  }
+  function frame(now) {
+    if (finished) return; raf = requestAnimationFrame(frame);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (phase === 'fly') {
+      const q = clamp((now - flyStart) / (skipped ? 200 : 700)), e = q * q * (3 - 2 * q); rot += dt * 2.4;
+      g.clearRect(0, 0, W, H); drawBg(1 - e);
+      if (target && !skipped) { globe.paint(rot); globe.drawTo(g, W / 2 + (target.x - W / 2) * e, H / 2 + (target.y - H / 2) * e, Rf() + (target.r - Rf()) * e); }
+      if (q >= 1) end();
+      return;
+    }
+    const p = clamp((now - t0) / T), L = Lend() * ease(p), pxA = M * Math.exp(-L), pxB = pxA * 9, Rg = pxB * 2.2;
+    const speed = Math.sin(Math.PI * p), aA = clamp((pxA / M - 0.05) / 0.2), aB = clamp((pxB / M - 0.2) / 0.25);
+    rot += dt * (0.5 + 1.9 * p);
+    drawBg(1);
+    if (aB < 1) { globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Math.max(Rg, Rf())); }
+    if (aB > 0) sceneB(pxB, aB);
+    if (aA > 0) sceneA(pxA, aA * aB);
+    /* thin cloud as the camera breaks out of the atmosphere */
+    const hz = 4 * aB * (1 - aB);
+    if (hz > 0.02) clouds.forEach(c => { const d = c[1] * M * (1.5 - aB), x = W / 2 + Math.cos(c[0]) * d, y = H / 2 + Math.sin(c[0]) * d * 0.7, r = c[2] * M * 0.5; const cg = g.createRadialGradient(x, y, 0, x, y, r); cg.addColorStop(0, `rgba(255,255,255,${0.5 * hz})`); cg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = cg; g.fillRect(x - r, y - r, 2 * r, 2 * r); });
+    /* speed lines rushing in toward the centre */
+    if (speed > 0.05) {
+      const D = Math.hypot(W, H) / 2; g.lineCap = 'round'; g.lineWidth = 1.5;
+      streaks.forEach(s => { const f = 1 - ((s[1] + (now - t0) / 520 * s[2]) % 1), r1 = D * (0.3 + f * 0.9), r2 = r1 + D * 0.16 * speed * s[2]; g.strokeStyle = `rgba(255,255,255,${0.26 * speed * f})`; g.beginPath(); g.moveTo(W / 2 + Math.cos(s[0]) * r1, H / 2 + Math.sin(s[0]) * r1); g.lineTo(W / 2 + Math.cos(s[0]) * r2, H / 2 + Math.sin(s[0]) * r2); g.stroke(); });
+    }
+    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.hypot(W, H) * 0.62); vg.addColorStop(0, 'rgba(2,11,36,0)'); vg.addColorStop(1, 'rgba(2,11,36,.5)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
+    if (p >= 1 && phase === 'zoom') { phase = 'hold'; resolveLanding(); }
+  }
+  function end() {
+    if (finished) return; finished = true; cancelAnimationFrame(raf); window.removeEventListener('resize', size);
+    if (target && !skipped) HeroSync.rot = rot;
+    el.remove(); document.body.classList.remove('intro-on');
+    if (!skipped) { document.body.classList.add('intro-reveal'); setTimeout(() => document.body.classList.remove('intro-reveal'), 2200); Sound.play('land'); }
+  }
+  const skip = () => { if (skipped || phase === 'fly') return; skipped = true; el.classList.add('skipping'); if (phase === 'zoom') { phase = 'hold'; resolveLanding(); } };
+  el.addEventListener('click', skip); const onKey = () => skip(); window.addEventListener('keydown', onKey, { once: true });
+  Sound.unlock(); Sound.play('whoosh');
+  raf = requestAnimationFrame(frame);
+  return {
+    untilLanding,
+    /* the page is drawn underneath now: fly the Earth to its place in the logo and fade away */
+    land() {
+      const st = document.querySelector('#stage');
+      if (st) { const b = st.getBoundingClientRect(); if (b.width && b.top < H) target = { x: b.left + 0.2675 * b.width, y: b.top + 0.2722 * b.width, r: 0.27 * b.width }; }
+      if (finished) return;
+      el.classList.add('landing'); phase = 'fly'; flyStart = performance.now();
+    },
+    cancel() { skipped = true; resolveLanding(); end(); },
+  };
+}
+
+/* a quick curved wipe between pages, like a meridian sweeping across the map */
+function pageSweep() {
+  if (reducedMotion() || document.body.classList.contains('intro-on')) return;
+  const s = document.createElement('div'); s.className = 'sweep'; s.setAttribute('aria-hidden', 'true'); document.body.appendChild(s);
+  setTimeout(() => s.remove(), 700);
+}
+
+function adminIntro() {
+  if (reducedMotion() || seenOnce('bgeo-admin-in')) return;
+  markSeen('bgeo-admin-in');
+  const el = document.createElement('div'); el.className = 'aintro';
+  el.innerHTML = `<div class="aintro-in"><canvas width="440" height="440" aria-hidden="true"></canvas>
+    <div class="aintro-name"><span>Bangladesh Geography</span><div class="aintro-row"><b>Olympiad</b><b class="aintro-a">Admin</b></div></div></div><p class="intro-skip">Tap to skip</p>`;
+  document.body.appendChild(el);
+  const cv = el.querySelector('canvas'), g = cv.getContext('2d'), globe = Globe.create(360);
+  let rot = 0.4, speed = 11, tint = 0, wantTint = 0, last = performance.now(), alive = true;
+  const frame = now => {
+    if (!alive) return; requestAnimationFrame(frame);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    speed += (0.7 - speed) * Math.min(1, dt * 2.6); rot += speed * dt; tint += (wantTint - tint) * Math.min(1, dt * 3);
+    globe.paint(rot); g.clearRect(0, 0, 440, 440); globe.drawTo(g, 220, 220, 210);
+    /* wash the land toward blue, so the admin Earth is its own colour */
+    if (tint > 0.01) { g.save(); g.globalCompositeOperation = 'source-atop'; g.globalAlpha = tint; g.fillStyle = '#1668d8'; g.fillRect(0, 0, 440, 440); g.restore(); }
+  };
+  requestAnimationFrame(frame);
+  const timers = [];
+  const close = () => { if (!alive) return; el.classList.add('bye'); timers.push(setTimeout(() => { alive = false; el.remove(); }, 420)); };
+  requestAnimationFrame(() => el.classList.add('in'));
+  Sound.play('open');
+  timers.push(setTimeout(() => { el.classList.add('admin'); wantTint = 0.5; speed = 6; Sound.play('good'); }, 950));
+  timers.push(setTimeout(close, 2500));
+  el.addEventListener('click', () => { timers.forEach(clearTimeout); close(); });
 }
 
 /* ---------- toasts, dialogs, forms, saving files ---------- */
@@ -2533,6 +2847,7 @@ function render() {
   const label = (NAV.find(n => n[0] === name) || [])[1];
   document.title = label && name !== 'home' ? `${label} | Bangladesh Geography Olympiad` : 'Bangladesh Geography Olympiad';
   window.scrollTo(0, 0);
+  setTimeout(mailMyCard, 600);
 }
 const pageHead = (title, lead) => `<header class="pagehead"><h1>${esc(title)}</h1>${lead ? `<p>${esc(lead)}</p>` : ''}</header>`;
 const sampleChip = r => (r && r.sample ? '<span class="chip chip-sample">Sample</span>' : '');
@@ -2552,13 +2867,25 @@ function mediaItemHtml(m) {
   const u = mediaUrl(m.url); if (!u || m.kind === 'youtube') return '';
   return `<figure><div class="frame16">${m.kind === 'video' ? `<video src="${esc(u)}" controls preload="metadata" playsinline></video>` : `<img src="${esc(u)}" alt="${esc(m.caption || 'Photo')}" loading="lazy">`}</div>${cap}</figure>`;
 }
+const firstPhoto = files => (files || []).find(f => f.kind === 'image' && mediaUrl(f.url)) || null;
 function noticeRow(n) {
-  const [d, m] = dayMonth(n.date);
+  const [d, m] = dayMonth(n.date), pic = firstPhoto(n.files), rest = (n.files || []).filter(f => f !== pic);
   return `<article class="notice"><div class="stamp"><b>${d}</b><span>${m}</span></div><div>
     <h3>${esc(n.title)}</h3>
-    <div class="notice-meta">${n.pinned ? '<span class="chip chip-soon">Pinned</span>' : ''}${n.tag ? `<span class="chip">${esc(n.tag)}</span>` : ''}${(n.files || []).length ? `<span class="chip">${icon('clip', 14)} ${plural(n.files.length, 'file')}</span>` : ''}${sampleChip(n)}</div>
-    <details><summary>Read notice</summary><p>${esc(n.body)}</p>${filesHtml(n.files)}</details>
+    <div class="notice-meta">${n.pinned ? '<span class="chip chip-soon">Pinned</span>' : ''}${n.tag ? `<span class="chip">${esc(n.tag)}</span>` : ''}${rest.length ? `<span class="chip">${icon('clip', 14)} ${plural(rest.length, 'file')}</span>` : ''}${sampleChip(n)}</div>
+    ${pic ? `<a class="notice-pic" href="${esc(pic.url)}" target="_blank" rel="noopener"><img src="${esc(pic.url)}" alt="${esc(pic.name || 'Photo for this notice')}" loading="lazy"></a>` : ''}
+    <details><summary>Read notice</summary><p>${esc(n.body)}</p>${filesHtml(rest)}</details>
   </div></article>`;
+}
+/* news on the home page: a card with its picture; tapping it opens the full story */
+function newsCard(n, hidden) {
+  const pic = firstPhoto(n.files), text = String(n.body || '').replace(/\s+/g, ' ').trim();
+  return `<button type="button" class="news" data-news="${esc(n.id)}"${hidden ? ' hidden' : ''}>${pic ? `<span class="news-pic"><img src="${esc(pic.url)}" alt="" loading="lazy"></span>` : `<span class="news-pic none" aria-hidden="true">${icon('globe', 44)}</span>`}
+    <span class="news-body"><small>${fmtDate(n.date)}${n.sample ? ', sample' : ''}</small><b>${esc(n.title)}</b>${text ? `<span class="news-snip">${esc(text.length > 150 ? text.slice(0, 147).trimEnd() + '…' : text)}</span>` : ''}</span></button>`;
+}
+function newsDialog(n) {
+  openDialog({ title: n.title, html: `<p class="muted">${fmtDate(n.date)}</p>${n.body ? `<p style="white-space:pre-line">${esc(n.body)}</p>` : ''}${filesHtml(n.files)}
+    <div class="dlg-actions">${safeUrl(n.link) ? `<a class="btn btn-quiet btn-sm" href="${esc(n.link)}" target="_blank" rel="noopener">${icon('link', 18)} Read more</a>` : ''}<button type="button" class="btn btn-ocean btn-sm" data-close>Close</button></div>` });
 }
 const STEPS = [
   ['Register', 'Create your account on this website. It takes about two minutes.'],
@@ -2568,7 +2895,7 @@ const STEPS = [
 ];
 
 PAGES.home = () => {
-  const me = Store.me(), ev = Store.nextEvent(), notices = Store.notices().slice(0, 3);
+  const me = Store.me(), ev = Store.nextEvent(), notices = Store.notices().slice(0, 3), news = Store.news();
   const gallery = (Store.db.settings.media || []).map(mediaItemHtml).filter(Boolean);
   const cta = me ? `<a class="btn btn-lime" href="#${me.role === 'admin' ? 'admin' : 'account'}">Open my account</a>`
     : Store.db.settings.regOpen ? '<a class="btn btn-lime" href="#register">Register now</a>' : '<span class="chip chip-sea">Registration is closed</span>';
@@ -2595,6 +2922,11 @@ PAGES.home = () => {
       <div class="between"><h2>Latest notices</h2><a class="btn btn-ghost btn-sm" href="#notices">All notices</a></div>
       <div class="sheet" style="margin-top:18px">${notices.map(noticeRow).join('') || '<p class="empty">No notices yet.</p>'}</div>
     </section>
+    ${news.length ? `<section class="band">
+      <h2>News</h2>
+      <div class="newsgrid" id="newsgrid">${news.map((n, i) => newsCard(n, i >= 6)).join('')}</div>
+      ${news.length > 6 ? '<div style="margin-top:16px"><button type="button" class="btn btn-ghost btn-sm" id="news-more">Show older news</button></div>' : ''}
+    </section>` : ''}
     <section class="band">
       <h2>Train on your phone</h2>
       <div class="doors">
@@ -2611,6 +2943,11 @@ PAGES.home = () => {
     </div>`,
     mount(v) {
       onLeave(mountHeroStage($('#stage', v)));
+      const ng = $('#newsgrid', v);
+      if (ng) {
+        ng.addEventListener('click', e => { const b = e.target.closest('[data-news]'); if (b) { const n = Store.get('news', b.dataset.news); if (n) newsDialog(n); } });
+        const more = $('#news-more', v); if (more) more.onclick = () => { $$('[data-news][hidden]', ng).forEach(b => { b.hidden = false; }); more.remove(); };
+      }
       if (ev) { const el = $('#mini', v), t = setInterval(() => { el.textContent = shortSpan(new Date(ev.at) - Date.now()); }, 1000); onLeave(() => clearInterval(t)); }
     },
   };
@@ -2764,9 +3101,96 @@ const EXTREMES = [
   ['Bay of Bengal', 'Largest bay', 'The sea to the south of Bangladesh.'],
   ['about 120 km', 'Cox\'s Bazar beach', 'One of the longest natural sea beaches in the world.'],
 ];
+/* short facts for the shuffle card: [topic, fact] */
+const FACTS = [
+  ['Bangladesh', 'Bangladesh has 8 divisions and 64 districts.'],
+  ['Bangladesh', 'The Tropic of Cancer crosses Bangladesh, so around 21 June the midday Sun is almost directly overhead.'],
+  ['Bangladesh', 'The Ganges is called the Padma once it enters Bangladesh, and the Brahmaputra is called the Jamuna.'],
+  ['Bangladesh', 'The Padma, the Jamuna and the Meghna join together before they reach the Bay of Bengal.'],
+  ['Bangladesh', 'The Sundarbans is the largest mangrove forest in the world and a UNESCO World Heritage Site.'],
+  ['Bangladesh', 'St. Martin\'s is the only coral island of Bangladesh.'],
+  ['Bangladesh', 'Kaptai Lake in Rangamati is the largest man-made lake in Bangladesh. It formed behind a dam on the Karnaphuli River.'],
+  ['Bangladesh', 'Chalan Beel, in the north-west, is the largest beel (wetland) in Bangladesh.'],
+  ['Bangladesh', 'Around 700 rivers and their branches flow across Bangladesh.'],
+  ['Bangladesh', 'Most of Bangladesh\'s rain falls during the monsoon, roughly from June to October.'],
+  ['Bangladesh', 'Bangladesh Standard Time is six hours ahead of Greenwich (UTC+6).'],
+  ['Planet Earth', 'The Earth is about 4.5 billion years old.'],
+  ['Planet Earth', 'The Earth\'s axis is tilted by about 23.4 degrees. That tilt is the reason we have seasons.'],
+  ['Planet Earth', 'The distance around the Earth at the Equator is about 40,075 km.'],
+  ['Planet Earth', 'About 71% of the Earth\'s surface is covered by water, and about 97% of that water is salty.'],
+  ['Planet Earth', 'The pull of the Moon is the main cause of the tides.'],
+  ['Rocks and plates', 'The Himalayas formed where the Indian Plate pushes into the Eurasian Plate. They are still rising by a few millimetres each year.'],
+  ['Rocks and plates', 'About three quarters of the world\'s active volcanoes sit around the Pacific Ring of Fire.'],
+  ['Rocks and plates', 'Around 300 million years ago the continents were joined in one supercontinent called Pangaea.'],
+  ['Rocks and plates', 'The Mid-Atlantic Ridge is a mountain chain on the sea floor where two plates move apart.'],
+  ['Rocks and plates', 'Sedimentary rocks, such as sandstone and limestone, form from layers of sediment pressed together.'],
+  ['Rocks and plates', 'On the earthquake magnitude scale, each whole number means about 32 times more energy.'],
+  ['Rivers and seas', 'The Nile, at about 6,650 km, is usually listed as the longest river. The Amazon carries the most water.'],
+  ['Rivers and seas', 'Lake Baikal in Russia is the deepest lake in the world, at about 1,640 m.'],
+  ['Rivers and seas', 'The Caspian Sea is the largest lake in the world by area.'],
+  ['Rivers and seas', 'The shore of the Dead Sea is the lowest land on Earth, more than 400 m below sea level.'],
+  ['Rivers and seas', 'A delta forms where a river slows down at the sea and drops the sediment it carries.'],
+  ['Rivers and seas', 'An oxbow lake forms when a river cuts through the narrow neck of a meander.'],
+  ['Rivers and seas', 'The Gulf Stream is a warm ocean current. It keeps north-west Europe milder than other places at the same latitude.'],
+  ['Weather and climate', 'Mawsynram in Meghalaya, just north of Bangladesh, is one of the wettest places on Earth, with nearly 12,000 mm of rain a year.'],
+  ['Weather and climate', 'Isobars are lines on a weather map that join places with the same air pressure.'],
+  ['Weather and climate', 'Because the Earth spins, winds bend to the right in the northern hemisphere and to the left in the southern. This is the Coriolis effect.'],
+  ['Weather and climate', 'Cyclones, hurricanes and typhoons are the same kind of storm. The name depends on the ocean where it forms.'],
+  ['Weather and climate', 'Antarctica is the largest desert in the world, because it gets very little rain or snow.'],
+  ['Weather and climate', 'The Atacama Desert in Chile is the driest desert outside the polar regions.'],
+  ['Maps', 'On a 1:50,000 map, 1 cm on the paper stands for 500 m on the ground.'],
+  ['Maps', 'Contour lines close together show a steep slope. Lines far apart show gentle ground.'],
+  ['Maps', 'The Prime Meridian, 0° longitude, passes through Greenwich in London.'],
+  ['Maps', 'The International Date Line roughly follows the 180° line of longitude across the Pacific Ocean.'],
+  ['Maps', 'The Earth turns 15° of longitude every hour, which is why time zones are about 15° wide.'],
+  ['World', 'Asia is the largest continent and Australia is the smallest.'],
+  ['World', 'Russia is the largest country by area and spans 11 time zones.'],
+  ['World', 'Greenland is the largest island in the world.'],
+  ['World', 'The Amazon in South America is the largest tropical rainforest on Earth.'],
+];
+const PLATES = [
+  { name: 'Moving apart', sub: 'Divergent boundary', kind: 'apart', text: 'Two plates pull away from each other. Magma rises into the gap, cools and makes new crust. The Mid-Atlantic Ridge was built this way.' },
+  { name: 'Pushing together', sub: 'Convergent boundary', kind: 'together', text: 'Two plates collide. One may slide under the other and melt, feeding volcanoes, or both crumple upward into mountains. The Himalayas are still growing like this.' },
+  { name: 'Sliding past', sub: 'Transform boundary', kind: 'past', text: 'Two plates grind past each other sideways. They stick, strain builds up, and it is released suddenly as an earthquake. The San Andreas Fault in California is the best-known example.' },
+];
+const CLIMATES = [
+  { name: 'Tropical', sub: 'Hot all year', color: '#2f9e5b', text: 'Warm in every month, with heavy rain for at least part of the year. Found near the Equator. Much of Bangladesh has a tropical monsoon climate.' },
+  { name: 'Dry', sub: 'Deserts and steppe', color: '#d9a441', text: 'More water evaporates than falls as rain. This zone covers hot deserts such as the Sahara and the Thar, and the dry grasslands around them.' },
+  { name: 'Temperate', sub: 'Mild winters', color: '#5aa9d6', text: 'Warm or hot summers and mild winters. Found around the Mediterranean Sea, across western Europe and in eastern China.' },
+  { name: 'Continental', sub: 'Cold winters', color: '#7a6fc4', text: 'Warm summers and long, snowy winters, deep inside the northern continents. Much of Russia and Canada has this climate.' },
+  { name: 'Polar', sub: 'Cold all year', color: '#8fb3c9', text: 'Even the warmest month stays below 10 °C. Tundra and ice caps: Antarctica, Greenland and the Arctic coast.' },
+];
+const MAPSKILLS = [
+  { name: 'Latitude and longitude', sub: 'Finding a place', text: 'Latitude says how far north or south of the Equator a place is, from 0° to 90°. Longitude says how far east or west of the Prime Meridian it is, from 0° to 180°. Dhaka is near 23.8° N, 90.4° E.' },
+  { name: 'Scale', sub: 'Map to ground', text: 'The scale tells you how much smaller the map is than the real ground. On a 1:50,000 map, 1 cm stands for 500 m. Worked example: 4 cm on that map is 4 × 500 m = 2 km on the ground.' },
+  { name: 'Contour lines', sub: 'Reading height', text: 'Each contour line joins places at the same height above sea level. Lines close together mean a steep slope. Lines far apart mean gentle ground. Closed rings that get smaller show a hilltop.' },
+  { name: 'Time zones', sub: 'Longitude and time', text: 'The Earth turns 360° in 24 hours, which is 15° every hour. So for every 15° you travel east, local time is one hour ahead. Bangladesh, near 90° E, is 90 ÷ 15 = 6 hours ahead of Greenwich.' },
+];
+const GLANCE = [
+  ['8', 'divisions'], ['64', 'districts'], ['about 148,000 km²', 'total area'], ['UTC+6', 'standard time'],
+  ['Padma, Jamuna, Meghna', 'the three great rivers'], ['June to October', 'the monsoon'],
+];
+/* a tiny drawing of two plates and which way they move */
+function plateSvg(kind) {
+  const arrow = (x1, x2, y) => `<path d="M${x1} ${y}H${x2}M${x2} ${y}l${x2 > x1 ? -9 : 9} -7M${x2} ${y}l${x2 > x1 ? -9 : 9} 7" fill="none" stroke="#04214f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const gap = kind === 'apart' ? 22 : 0, dy = kind === 'past' ? 12 : 0;
+  return `<svg viewBox="0 0 300 150" role="img" aria-label="${kind === 'apart' ? 'Two plates moving apart' : kind === 'together' ? 'Two plates pushing together' : 'Two plates sliding past each other'}">
+    <rect x="0" y="0" width="300" height="150" rx="16" fill="#e6effd"/>
+    ${kind === 'apart' ? '<path d="M150 150V70" stroke="#e8743b" stroke-width="20" stroke-linecap="round"/>' : ''}
+    <rect x="${14 - 0}" y="${48 - dy}" width="${132 - gap}" height="54" rx="10" fill="#8c6b4f"/><rect x="${154 + gap}" y="${48 + dy}" width="${132 - gap}" height="54" rx="10" fill="#a98463"/>
+    ${kind === 'together' ? '<path d="M118 48l32 -30l32 30z" fill="#6f5540"/>' : ''}
+    ${kind === 'apart' ? arrow(96, 44, 75) + arrow(204, 256, 75) : kind === 'together' ? arrow(40, 96, 75) + arrow(260, 204, 75) : arrow(44, 108, 75 - dy) + arrow(256, 192, 75 + dy)}
+  </svg>`;
+}
+/* a lab with a row of tabs and one explanation shown at a time */
+const tabLab = (id, items) => `<div class="stack"><div class="tabs" role="group">${items.map((x, i) => `<button type="button" data-tl="${id}:${i}" aria-pressed="false">${x.name}</button>`).join('')}</div><div class="tl-fig" id="${id}-fig"></div><div class="fact" id="${id}-fact" aria-live="polite"></div></div>`;
 PAGES.explore = () => ({
   html: `<div class="wrap stack-lg">
-    ${pageHead('Explore the Earth', 'Four small labs. Tap, slide and answer your way around the planet.')}
+    ${pageHead('Explore the Earth', 'Small labs, quick facts and a quiz. Tap, shuffle and answer your way around the planet.')}
+    <section class="shuffle"><div><h2>Shuffle a fact</h2><p>${FACTS.length} quick facts. Tap shuffle for a new one.</p></div>
+      <div class="deck"><div class="deck-card" id="fact-card"><span class="chip" id="fact-topic"></span><p id="fact-text" aria-live="polite"></p><small id="fact-count"></small></div></div>
+      <div><button type="button" class="btn btn-lime" id="fact-go">${icon('shuffle', 20)} Shuffle</button></div>
+    </section>
     <section class="sheet"><h2>Journey to the centre of the Earth</h2><p class="muted" style="margin:6px 0 14px">Tap a layer to see what it is made of.</p>
       <div class="lab">
         <svg viewBox="0 0 320 320" role="img" aria-label="Cross-section of the Earth showing crust, mantle, outer core and inner core">${LAYERS.map((l, i) => `<circle cx="160" cy="160" r="${l.r}" fill="${l.fill}" data-layer="${i}"/>`).join('')}</svg>
@@ -2777,10 +3201,14 @@ PAGES.explore = () => ({
       <div class="sky"><div class="sky-col" id="sky-col">${SKY.map((s, i) => `<button type="button" data-sky="${i}" style="background:${s.color};color:${s.ink}">${s.name}<small>${s.range}</small></button>`).join('')}<span class="probe"></span></div>
         <div class="fact" id="sky-fact" aria-live="polite"></div></div>
     </section>
+    <section class="sheet"><h2>How the plates move</h2><p class="muted" style="margin:6px 0 14px">The Earth's crust is broken into plates. There are three ways two plates can meet.</p>${tabLab('plates', PLATES)}</section>
+    <section class="sheet"><h2>Climate zones</h2><p class="muted" style="margin:6px 0 14px">Geographers sort the world's climates into five main groups.</p>${tabLab('climate', CLIMATES)}</section>
+    <section class="sheet"><h2>Map skills</h2><p class="muted" style="margin:6px 0 14px">Four ideas every olympiad paper tests.</p>${tabLab('maps', MAPSKILLS)}</section>
     <section class="reel-wrap"><div class="between" style="margin-bottom:12px"><h2>Records of the planet</h2><div class="btnrow"><button type="button" class="iconbtn" id="reel-prev" aria-label="Previous record">${icon('back')}</button><button type="button" class="iconbtn" id="reel-next" aria-label="Next record">${icon('next')}</button></div></div>
       <div class="reel" id="reel" tabindex="0" aria-label="Records of the planet">${EXTREMES.map(x => `<article><b>${x[0]}</b><span>${x[1]}</span><p>${x[2]}</p></article>`).join('')}</div>
     </section>
-    <section class="sheet"><h2>Quick fire</h2><p class="muted" style="margin:6px 0 14px">Five questions, picked at random. No timer, no login.</p><div id="qf"></div></section>
+    <section><h2>Bangladesh at a glance</h2><div class="glance">${GLANCE.map(x => `<div><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div></section>
+    <section class="qf"><div class="qf-top"><div><h2>Quick fire</h2><p>Five questions, picked at random. No timer, no login.</p></div><span class="qf-score" id="qf-score"></span></div><div id="qf"></div></section>
   </div>`,
   mount(v) {
     const lf = $('#layer-fact', v), pickLayer = (i, quiet) => {
@@ -2793,28 +3221,61 @@ PAGES.explore = () => ({
       col.style.setProperty('--y', (b.offsetTop + b.offsetHeight / 2 - 13) + 'px');
       sf.innerHTML = `<b>${s.name}</b><em>${s.range}</em><p>${esc(s.text)}</p>`; if (!quiet) Sound.play('move');
     };
+    const LABS = { plates: PLATES, climate: CLIMATES, maps: MAPSKILLS };
+    const pickTab = (id, i, quiet) => {
+      const x = LABS[id][i];
+      $$(`[data-tl^="${id}:"]`, v).forEach(b => b.setAttribute('aria-pressed', b.dataset.tl === `${id}:${i}` ? 'true' : 'false'));
+      $(`#${id}-fig`, v).innerHTML = x.kind ? plateSvg(x.kind) : x.color ? `<span class="swatch" style="background:${x.color}"></span>` : '';
+      $(`#${id}-fact`, v).innerHTML = `<b>${esc(x.name)}</b><em>${esc(x.sub)}</em><p>${esc(x.text)}</p>`; if (!quiet) Sound.play('pick');
+    };
     v.addEventListener('click', e => {
       const l = e.target.closest('[data-layer]'); if (l) return pickLayer(+l.dataset.layer);
       const s = e.target.closest('[data-sky]'); if (s) return pickSky(+s.dataset.sky);
+      const t = e.target.closest('[data-tl]'); if (t) { const [id, i] = t.dataset.tl.split(':'); return pickTab(id, +i); }
     });
-    pickLayer(1, true); pickSky(4, true);
+    pickLayer(1, true); pickSky(4, true); Object.keys(LABS).forEach(id => pickTab(id, 0, true));
     const reel = $('#reel', v), stepReel = dir => { const a = $('article', reel); reel.scrollBy({ left: dir * (a.offsetWidth + 14), behavior: reducedMotion() ? 'auto' : 'smooth' }); Sound.play('tap'); };
     $('#reel-prev', v).onclick = () => stepReel(-1); $('#reel-next', v).onclick = () => stepReel(1);
     reel.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); stepReel(1); } if (e.key === 'ArrowLeft') { e.preventDefault(); stepReel(-1); } });
+    /* shuffle a fact: every fact comes up once before any repeats */
+    const card = $('#fact-card', v); let pile = [], seen = 0, flipT = 0;
+    const setFact = () => {
+      if (!pile.length) { pile = FACTS.map((_, i) => i).sort(() => Math.random() - 0.5); seen = 0; }
+      const f = FACTS[pile.pop()]; seen++;
+      $('#fact-topic', v).textContent = f[0]; $('#fact-text', v).textContent = f[1]; $('#fact-count', v).textContent = `Fact ${seen} of ${FACTS.length}`;
+    };
+    setFact();
+    $('#fact-go', v).onclick = () => {
+      Sound.play('move');
+      if (reducedMotion()) return setFact();
+      clearTimeout(flipT); card.classList.remove('flip'); void card.offsetWidth; card.classList.add('flip');
+      flipT = setTimeout(setFact, 210);
+    };
+    onLeave(() => clearTimeout(flipT));
     /* quick fire */
-    const box = $('#qf', v); let qs = [], at = 0, score = 0;
-    const start = () => { qs = QUIZ_POOL.slice().sort(() => Math.random() - 0.5).slice(0, 5); at = 0; score = 0; show(); };
+    const box = $('#qf', v), tally = $('#qf-score', v); let qs = [], at = 0, score = 0, marks = [];
+    const steps = () => `<div class="qf-steps" aria-hidden="true">${qs.map((_, i) => `<i class="${marks[i] === true ? 'ok' : marks[i] === false ? 'no' : i === at ? 'now' : ''}"></i>`).join('')}</div>`;
+    const start = () => { qs = QUIZ_POOL.slice().sort(() => Math.random() - 0.5).slice(0, 5); at = 0; score = 0; marks = []; show(); };
     const show = () => {
-      if (at >= qs.length) { box.innerHTML = `<div class="stack"><p class="score">${score}<small> / ${qs.length}</small></p><p>${score === qs.length ? 'A perfect round.' : score >= 3 ? 'Good work. Try for a perfect round.' : 'Keep going. Every round uses new questions.'}</p><div><button type="button" class="btn btn-ocean" id="qf-again">Play again</button></div></div>`; $('#qf-again', box).onclick = () => { Sound.play('tap'); start(); }; Sound.play(score >= 3 ? 'win' : 'pick'); return; }
+      tally.textContent = at ? `${score} right so far` : '';
+      if (at >= qs.length) {
+        const pct = score / qs.length, C = 2 * Math.PI * 52;
+        tally.textContent = '';
+        box.innerHTML = `<div class="qf-end">${steps()}<div class="qf-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" class="track"/><circle cx="60" cy="60" r="52" class="arc" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" transform="rotate(-90 60 60)"/></svg><p><b>${score}</b><span>of ${qs.length}</span></p></div>
+          <p class="qf-msg">${score === qs.length ? 'A perfect round.' : score >= 3 ? 'Good work. Try for a perfect round.' : 'Keep going. Every round uses new questions.'}</p><button type="button" class="btn btn-lime" id="qf-again">Play again</button></div>`;
+        $('#qf-again', box).onclick = () => { Sound.play('tap'); start(); }; Sound.play(score >= 3 ? 'win' : 'pick'); return;
+      }
       const q = qs[at];
-      box.innerHTML = `<div class="stack"><p class="muted">Question ${at + 1} of ${qs.length}</p><p class="qtext">${esc(q.q)}</p><div class="opts">${q.options.map((o, i) => `<button type="button" class="opt" data-o="${i}"><span class="key">${'ABCD'[i]}</span><span>${esc(o)}</span></button>`).join('')}</div><div id="qf-next"></div></div>`;
+      box.innerHTML = `${steps()}<p class="qf-count">Question ${at + 1} of ${qs.length}</p><p class="qtext">${esc(q.q)}</p><div class="opts">${q.options.map((o, i) => `<button type="button" class="opt" data-o="${i}"><span class="key">${'ABCD'[i]}</span><span>${esc(o)}</span></button>`).join('')}</div><div class="qf-next" id="qf-next"></div>`;
     };
     box.addEventListener('click', e => {
       const b = e.target.closest('[data-o]'); if (!b || b.disabled) return;
-      const q = qs[at], pick = +b.dataset.o, right = pick === q.answer; if (right) score++;
+      const q = qs[at], pick = +b.dataset.o, right = pick === q.answer; if (right) score++; marks[at] = right;
       $$('.opt', box).forEach((o, i) => { o.disabled = true; if (i === q.answer) o.classList.add('right'); else if (i === pick) o.classList.add('wrong'); });
+      $('.qf-steps', box).outerHTML = steps().replace('class="now"', 'class=""');
+      tally.textContent = `${score} right so far`;
       Sound.play(right ? 'good' : 'bad');
-      $('#qf-next', box).innerHTML = `<button type="button" class="btn btn-ocean">${at + 1 < qs.length ? 'Next question' : 'See my score'}</button>`;
+      $('#qf-next', box).innerHTML = `<p class="${right ? 'yes' : 'nope'}">${right ? 'Correct.' : `The answer is ${'ABCD'[q.answer]}: ${esc(q.options[q.answer])}`}</p><button type="button" class="btn btn-lime">${at + 1 < qs.length ? 'Next question' : 'See my score'}</button>`;
       $('#qf-next button', box).onclick = () => { at++; show(); };
     });
     start();
@@ -2997,14 +3458,37 @@ PAGES.register = () => {
   };
 };
 
-/* the registration card, drawn on a canvas so it can be saved as a picture.
-   The QR code holds the registration number, so an admin can scan it at the venue. */
+/* ---------- admit cards, drawn on a canvas so they can be saved as a picture ----------
+   Each card carries a QR code holding the registration number, so an admin can scan
+   it at the venue. The Regional round card is the one every student gets on
+   registering; the National round card goes to the students selected for the final. */
 const roundImg = new Image(); roundImg.src = LOGO_ROUND;
-function drawCard(u) {
-  const W = 1200, H = 756, PW = 410, c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d'), disp = '"Baloo Da 2", "Trebuchet MS", sans-serif', body = '"Anek Bangla", "Segoe UI", sans-serif';
+const CARD_W = 1200, CARD_H = 756;
+function cardKit(g) {
+  const disp = '"Baloo Da 2", "Trebuchet MS", sans-serif', body = '"Anek Bangla", "Segoe UI", sans-serif';
   const fit = (text, maxW, size, weight, fam) => { let px = size; g.font = `${weight} ${px}px ${fam}`; while (g.measureText(text).width > maxW && px > 16) { px -= 2; g.font = `${weight} ${px}px ${fam}`; } };
   const box = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+  /* a long school name goes onto two lines instead of shrinking */
+  const twoLines = (text, maxW) => {
+    const lines = ['']; String(text).split(/\s+/).forEach(w => { const t = (lines[lines.length - 1] + ' ' + w).trim(); if (g.measureText(t).width <= maxW || !lines[lines.length - 1]) lines[lines.length - 1] = t; else lines.push(w); });
+    if (lines.length > 2) { lines[1] = lines.slice(1).join(' '); lines.length = 2; } return lines;
+  };
+  /* the QR code: dark squares on a white tile, each square a whole number of pixels so scanners read it cleanly */
+  const qr = (u, x, y, Q) => {
+    const m = qrMatrix(Store.cardCode(u)), n = m.length, px = Math.floor(Q / (n + 4)), side = px * (n + 4), ox = x + Math.round((Q - side) / 2), oy = y + Math.round((Q - side) / 2);
+    g.fillStyle = '#04122b';
+    for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (m[r][k]) g.fillRect(ox + (k + 2) * px, oy + (r + 2) * px, px, px);
+  };
+  const logo = (cx, cy, L, ring) => {
+    g.save(); g.shadowColor = 'rgba(0,0,0,.3)'; g.shadowBlur = L / 7; g.shadowOffsetY = L / 20; g.fillStyle = '#0b3d8f'; g.beginPath(); g.arc(cx, cy, L / 2 - 3, 0, 6.2832); g.fill(); g.restore();
+    if (roundImg.complete && roundImg.naturalWidth) g.drawImage(roundImg, cx - L / 2, cy - L / 2, L, L);
+    g.strokeStyle = ring; g.lineWidth = Math.max(3, L / 48); g.beginPath(); g.arc(cx, cy, L / 2, 0, 6.2832); g.stroke();
+  };
+  return { disp, body, fit, box, twoLines, qr, logo };
+}
+function drawRegionalCard(u) {
+  const W = CARD_W, H = CARD_H, PW = 410, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), { disp, body, fit, box, twoLines, qr, logo } = cardKit(g);
   box(0, 0, W, H, 40); g.save(); g.clip();
   g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
   /* left panel: the olympiad's blue, with faint contour lines */
@@ -3013,14 +3497,12 @@ function drawCard(u) {
   for (let i = 1; i <= 8; i++) { g.beginPath(); g.ellipse(40, H - 20, i * 60, i * 46, -0.35, 0, 6.2832); g.stroke(); }
   for (let i = 1; i <= 4; i++) { g.beginPath(); g.ellipse(PW - 10, 40, i * 48, i * 36, 0.4, 0, 6.2832); g.stroke(); }
   g.restore();
-  const L = 240, cx = PW / 2, ly = 92;
-  g.save(); g.shadowColor = 'rgba(0,0,0,.3)'; g.shadowBlur = 32; g.shadowOffsetY = 12; g.fillStyle = '#0b3d8f'; g.beginPath(); g.arc(cx, ly + L / 2, L / 2 - 3, 0, 6.2832); g.fill(); g.restore();
-  if (roundImg.complete && roundImg.naturalWidth) g.drawImage(roundImg, cx - L / 2, ly, L, L);
-  g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 5; g.beginPath(); g.arc(cx, ly + L / 2, L / 2, 0, 6.2832); g.stroke();
-  g.textAlign = 'center'; g.fillStyle = '#ffffff'; g.font = `800 42px ${disp}`; g.fillText('Bangladesh', cx, 418);
-  fit('Geography Olympiad', PW - 48, 42, 800, disp); g.fillText('Geography Olympiad', cx, 466);
-  g.font = `800 26px ${disp}`; const tag = 'Registration card', tw = g.measureText(tag).width + 48;
-  g.fillStyle = '#9ad96f'; box(cx - tw / 2, 510, tw, 52, 26); g.fill(); g.fillStyle = '#04214f'; g.fillText(tag, cx, 545);
+  const cx = PW / 2; logo(cx, 186, 224, 'rgba(255,255,255,.85)');
+  g.textAlign = 'center'; g.fillStyle = '#ffffff'; g.font = `800 42px ${disp}`; g.fillText('Bangladesh', cx, 380);
+  fit('Geography Olympiad', PW - 48, 42, 800, disp); g.fillText('Geography Olympiad', cx, 428);
+  g.fillStyle = 'rgba(255,255,255,.82)'; g.font = `500 26px ${body}`; g.fillText('Admit card', cx, 500);
+  g.font = `800 30px ${disp}`; const tag = 'Regional round', tw = g.measureText(tag).width + 56;
+  g.fillStyle = '#9ad96f'; box(cx - tw / 2, 524, tw, 58, 29); g.fill(); g.fillStyle = '#04214f'; g.fillText(tag, cx, 564);
   g.fillStyle = 'rgba(255,255,255,.8)'; g.font = `500 22px ${body}`; g.fillText('geographyolympiad.org', cx, 700);
   /* right side: who the card belongs to */
   const X = PW + 56, R = W - 56; g.textAlign = 'left';
@@ -3033,51 +3515,124 @@ function drawCard(u) {
   const cell = (label, value, x, y, maxW) => { g.fillStyle = '#4b6088'; g.font = `500 22px ${body}`; g.fillText(label, x, y); g.fillStyle = '#0a2350'; fit(String(value), maxW, 32, 600, body); g.fillText(String(value), x, y + 40); };
   cell('Category', u.category, X, 372, 230); cell('Class', 'Class ' + u.klass, X + 250, 372, 150);
   cell('Region', u.region, X, 478, 400);
-  /* a long school name goes onto two lines instead of shrinking */
   g.fillStyle = '#4b6088'; g.font = `500 22px ${body}`; g.fillText('School or college', X, 584);
   g.fillStyle = '#0a2350'; g.font = `600 28px ${body}`;
-  const words = String(u.institution).split(/\s+/), lines = ['']; 
-  words.forEach(w => { const t = (lines[lines.length - 1] + ' ' + w).trim(); if (g.measureText(t).width <= 420 || !lines[lines.length - 1]) lines[lines.length - 1] = t; else lines.push(w); });
-  if (lines.length > 2) { lines[1] = lines.slice(1).join(' '); lines.length = 2; }
-  lines.forEach((t, i) => { if (i === 1) fit(t, 420, 28, 600, body); g.fillText(t, X, 622 + i * 36); });
-  /* the QR code */
-  const Q = 236, qx = R - Q, qy = 350, m = qrMatrix(Store.cardCode(u)), n = m.length, px = Math.floor(Q / (n + 4)), side = px * (n + 4), ox = qx + Math.round((Q - side) / 2), oy = qy + Math.round((Q - side) / 2);
+  twoLines(u.institution, 420).forEach((t, i) => { if (i === 1) fit(t, 420, 28, 600, body); g.fillText(t, X, 622 + i * 36); });
+  const Q = 236, qx = R - Q, qy = 350;
   g.fillStyle = '#ffffff'; g.strokeStyle = '#d5e2f0'; g.lineWidth = 2; box(qx - 6, qy - 6, Q + 12, Q + 12, 16); g.fill(); g.stroke();
-  g.fillStyle = '#04122b';
-  for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (m[r][k]) g.fillRect(ox + (k + 2) * px, oy + (r + 2) * px, px, px);
+  qr(u, qx, qy, Q);
   g.fillStyle = '#4b6088'; g.font = `500 20px ${body}`; g.textAlign = 'center'; g.fillText('Show this code at the venue', qx + Q / 2, qy + Q + 40);
   g.fillStyle = '#9ad96f'; g.fillRect(PW, H - 20, W - PW, 20);
   g.restore();
   return c;
 }
+/* the National round card: night-blue and gold, for the students who reach the final */
+function drawNationalCard(u) {
+  const W = CARD_W, H = CARD_H, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), { disp, body, fit, box, twoLines, qr, logo } = cardKit(g);
+  const GOLD = '#f2c14e', PALE = '#ffe7a8', MIST = '#a9bfe3';
+  box(0, 0, W, H, 40); g.save(); g.clip();
+  const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#020b24'); bg.addColorStop(0.55, '#06245a'); bg.addColorStop(1, '#0d47a1'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  /* a faint globe grid rising from the lower right, and contour rings in the top left */
+  g.lineWidth = 2; g.strokeStyle = 'rgba(242,193,78,.13)';
+  const gx = W - 150, gy = H + 130, GR = 520;
+  g.beginPath(); g.arc(gx, gy, GR, 0, 6.2832); g.stroke();
+  for (let i = 1; i <= 4; i++) { g.beginPath(); g.ellipse(gx, gy, GR * i / 5, GR, 0, 0, 6.2832); g.stroke(); g.beginPath(); g.ellipse(gx, gy, GR, GR * i / 5, 0, 0, 6.2832); g.stroke(); }
+  g.strokeStyle = 'rgba(255,255,255,.06)';
+  for (let i = 1; i <= 6; i++) { g.beginPath(); g.ellipse(120, 40, i * 62, i * 44, 0.3, 0, 6.2832); g.stroke(); }
+  /* gold frame */
+  const fr = g.createLinearGradient(0, 0, W, H); fr.addColorStop(0, PALE); fr.addColorStop(0.5, GOLD); fr.addColorStop(1, '#b8862d');
+  g.strokeStyle = fr; g.lineWidth = 3; box(20, 20, W - 40, H - 40, 26); g.stroke();
+  g.strokeStyle = 'rgba(242,193,78,.35)'; g.lineWidth = 1.5; box(30, 30, W - 60, H - 60, 20); g.stroke();
+  /* heading */
+  const X = 76, R = W - 76; logo(X + 62, 128, 124, PALE);
+  g.textAlign = 'left'; g.fillStyle = '#e6eefc'; g.font = `600 27px ${body}`; g.fillText('Bangladesh Geography Olympiad', X + 152, 106);
+  const tg = g.createLinearGradient(X + 152, 0, X + 640, 0); tg.addColorStop(0, PALE); tg.addColorStop(1, GOLD);
+  g.fillStyle = tg; g.font = `800 66px ${disp}`; g.fillText('National round', X + 150, 172);
+  g.font = `800 26px ${disp}`; const tag = 'Admit card', tw = g.measureText(tag).width + 52;
+  g.fillStyle = fr; box(R - tw, 84, tw, 54, 27); g.fill(); g.fillStyle = '#04122b'; g.textAlign = 'center'; g.fillText(tag, R - tw / 2, 121); g.textAlign = 'left';
+  const rule = g.createLinearGradient(X, 0, R, 0); rule.addColorStop(0, GOLD); rule.addColorStop(1, 'rgba(242,193,78,0)');
+  g.strokeStyle = rule; g.lineWidth = 2; g.beginPath(); g.moveTo(X, 222); g.lineTo(R, 222); g.stroke();
+  /* the finalist */
+  const Q = 244, qx = R - Q, qy = 262, TW = qx - X - 48;
+  g.fillStyle = MIST; g.font = `500 24px ${body}`; g.fillText('National finalist', X, 280);
+  g.fillStyle = '#ffffff'; fit(u.name, TW, 64, 800, disp); g.fillText(u.name, X, 346);
+  g.font = `800 38px ${disp}`; const rw = g.measureText(u.regNo).width + 56;
+  g.strokeStyle = GOLD; g.lineWidth = 2.5; box(X, 380, rw, 66, 33); g.stroke(); g.fillStyle = PALE; g.fillText(u.regNo, X + 28, 427);
+  g.fillStyle = MIST; g.font = `500 22px ${body}`; g.fillText('Registration number', X + rw + 20, 422);
+  const cell = (label, value, x, y, maxW) => { g.fillStyle = MIST; g.font = `500 22px ${body}`; g.fillText(label, x, y); g.fillStyle = '#ffffff'; fit(String(value), maxW, 31, 600, body); g.fillText(String(value), x, y + 40); };
+  cell('Category', u.category, X, 506, 250); cell('Class', 'Class ' + u.klass, X + 280, 506, 140); cell('Region', u.region, X + 440, 506, TW - 440);
+  g.fillStyle = MIST; g.font = `500 22px ${body}`; g.fillText('School or college', X, 604);
+  g.fillStyle = '#ffffff'; g.font = `600 28px ${body}`;
+  twoLines(u.institution, TW).forEach((t, i) => { if (i === 1) fit(t, TW, 28, 600, body); g.fillText(t, X, 642 + i * 36); });
+  /* the QR code on its own white tile */
+  g.save(); g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = 30; g.shadowOffsetY = 10; g.fillStyle = '#ffffff'; box(qx - 8, qy - 8, Q + 16, Q + 16, 20); g.fill(); g.restore();
+  g.strokeStyle = fr; g.lineWidth = 3; box(qx - 8, qy - 8, Q + 16, Q + 16, 20); g.stroke();
+  qr(u, qx, qy, Q);
+  g.fillStyle = MIST; g.font = `500 20px ${body}`; g.textAlign = 'center'; g.fillText('Show this code at the venue', qx + Q / 2, qy + Q + 44);
+  g.fillStyle = 'rgba(230,238,252,.75)'; g.fillText('geographyolympiad.org', qx + Q / 2, qy + Q + 76);
+  g.restore();
+  return c;
+}
+const drawCard = (u, kind) => (kind === 'national' ? drawNationalCard(u) : drawRegionalCard(u));
+const isNational = round => /national/i.test(round || '');
+const hasNationalCard = u => (u.selected || []).some(s => isNational(s.round));
+/* the finished picture, drawn only once the site's fonts and the logo are ready */
+async function cardBlob(u, kind) {
+  try { if (document.fonts && document.fonts.load) await Promise.race([Promise.all([document.fonts.load('800 40px "Baloo Da 2"'), document.fonts.load('600 28px "Anek Bangla"'), document.fonts.load('500 22px "Anek Bangla"')]), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* fall back to the device's own fonts */ }
+  if (!roundImg.complete) await new Promise(r => { roundImg.addEventListener('load', r, { once: true }); roundImg.addEventListener('error', r, { once: true }); setTimeout(r, 2500); });
+  /* toDataURL finishes at once; the browser's toBlob can stall for seconds when the tab is idle or in the background */
+  const b64 = drawCard(u, kind).toDataURL('image/png').split(',')[1] || '', bin = atob(b64), bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const blob = new Blob([bytes], { type: 'image/png' }); blob.base64 = b64; return blob;
+}
+/* once a student is logged in with a confirmed email, their Regional round card is emailed to them (one time) */
+let cardMailTried = false;
+async function mailMyCard() {
+  if (cardMailTried || !Store.cardMailDue()) return; cardMailTried = true;
+  try { const u = Store.me(), r = await Store.sendMyCard((await cardBlob(u, 'regional')).base64); if (r === 'sent') toast('Your admit card has been emailed to ' + u.email, 'good'); } catch (e) { /* the card is still in My account */ }
+}
 
+const initials = name => String(name || '').trim().split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || 'G';
 PAGES.account = () => {
   const u = Store.me(); if (!u) return needLogin('Log in to see your account.');
   if (u.role === 'admin') return simplePage('Admin account', 'You are logged in as an admin. The admin portal is where you manage the olympiad.', '#admin', 'Open the admin portal');
-  const msgs = Store.messagesFor(u.id), s = Store.db.settings;
+  const msgs = Store.messagesFor(u.id), s = Store.db.settings, national = hasNationalCard(u);
   const done = Store.all('attempts').filter(a => a.userId === u.id && a.submittedAt).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+  const cardBox = (kind, title, note) => `<div class="cardbox"><div class="between"><div><h3>${title}</h3><p class="muted">${note}</p></div><button type="button" class="btn btn-ocean btn-sm" id="card-${kind === 'national' ? 'nat-' : ''}dl">${icon('download', 18)} Download</button></div><div class="cardprev" id="card${kind === 'national' ? '-nat' : ''}"></div></div>`;
   return {
     html: `<div class="wrap">
-      ${pageHead('Hello, ' + u.name.split(' ')[0], 'Everything about your olympiad is on this page.')}
-      <div class="chips" style="margin-bottom:16px"><span class="chip chip-live">${icon('check', 16)} Registered</span><span class="chip chip-sea">${esc(u.regNo)}</span><span class="chip chip-sea">${esc(u.category)}</span>${(u.selected || []).map(x => `<span class="chip chip-soon">Selected: ${esc(x.round)}</span>`).join('')}${Store.all('attendance').filter(a => a.userId === u.id).map(a => `<span class="chip chip-live">Present: ${esc(a.session)}</span>`).join('')}</div>
-      <section class="sheet"><h2>My notices</h2><div class="stack" style="margin-top:12px">${msgs.map(m => `<div class="msg ${m.kind === 'selected' ? 'sel' : ''}"><h3>${esc(m.title)}</h3><p>${esc(m.body)}</p><small class="muted">${fmtDateTime(m.at)}</small></div>`).join('') || '<p class="muted">No personal notices yet.</p>'}</div></section>
-      <section class="sheet"><div class="between"><h2>Registration card</h2>${s.cardsOpen ? `<button type="button" class="btn btn-ocean btn-sm" id="card-dl">${icon('download', 18)} Download card</button>` : ''}</div>
-        ${s.cardsOpen ? '<div class="cardprev" id="card" style="margin-top:14px"></div>' : '<p class="note" style="margin-top:12px">Cards are not released yet. You will get a notice when yours is ready.</p>'}</section>
-      <section class="sheet"><div class="between"><h2>My online exams</h2><a class="btn btn-quiet btn-sm" href="#exams">All exams</a></div>
-        <div style="margin-top:6px">${done.map(a => { const ex = Store.get('exams', a.examId); return ex ? `<div class="rowi"><div class="grow"><h3>${esc(ex.title)}</h3><p>${fmtDateTime(a.submittedAt)}</p></div><b class="chip chip-live">${a.score} / ${ex.questions.length}</b></div>` : ''; }).join('') || '<p class="muted" style="padding-top:8px">You have not finished an exam yet.</p>'}</div></section>
-      <section class="sheet"><div class="between"><h2>My details</h2><button type="button" class="btn btn-quiet btn-sm" id="edit-me">${icon('edit', 18)} Edit</button></div>
-        <dl class="kv" style="margin-top:12px"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Mobile</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)}</dd><dt>Region</dt><dd>${esc(u.region)}</dd></dl></section>
-      <section class="sheet"><h2>Payment</h2><p class="muted" style="margin-top:8px">Online payment is not open yet. The organisers will announce it in Notices.</p></section>
-      <div style="margin-top:20px"><button type="button" class="btn btn-ghost" id="logout">${icon('out', 20)} Log out</button></div>
+      <header class="acct-head">
+        <span class="avatar avatar-lg" aria-hidden="true">${esc(initials(u.name))}</span>
+        <div class="acct-who"><h1>${esc(u.name)}</h1><p>${esc(u.regNo)}, ${esc(u.category)}, Class ${esc(u.klass)}, ${esc(u.region)}</p>
+          <div class="chips"><span class="chip chip-live">${icon('check', 14)} Registered</span>${(u.selected || []).map(x => `<span class="chip chip-soon">Selected: ${esc(x.round)}</span>`).join('')}${Store.all('attendance').filter(a => a.userId === u.id).map(a => `<span class="chip chip-live">Present: ${esc(a.session)}</span>`).join('')}</div></div>
+        <div class="acct-acts"><button type="button" class="btn btn-ghost btn-sm" id="edit-me">${icon('edit', 18)} Edit details</button><button type="button" class="btn btn-ghost btn-sm" id="logout">${icon('out', 18)} Log out</button></div>
+      </header>
+      <div class="acct-grid">
+        <div class="acct-main">
+          <section class="sheet"><h2>${national ? 'Admit cards' : 'Admit card'}</h2>
+            ${s.cardsOpen ? `<div class="stack-lg" style="margin-top:14px">${national ? cardBox('national', 'National round', 'For the final. Bring this card to the national venue.') : ''}${cardBox('regional', 'Regional round', 'Bring this card to your Regional round. The organisers scan the QR code.')}</div>`
+              : '<p class="note" style="margin-top:12px">Cards are not released yet. You will get a notice when yours is ready.</p>'}</section>
+          <section class="sheet"><h2>My notices</h2><div class="stack" style="margin-top:12px">${msgs.map(m => `<div class="msg ${m.kind === 'selected' ? 'sel' : ''}"><h3>${esc(m.title)}</h3><p>${esc(m.body)}</p><small class="muted">${fmtDateTime(m.at)}</small></div>`).join('') || '<p class="muted">No personal notices yet.</p>'}</div></section>
+          <section class="sheet"><div class="between"><h2>My online exams</h2><a class="btn btn-quiet btn-sm" href="#exams">All exams</a></div>
+            <div style="margin-top:6px">${done.map(a => { const ex = Store.get('exams', a.examId); return ex ? `<div class="rowi"><div class="grow"><h3>${esc(ex.title)}</h3><p>${fmtDateTime(a.submittedAt)}</p></div><b class="chip chip-live">${a.score} / ${ex.questions.length}</b></div>` : ''; }).join('') || '<p class="muted" style="padding-top:8px">You have not finished an exam yet.</p>'}</div></section>
+        </div>
+        <aside class="acct-side">
+          <section class="sheet"><h2>My details</h2>
+            <dl class="kv" style="margin-top:12px"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Mobile</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)}</dd><dt>Region</dt><dd>${esc(u.region)}</dd></dl></section>
+          <section class="sheet"><h2>Payment</h2><p class="muted" style="margin-top:8px">Online payment is not open yet. The organisers will announce it in Notices.</p></section>
+        </aside>
+      </div>
     </div>`,
     mount(v) {
-      const holder = $('#card', v);
-      if (holder) {
-        const paint = () => { holder.innerHTML = ''; holder.appendChild(drawCard(u)); };
+      const show = (id, kind, file) => {
+        const holder = $('#' + id, v); if (!holder) return;
+        const paint = () => { holder.innerHTML = ''; holder.appendChild(drawCard(u, kind)); };
         paint(); if (!roundImg.complete) roundImg.addEventListener('load', paint, { once: true });
         if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (holder.isConnected) paint(); });
-        $('#card-dl', v).onclick = () => drawCard(u).toBlob(b => { if (b) saveAndTell(`BGeO-card-${u.regNo}.png`, b); }, 'image/png');
-      }
+        $('#' + id + '-dl', v).onclick = e => busy(e.currentTarget, async () => saveAndTell(file, await cardBlob(u, kind)));
+      };
+      show('card', 'regional', `BGeO-admit-card-${u.regNo}.png`); show('card-nat', 'national', `BGeO-national-admit-card-${u.regNo}.png`);
       $('#edit-me', v).onclick = async () => {
         const fields = [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
           { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) }, { key: 'region', label: 'Region (division)', type: 'select', options: DIVISIONS }];
@@ -3186,7 +3741,7 @@ function examResult(ex, at, st) {
 
 /* ---------- admin portal: its own screen, only for admin accounts ---------- */
 const ADMIN_TABS = [
-  ['admin', 'Overview', 'compass'], ['admin-people', 'Participants', 'people'], ['admin-attend', 'Attendance', 'check'], ['admin-notices', 'Notices', 'mail'], ['admin-resources', 'Resources', 'book'],
+  ['admin', 'Overview', 'compass'], ['admin-people', 'Participants', 'people'], ['admin-attend', 'Attendance', 'check'], ['admin-notices', 'Notices', 'mail'], ['admin-news', 'News', 'list'], ['admin-resources', 'Resources', 'book'],
   ['admin-home', 'Home page', 'image'], ['admin-dates', 'Dates', 'calendar'], ['admin-exams', 'Exams', 'edit'], ['admin-results', 'Results', 'trophy'], ['admin-emails', 'Emails', 'mail'], ['admin-site', 'Site', 'gear'],
 ];
 const ADMIN = {};
@@ -3194,12 +3749,13 @@ function renderAdmin(name) {
   const root = $('#admin'), u = Store.me();
   document.title = 'Admin portal | Bangladesh Geography Olympiad';
   if (!u || u.role !== 'admin') return adminGate(root, u);
+  adminIntro();
   const tab = ADMIN_TABS.some(t => t[0] === name) ? name : 'admin';
   root.innerHTML = `<div class="adm-top"><b>BGeO admin</b>${CLOUD ? '' : '<span class="chip chip-sample">Preview data</span>'}
       <div class="sp">${CLOUD ? `<button type="button" class="iconbtn" id="adm-refresh" aria-label="Load the latest data" title="Load the latest data">${icon('download')}</button>` : ''}<a class="iconbtn" href="#home" aria-label="View the public site" title="View the public site">${icon('globe')}</a><button type="button" class="iconbtn" id="adm-out" aria-label="Log out" title="Log out">${icon('out')}</button></div></div>
     <nav class="adm-tabs" aria-label="Admin sections">${ADMIN_TABS.map(t => `<a href="#${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${icon(t[2], 18)} ${t[1]}</a>`).join('')}</nav>
     <div class="adm-main" id="adm-main"></div>`;
-  $('#adm-out', root).onclick = async () => { await Store.signOut(); toast('You are logged out'); go('home'); };
+  $('#adm-out', root).onclick = async () => { await Store.signOut(); try { sessionStorage.removeItem('bgeo-admin-in'); } catch (e) { /* storage may be blocked */ } toast('You are logged out'); go('home'); };
   const rf = $('#adm-refresh', root); if (rf) rf.onclick = () => busy(rf, async () => { await Store.refresh(); toast('Latest data loaded', 'good'); render(); });
   const cur = $('.adm-tabs [aria-current]', root); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
   ADMIN[tab]($('#adm-main', root));
@@ -3261,9 +3817,12 @@ ADMIN.admin = main => {
 function selectDialog(ids, after) {
   formDialog({
     title: `Mark ${plural(ids.length, 'student')} as selected`, submit: 'Mark as selected',
-    intro: 'Each student gets a notice in their account and an email.',
+    intro: 'Each student gets a notice in their account and a congratulations email. For the National round the email also carries their National round admit card.',
     fields: [{ key: 'round', label: 'Selected for', type: 'select', options: ROUNDS.slice(1) }, { key: 'note', label: 'Message (optional)', type: 'textarea', help: 'Leave this empty to send the standard congratulations message.' }],
-  }).then(async v => { if (!v) return; let n; try { n = await Store.select(ids, v.round, v.note); } catch (e) { return toast(e.message, 'bad'); } toast(n ? `${plural(n, 'student')} marked as selected. A notice is in each account.` : 'Those students were already selected for that round.', n ? 'good' : ''); after(); if (n) sendAndTell(); });
+  }).then(async v => {
+    if (!v) return; let n; const withCard = isNational(v.round);
+    if (withCard && CLOUD && ids.length > 3) toast('Preparing the admit cards. This can take a moment.');
+    try { n = await Store.select(ids, v.round, v.note, withCard ? (CLOUD ? async u => Store.uploadCard(await cardBlob(u, 'national'), u, 'national') : async () => 'preview') : null); } catch (e) { return toast(e.message, 'bad'); } toast(n ? `${plural(n, 'student')} marked as selected. A notice is in each account.` : 'Those students were already selected for that round.', n ? 'good' : ''); after(); if (n) sendAndTell(); });
 }
 function personDialog(p, after) {
   const tries = Store.all('attempts').filter(a => a.userId === p.id && a.submittedAt);
@@ -3271,10 +3830,18 @@ function personDialog(p, after) {
     <dl class="kv"><dt>Registration no.</dt><dd>${esc(p.regNo)}</dd><dt>Email</dt><dd>${esc(p.email)}</dd><dt>Mobile</dt><dd>${esc(p.phone || 'Not given')}</dd><dt>School</dt><dd>${esc(p.institution)}</dd>
       <dt>Class</dt><dd>Class ${esc(p.klass)} (${esc(p.category)})</dd><dt>Region</dt><dd>${esc(p.region)}</dd><dt>Registered</dt><dd>${fmtDateTime(p.createdAt)}</dd>
       <dt>Selected for</dt><dd>${(p.selected || []).map(s => esc(s.round)).join(', ') || 'Nothing yet'}</dd>
+      <dt>Attendance</dt><dd id="pd-att"></dd>
       <dt>Online exams</dt><dd>${tries.map(a => { const ex = Store.get('exams', a.examId); return ex ? `${esc(ex.title)}: ${a.score}/${ex.questions.length}` : ''; }).filter(Boolean).join('<br>') || 'None finished'}</dd></dl>
     <div class="cardprev" id="pd-card"></div>
-    <div class="dlg-actions"><button type="button" class="btn btn-danger btn-sm" data-rm>Remove participant</button><button type="button" class="btn btn-quiet btn-sm" data-ed>Edit details</button>${(p.selected || []).length ? '<button type="button" class="btn btn-quiet btn-sm" data-unsel>Clear selection</button>' : ''}<button type="button" class="btn btn-ocean btn-sm" data-sel>Mark as selected</button></div>` });
-  $('#pd-card', d).appendChild(drawCard(p));
+    <div class="dlg-actions"><button type="button" class="btn btn-danger btn-sm" data-rm>Remove participant</button><button type="button" class="btn btn-quiet btn-sm" data-ed>Edit details</button><button type="button" class="btn btn-quiet btn-sm" data-att>Mark present</button>${(p.selected || []).length ? '<button type="button" class="btn btn-quiet btn-sm" data-unsel>Clear selection</button>' : ''}<button type="button" class="btn btn-ocean btn-sm" data-sel>Mark as selected</button></div>` });
+  if (hasNationalCard(p)) $('#pd-card', d).appendChild(drawCard(p, 'national'));
+  $('#pd-card', d).appendChild(drawCard(p, 'regional'));
+  const att = $('#pd-att', d), drawAtt = () => { const rows = Store.all('attendance').filter(a => a.userId === p.id).sort((a, b) => new Date(a.at) - new Date(b.at)); att.innerHTML = rows.map(a => `${esc(a.session)} (${fmtDateTime(a.at)})`).join('<br>') || 'Not marked present yet'; };
+  drawAtt();
+  $('[data-att]', d).onclick = async () => {
+    const v = await formDialog({ title: `Mark ${p.name} present`, submit: 'Mark present', values: { session: attendSession || (Store.nextEvent() || {}).label || ROUNDS[0] }, fields: [{ key: 'session', label: 'For which round or session', required: true, help: 'Use the same name as on the Attendance tab.' }] });
+    if (v) busy(null, async () => { const r = await Store.markPresent(p.id, v.session.trim()); toast(r === 'new' ? `${p.name} marked present` : `${p.name} was already marked present`, r === 'new' ? 'good' : ''); drawAtt(); });
+  };
   $('[data-sel]', d).onclick = () => { d.close(); selectDialog([p.id], after); };
   $('[data-ed]', d).onclick = async () => {
     const v = await formDialog({ title: 'Edit ' + p.name, submit: 'Save changes', values: p, fields: [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
@@ -3336,29 +3903,43 @@ function loadJsQr() {
     const s = document.createElement('script'); s.src = urls[i]; s.onload = s.onerror = () => next(i + 1); document.head.appendChild(s);
   })(0));
 }
-/* a function that looks at the camera picture and returns the text of a QR code, or '' */
+/* a function that reads the text of a QR code out of a camera frame or a picture, or '' */
 async function makeQrReader() {
   if ('BarcodeDetector' in window) {
-    try { const det = new window.BarcodeDetector({ formats: ['qr_code'] }); return async video => { const r = await det.detect(video); return r.length ? r[0].rawValue : ''; }; } catch (e) { /* fall through to the library */ }
+    try { const det = new window.BarcodeDetector({ formats: ['qr_code'] }); return async src => { const r = await det.detect(src); return r.length ? r[0].rawValue : ''; }; } catch (e) { /* fall through to the library */ }
   }
   if (await loadJsQr()) {
     const cv = document.createElement('canvas'), g = cv.getContext('2d', { willReadFrequently: true });
-    return async video => {
-      const w = video.videoWidth, h = video.videoHeight; if (!w) return '';
-      const k = Math.min(1, 640 / w); cv.width = Math.round(w * k); cv.height = Math.round(h * k);
-      g.drawImage(video, 0, 0, cv.width, cv.height);
+    return async (src, w, h, max = 640) => {
+      if (!w || !h) return '';
+      const k = Math.min(1, max / Math.max(w, h)); cv.width = Math.round(w * k); cv.height = Math.round(h * k);
+      g.drawImage(src, 0, 0, cv.width, cv.height);
       const r = window.jsQR(g.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height); return r ? r.data : '';
     };
   }
   return null;
 }
+/* find the QR code in a picture file (a card someone sent by email or chat) */
+async function readQrFromFile(file, read) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('unreadable')); i.src = url; });
+    const k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight)), cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.round(img.naturalWidth * k)); cv.height = Math.max(1, Math.round(img.naturalHeight * k));
+    const g = cv.getContext('2d', { willReadFrequently: true }); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(img, 0, 0, cv.width, cv.height);
+    return await read(cv, cv.width, cv.height, 1600);
+  } finally { URL.revokeObjectURL(url); }
+}
+const findByNumber = text => { const num = parseInt(String(text).replace(/\D/g, ''), 10); return Store.participants().find(p => parseInt(String(p.regNo).replace(/\D/g, ''), 10) === num) || null; };
 async function scanDialog(session, after) {
-  const d = openDialog({ title: 'Scan cards', html: `<p class="muted">Attendance for <b>${esc(session)}</b>. Hold the QR code on a card in front of the camera.</p>
+  const d = openDialog({ title: 'Scan cards', html: `<p class="muted">Attendance for <b>${esc(session)}</b>. Hold the QR code on a card in front of the camera, or upload a picture of the card.</p>
     <div class="scanbox"><video playsinline muted></video></div>
     <div class="scanres" id="sc-res" aria-live="assertive"><p>Starting the camera…</p></div>
+    <div><button type="button" class="btn btn-quiet btn-sm" id="sc-up">${icon('image', 18)} Upload a card picture</button><input type="file" id="sc-file" accept="image/*" hidden></div>
     <form class="form" id="sc-form" novalidate><div class="field"><label for="sc-num">Or type the registration number</label><input id="sc-num" placeholder="BGEO-0007" autocomplete="off" inputmode="text"></div>
     <div class="dlg-actions"><button type="button" class="btn btn-quiet btn-sm" data-close>Done</button><button type="submit" class="btn btn-ocean btn-sm">Mark present</button></div></form>` });
-  const video = $('video', d), res = $('#sc-res', d); let stream = null, alive = true, last = '', lastAt = 0;
+  const video = $('video', d), res = $('#sc-res', d), file = $('#sc-file', d); let stream = null, alive = true, last = '', lastAt = 0, readerP = null;
+  const reader = () => (readerP = readerP || makeQrReader());
   const show = (kind, title, sub) => { res.className = 'scanres ' + kind; res.innerHTML = `<h3>${esc(title)}</h3>${sub ? `<p>${esc(sub)}</p>` : ''}`; };
   const mark = async u => {
     if (!u) { show('bad', 'Not a BGeO card', 'This code or number does not match any registered student.'); Sound.play('bad'); return; }
@@ -3368,20 +3949,26 @@ async function scanDialog(session, after) {
       Sound.play(r === 'new' ? 'good' : 'pick'); after();
     } catch (e) { show('bad', 'Could not save', e.message); Sound.play('bad'); }
   };
-  $('#sc-form', d).addEventListener('submit', e => {
-    e.preventDefault(); const inp = $('#sc-num', d), num = parseInt(inp.value.replace(/\D/g, ''), 10); if (!inp.value.trim()) return;
-    mark(Store.participants().find(p => parseInt(String(p.regNo).replace(/\D/g, ''), 10) === num)); inp.value = '';
+  $('#sc-form', d).addEventListener('submit', e => { e.preventDefault(); const inp = $('#sc-num', d); if (!inp.value.trim()) return; mark(findByNumber(inp.value)); inp.value = ''; });
+  $('#sc-up', d).onclick = () => file.click();
+  file.addEventListener('change', async () => {
+    const f = file.files[0]; file.value = ''; if (!f) return;
+    show('', 'Reading the picture…'); const read = await reader();
+    if (!read) return show('warn', 'This browser cannot read QR codes', 'Type the registration number below, or open the admin portal in Chrome.');
+    let code = ''; try { code = await readQrFromFile(f, read); } catch (e) { Sound.play('bad'); return show('bad', 'That picture could not be opened', 'Use a JPG or PNG picture of the card.'); }
+    if (!code) { Sound.play('bad'); return show('warn', 'No QR code found in that picture', 'Use a clear picture of the whole card, or type the registration number below.'); }
+    last = code; lastAt = Date.now(); await mark(Store.findByCode(code));
   });
   d.addEventListener('close', () => { alive = false; if (stream) stream.getTracks().forEach(t => t.stop()); });
   try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }); }
-  catch (e) { show('warn', 'The camera could not be opened', 'Allow camera access for this site, or type registration numbers below.'); return; }
+  catch (e) { show('warn', 'The camera could not be opened', 'Allow camera access for this site, upload a picture of the card, or type the registration number below.'); return; }
   if (!alive) { stream.getTracks().forEach(t => t.stop()); return; }
   video.srcObject = stream; try { await video.play(); } catch (e) { /* some browsers start it themselves */ }
-  const read = await makeQrReader();
+  const read = await reader();
   if (!read) { show('warn', 'This browser cannot read QR codes', 'Type registration numbers below, or open the admin portal in Chrome.'); return; }
   show('', 'Ready', 'Show a card to the camera.');
   const loop = async () => {
-    if (!alive) return; let code = ''; try { code = await read(video); } catch (e) { /* try again on the next frame */ }
+    if (!alive) return; let code = ''; try { code = await read(video, video.videoWidth, video.videoHeight); } catch (e) { /* try again on the next frame */ }
     const now = Date.now();
     if (code && (code !== last || now - lastAt > 4000)) { last = code; lastAt = now; await mark(Store.findByCode(code)); }
     setTimeout(loop, 220);
@@ -3396,12 +3983,18 @@ ADMIN['admin-attend'] = main => {
     const ps = Store.participants(), rows = Store.all('attendance').filter(a => a.session === attendSession).sort((a, b) => new Date(b.at) - new Date(a.at))
       .map(a => ({ a, u: ps.find(p => p.id === a.userId) })).filter(x => x.u);
     main.innerHTML = `<section class="panel"><div class="panel-head"><h2>Attendance</h2><b>${rows.length} of ${ps.length} present</b></div>
-      <p class="muted">Each registration card has a QR code. Scan it when a student arrives and they are marked present.</p>
+      <p class="muted">Each registration card has a QR code. Scan it when a student arrives and they are marked present. Inside the scanner you can also upload a picture of a card.</p>
       <div class="field"><label for="at-session">Taking attendance for</label><input id="at-session" list="at-known" value="${esc(attendSession)}"><datalist id="at-known">${known().map(k => `<option value="${esc(k)}"></option>`).join('')}</datalist><small>Pick a round, or type your own name for this session.</small></div>
       <div class="btnrow"><button type="button" class="btn btn-ocean" id="at-scan">${icon('check', 20)} Scan cards</button>${CLOUD ? '<button type="button" class="btn btn-quiet btn-sm" id="at-refresh">Load the latest</button>' : ''}<button type="button" class="btn btn-quiet btn-sm" id="at-csv">${icon('download', 18)} Export list</button></div>
+      <form class="field" id="at-form" novalidate><label for="at-num">Mark by registration number</label><div class="inrow"><input id="at-num" placeholder="BGEO-0007" autocomplete="off"><button type="submit" class="btn btn-quiet btn-sm">Mark present</button></div><small>For a student who has no card with them.</small></form>
       <div>${rows.map(x => `<div class="rowi"><span class="tick on">${icon('check', 18)}</span><div class="grow"><h3>${esc(x.u.name)}</h3><p>${esc(x.u.regNo)}, Class ${esc(x.u.klass)}, ${esc(x.u.institution)}</p><p>${fmtDateTime(x.a.at)}</p></div><div class="acts"><button type="button" class="mini del" data-undo="${x.u.id}" aria-label="Remove ${esc(x.u.name)} from the present list">${icon('close', 18)}</button></div></div>`).join('') || '<p class="empty">Nobody is marked present for this session yet.</p>'}</div></section>`;
-    $('#at-session', main).addEventListener('change', e => { attendSession = e.target.value.trim() || attendSession; draw(); });
+    $('#at-session', main).addEventListener('change', e => { const v = e.target.value.trim(); if (!v || v === attendSession) return; attendSession = v; setTimeout(draw, 0); });
     $('#at-scan', main).onclick = () => scanDialog(attendSession, draw);
+    $('#at-form', main).addEventListener('submit', e => {
+      e.preventDefault(); const inp = $('#at-num', main); if (!inp.value.trim()) return; const u = findByNumber(inp.value);
+      if (!u) return toast('No registered student has that number', 'bad');
+      busy(null, async () => { const r = await Store.markPresent(u.id, attendSession); toast(r === 'new' ? `${u.name} marked present` : `${u.name} was already marked present`, r === 'new' ? 'good' : ''); draw(); });
+    });
     const rf = $('#at-refresh', main); if (rf) rf.onclick = () => busy(rf, async () => { await Store.loadAttendance(); draw(); toast('Latest attendance loaded', 'good'); });
     $('#at-csv', main).onclick = () => {
       const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -3456,16 +4049,50 @@ const NOTICE_TEMPLATES = [
     fields: [{ key: 'last', label: 'Last day to register', placeholder: 'For example: 10 December 2026', required: true }],
     make: v => ['Registration closes soon', `Registration for the Bangladesh Geography Olympiad closes on ${v.last}. If you have not registered yet, create your account on this website before then.`] },
 ];
-function noticeTemplates(main, panel) {
+function templateBox(main, panel, { heading, templates, submit, toRow, extraHtml = '' }) {
   const box = document.createElement('section'); box.className = 'panel';
-  box.innerHTML = `<h2>Quick notices</h2><p class="muted">Pick one, fill in the blanks, check the wording, then add it.</p><div class="btnrow">${NOTICE_TEMPLATES.map((t, i) => `<button type="button" class="btn btn-quiet btn-sm" data-tpl="${i}">${t.name}</button>`).join('')}</div>`;
+  box.innerHTML = `<h2>${heading}</h2><p class="muted">Pick one, fill in the blanks, check the wording, then add it.</p><div class="btnrow">${templates.map((t, i) => `<button type="button" class="btn btn-quiet btn-sm" data-tpl="${i}">${t.name}</button>`).join('')}${extraHtml}</div>`;
   box.addEventListener('click', async e => {
-    const b = e.target.closest('[data-tpl]'); if (!b) return; const t = NOTICE_TEMPLATES[+b.dataset.tpl];
-    const v = await formDialog({ title: t.name, fields: t.fields, submit: 'Write the notice' }); if (!v) return;
-    const [title, body] = t.make(v); panel.addWith({ title, body, tag: t.tagFrom ? v[t.tagFrom] : t.tag, pinned: !!t.pinned });
+    const b = e.target.closest('[data-tpl]'); if (!b) return; const t = templates[+b.dataset.tpl];
+    const v = await formDialog({ title: t.name, fields: t.fields, submit }); if (!v) return;
+    panel.addWith(toRow(t, v, t.make(v)));
   });
-  main.appendChild(box);
+  main.appendChild(box); return box;
 }
+const noticeTemplates = (main, panel) => templateBox(main, panel, { heading: 'Quick notices', templates: NOTICE_TEMPLATES, submit: 'Write the notice', toRow: (t, v, [title, body]) => ({ title, body, tag: t.tagFrom ? v[t.tagFrom] : t.tag, pinned: !!t.pinned }) });
+
+/* ---------- news for the home page ---------- */
+const NEWS_TEMPLATES = [
+  { name: 'Event report',
+    fields: [{ key: 'event', label: 'Name of the event', placeholder: 'For example: Dhaka Regional round', required: true }, { key: 'date', label: 'When it took place', placeholder: 'For example: Saturday, 19 December 2026', required: true }, { key: 'place', label: 'Where', required: true }, { key: 'count', label: 'How many students took part (optional)', placeholder: 'For example: 450' }, { key: 'high', label: 'What stood out (optional)', type: 'textarea', rows: 3 }],
+    make: v => [`${v.event} held at ${v.place}`, `${v.event} took place on ${v.date} at ${v.place}.${v.count ? ` ${v.count} students took part.` : ''}${v.high ? '\n\n' + v.high : ''}`] },
+  { name: 'Winners announced',
+    fields: [{ key: 'round', label: 'Which round', type: 'select', options: ROUNDS.slice(0, 2) }, { key: 'region', label: 'Region (leave empty if it is for everyone)' }, { key: 'names', label: 'Winners, one per line', type: 'textarea', rows: 5, required: true }],
+    make: v => [`Winners of the ${v.round}${v.region ? ', ' + v.region : ''}`, `Congratulations to the winners of the ${v.round}${v.region ? ' in ' + v.region : ''}.\n\n${v.names}\n\nThe full list is on the Results page.`] },
+  { name: 'In the media',
+    fields: [{ key: 'outlet', label: 'Newspaper, channel or website', required: true }, { key: 'headline', label: 'Headline of the story', required: true }, { key: 'link', label: 'Link to the story (optional)', type: 'url', placeholder: 'https://' }],
+    make: v => [`In the media: ${v.outlet}`, `${v.outlet} covered the Bangladesh Geography Olympiad.\n\n"${v.headline}"`, v.link || ''] },
+  { name: 'New partner',
+    fields: [{ key: 'partner', label: 'Name of the partner', required: true }, { key: 'help', label: 'How they are helping', placeholder: 'For example: hosting the National round', required: true }],
+    make: v => [`${v.partner} joins the olympiad as a partner`, `${v.partner} has joined the Bangladesh Geography Olympiad as a partner.\n\nWhat they are doing: ${v.help}.`] },
+];
+ADMIN['admin-news'] = main => { const newsPanel = crudPanel({
+  table: 'news', title: 'News', addLabel: 'Add news', hint: 'News shows on the home page, newest first. The paperclip button adds photos, PDFs or a short video. The first photo becomes the picture shown on the home page.',
+  fields: [{ key: 'title', label: 'Headline', required: true }, { key: 'body', label: 'The story', type: 'textarea', rows: 6 }, { key: 'link', label: 'Link to read more (optional)', type: 'url', placeholder: 'https://' }, { key: 'date', label: 'Date shown', type: 'datetime', required: true }],
+  defaults: () => ({ date: nowIso() }),
+  sort: (a, b) => new Date(b.date) - new Date(a.date),
+  row: n => `<h3>${esc(n.title)} ${sampleChip(n)}</h3><p>${fmtDate(n.date)}${(n.files || []).length ? ', ' + plural(n.files.length, 'file') : ''}</p>`,
+  extra: n => `<button type="button" class="mini" data-filesw="${n.id}" aria-label="Photos and PDFs for this news" title="Photos and PDFs">${icon('clip', 18)}</button>`,
+}); newsPanel.addEventListener('click', e => { const f = e.target.closest('[data-filesw]'); if (f) attachDialog(Store.get('news', f.dataset.filesw), newsPanel.redraw, 'news'); });
+  const box = templateBox(main, newsPanel, { heading: 'Quick news', templates: NEWS_TEMPLATES, submit: 'Write the news', toRow: (t, v, [title, body, link]) => ({ title, body, link: link || '' }),
+    extraHtml: `<button type="button" class="btn btn-ocean btn-sm" id="news-file">${icon('clip', 18)} Upload a file as news</button>` });
+  /* a poster, a press cutting or a PDF can be the whole news item */
+  $('#news-file', box).onclick = async () => {
+    const files = await pickFiles(true); if (!files.length) return;
+    const v = await formDialog({ title: 'News from a file', submit: 'Upload and add', intro: `${plural(files.length, 'file')} chosen. Give it a headline.`, fields: [{ key: 'title', label: 'Headline', required: true }, { key: 'body', label: 'A line or two about it (optional)', type: 'textarea', rows: 3 }] });
+    if (v) busy($('#news-file', box), async () => { const added = []; for (const f of files) added.push(await Store.upload(f, 'news')); await Store.add('news', { title: v.title, body: v.body || '', link: '', date: nowIso(), files: added }); toast('News added to the home page', 'good'); newsPanel.redraw(); });
+  };
+  main.appendChild(newsPanel); };
 ADMIN['admin-notices'] = main => { const noticePanel = crudPanel({
   table: 'notices', title: 'Notices', addLabel: 'Add a notice', hint: 'Notices show on the public Notices page straight away. Pinned notices stay at the top. The paperclip button adds photos and PDFs to a notice. The envelope button emails it to students.',
   fields: [{ key: 'title', label: 'Title', required: true }, { key: 'body', label: 'Notice text', type: 'textarea', rows: 6, required: true }, { key: 'tag', label: 'Label (optional)', placeholder: 'For example: Regional round' },
@@ -3476,7 +4103,7 @@ ADMIN['admin-notices'] = main => { const noticePanel = crudPanel({
   extra: n => `<button type="button" class="mini" data-filesn="${n.id}" aria-label="Photos and PDFs for this notice" title="Photos and PDFs">${icon('clip', 18)}</button><button type="button" class="mini" data-mailn="${n.id}" aria-label="Email this notice" title="Email this notice">${icon('mail', 18)}</button>`,
 }); noticePanel.addEventListener('click', e => {
     const b = e.target.closest('[data-mailn]'); if (b) return emailNoticeDialog(Store.get('notices', b.dataset.mailn));
-    const f = e.target.closest('[data-filesn]'); if (f) attachDialog(Store.get('notices', f.dataset.filesn), noticePanel.redraw);
+    const f = e.target.closest('[data-filesn]'); if (f) attachDialog(Store.get('notices', f.dataset.filesn), noticePanel.redraw, 'notices');
   });
   noticeTemplates(main, noticePanel); main.appendChild(noticePanel); };
 /* let the admin pick files from their device; resolves with the chosen files (or none) */
@@ -3487,25 +4114,26 @@ function pickFiles(multiple) {
     document.body.appendChild(inp); inp.click();
   });
 }
-function attachDialog(n, after) {
+function attachDialog(n, after, table = 'notices') {
+  const word = table === 'news' ? 'news item' : 'notice';
   const d = openDialog({ title: 'Photos and PDFs', html: `<p class="muted">${esc(n.title)}</p><div id="at-list"></div>
-    <div class="field"><label for="at-file">Add photos, PDFs or a short video</label><input id="at-file" type="file" multiple accept="${FILE_TYPES.join(',')}"><small>Photos show inside the notice. A PDF shows as a button that opens it.</small></div>
+    <div class="field"><label for="at-file">Add photos, PDFs or a short video</label><input id="at-file" type="file" multiple accept="${FILE_TYPES.join(',')}"><small>The first photo shows on the home page with the ${word}. A PDF shows as a button that opens it.</small></div>
     <p class="err" role="alert" hidden></p>
     <div class="dlg-actions"><button type="button" class="btn btn-quiet btn-sm" data-close>Done</button><button type="button" class="btn btn-ocean btn-sm" id="at-up">Upload</button></div>` });
   const list = $('#at-list', d), err = $('.err', d), input = $('#at-file', d);
-  const draw = () => { list.innerHTML = (n.files || []).map((f, i) => `<div class="rowi"><div class="grow"><h3>${esc(f.name)}</h3><p>${FILE_WORD[f.kind] || 'File'}</p></div><div class="acts"><button type="button" class="mini del" data-rmf="${i}" aria-label="Remove ${esc(f.name)}">${icon('trash', 18)}</button></div></div>`).join('') || '<p class="empty">No files on this notice yet.</p>'; };
+  const draw = () => { list.innerHTML = (n.files || []).map((f, i) => `<div class="rowi"><div class="grow"><h3>${esc(f.name)}</h3><p>${FILE_WORD[f.kind] || 'File'}</p></div><div class="acts"><button type="button" class="mini del" data-rmf="${i}" aria-label="Remove ${esc(f.name)}">${icon('trash', 18)}</button></div></div>`).join('') || `<p class="empty">No files on this ${word} yet.</p>`; };
   $('#at-up', d).onclick = e => {
     const picked = [...input.files]; err.hidden = true;
     if (!picked.length) { err.textContent = 'Choose one or more files first.'; err.hidden = false; return; }
     busy(e.currentTarget, async () => {
-      const added = []; for (const f of picked) added.push(await Store.upload(f, 'notices'));
-      await Store.patch('notices', n.id, { files: [...(n.files || []), ...added] });
-      input.value = ''; toast(`${plural(added.length, 'file')} added to the notice`, 'good'); draw(); after();
+      const added = []; for (const f of picked) added.push(await Store.upload(f, table));
+      await Store.patch(table, n.id, { files: [...(n.files || []), ...added] });
+      input.value = ''; toast(`${plural(added.length, 'file')} added to the ${word}`, 'good'); draw(); after();
     });
   };
   list.addEventListener('click', async e => {
     const b = e.target.closest('[data-rmf]'); if (!b) return; const i = +b.dataset.rmf, f = (n.files || [])[i];
-    if (f && await confirmDialog(`Remove "${f.name}" from this notice?`, 'Remove', true)) busy(null, async () => { await Store.patch('notices', n.id, { files: n.files.filter((_, k) => k !== i) }); await Store.removeFile(f.path); draw(); after(); });
+    if (f && await confirmDialog(`Remove "${f.name}" from this ${word}?`, 'Remove', true)) busy(null, async () => { await Store.patch(table, n.id, { files: n.files.filter((_, k) => k !== i) }); await Store.removeFile(f.path); draw(); after(); });
   });
   draw();
 }
@@ -3680,7 +4308,7 @@ ADMIN['admin-emails'] = main => {
     main.innerHTML = `<section class="panel"><div class="panel-head"><h2>Emails</h2>${CLOUD && waiting ? `<button type="button" class="btn btn-ocean btn-sm" id="m-send">${icon('mail', 18)} Send ${waiting} waiting</button>` : ''}</div>
       ${CLOUD ? `<p class="muted">Selection emails and notice emails are listed here. ${n('sent')} sent, ${waiting} waiting, ${failed} failed. The free email plan sends up to 300 a day.</p>${failed ? '<div><button type="button" class="btn btn-quiet btn-sm" id="m-retry">Try the failed ones again</button></div>' : ''}`
         : '<p class="note">In this preview, emails are only listed here. On the live site they are sent for real.</p>'}
-      <div>${mails.slice(0, 300).map(m => { const st = MAIL_STATE[m.status] || MAIL_STATE.preview; return `<div class="rowi"><button type="button" class="plink grow" data-mail="${m.id}"><h3>${esc(m.subject)}</h3><p>To ${esc(m.name)} (${esc(m.to)}), ${fmtDateTime(m.at)}</p></button><span class="chip ${st[1]}">${st[0]}</span></div>`; }).join('') || '<p class="empty">No emails yet. Mark a participant as selected, or email a notice, and it appears here.</p>'}</div>
+      <div>${mails.slice(0, 300).map(m => { const st = MAIL_STATE[m.status] || MAIL_STATE.preview; return `<div class="rowi"><button type="button" class="plink grow" data-mail="${m.id}"><h3>${esc(m.subject)}</h3><p>To ${esc(m.name)} (${esc(m.to)}), ${fmtDateTime(m.at)}${m.cardUrl ? ', with admit card' : ''}</p></button><span class="chip ${st[1]}">${st[0]}</span></div>`; }).join('') || '<p class="empty">No emails yet. Mark a participant as selected, or email a notice, and it appears here.</p>'}</div>
       ${mails.length > 300 ? `<p class="muted">Showing the newest 300 of ${mails.length}.</p>` : ''}</section>`;
     const sb1 = $('#m-send', main); if (sb1) sb1.onclick = () => busy(sb1, async () => { await sendAndTell(); draw(); });
     const rt = $('#m-retry', main); if (rt) rt.onclick = () => busy(rt, async () => { await Store.retryFailed(); await sendAndTell(); draw(); });
@@ -3741,13 +4369,15 @@ ADMIN['admin-site'] = main => {
 /* ---------- start ---------- */
 async function boot() {
   buildShell();
-  if (WANT_CLOUD && !CLOUD) { $('#view').innerHTML = '<div class="wrap narrow"><header class="pagehead"><h1>The site could not start</h1><p>A file it needs did not load. Check your internet connection and reload the page.</p></header></div>'; return; }
+  const intro = siteIntro();
+  if (WANT_CLOUD && !CLOUD) { if (intro) intro.cancel(); $('#view').innerHTML = '<div class="wrap narrow"><header class="pagehead"><h1>The site could not start</h1><p>A file it needs did not load. Check your internet connection and reload the page.</p></header></div>'; return; }
   $('#view').innerHTML = '<div class="wrap"><header class="pagehead"><p>Loading…</p></header></div>';
   try { await Store.init(); }
-  catch (e) { $('#view').innerHTML = `<div class="wrap narrow"><header class="pagehead"><h1>Could not load the olympiad data</h1><p>${esc(e.message)}</p></header><p><a class="btn btn-lime" href="">Try again</a></p></div>`; return; }
+  catch (e) { if (intro) intro.cancel(); $('#view').innerHTML = `<div class="wrap narrow"><header class="pagehead"><h1>Could not load the olympiad data</h1><p>${esc(e.message)}</p></header><p><a class="btn btn-lime" href="">Try again</a></p></div>`; return; }
   Store.onRecovery = recoveryDialog;
   drawContours($('#contours'));
-  window.addEventListener('hashchange', () => { Sound.play('move'); render(); });
+  let drawn = false;
+  window.addEventListener('hashchange', () => { drawn = true; if (intro) intro.cancel(); Sound.play('move'); const to = routeName(); if (!(to === 'admin' || to.startsWith('admin-'))) pageSweep(); render(); });
   /* the first tap anywhere switches sound on (browsers only allow audio after a tap) */
   document.addEventListener('click', e => {
     Sound.unlock();
@@ -3761,7 +4391,9 @@ async function boot() {
     requestAnimationFrame(() => { queued = false; const y = window.scrollY || 0; north.hidden = y < 500 || document.body.classList.contains('is-admin'); north.style.setProperty('--turn', ((y * 0.3) % 360) + 'deg'); });
   }, { passive: true });
   north.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' }));
-  render();
+  /* the page is drawn only once the opening animation has pulled back to the whole Earth */
+  if (intro) await intro.untilLanding;
+  if (!drawn) { render(); if (intro) intro.land(); }
   if (Store.recovery) recoveryDialog();
 }
 boot();
