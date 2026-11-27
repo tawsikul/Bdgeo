@@ -26,7 +26,7 @@
   --body:"Hind Siliguri","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --r-md:14px; --r-lg:22px; --bar-h:62px;
   /* motion: one ease-out for the interface, one for things arriving; nothing bounces or overshoots */
-  --ease:cubic-bezier(.2,.8,.2,1); --ease-enter:cubic-bezier(.22,1,.36,1); --m-in:.15s; --m-out:.12s; --m-press:.09s;
+  --ease:cubic-bezier(.23,1,.32,1); --ease-enter:cubic-bezier(.23,1,.32,1); --ease-io:cubic-bezier(.77,0,.175,1); --m-in:.15s; --m-out:.12s; --m-press:.1s; --m-quick:.16s; --m-std:.24s; --m-slow:.52s;
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -58,6 +58,8 @@ body.is-admin{background:var(--foam);color:var(--ink)}
    A phone is too narrow for six links, so there they are listed under the menu button instead. */
 .bar{position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:40;display:flex;align-items:center;gap:10px;padding:0 14px;background:#052057;border-bottom:1px solid rgba(255,255,255,.1)}
 .brand{display:flex;align-items:center;flex:none}
+.brand,.brand img,.hero-title,.foot img,.stage,.intro,.aintro,.gate{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+.brand img,.foot img,.gate img{pointer-events:none}
 .brand img{height:42px;width:auto;display:block}
 .bar-links{display:none;align-items:center;gap:0;min-width:0}
 .bar-links > a,.dd-btn{display:inline-flex;align-items:center;gap:4px;padding:8px clamp(6px,.95vw,12px);border:0;border-radius:10px;background:none;text-decoration:none;font:600 clamp(.9rem,1.75vw,.97rem)/1.3 var(--body);white-space:nowrap;color:#fff;cursor:pointer}
@@ -67,7 +69,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .bar-links > a[aria-current="page"]::after,.dd.here .dd-btn::after,.dd-btn[aria-expanded="true"]::after{transform:scaleX(1)}
 .dd.here .dd-btn{color:var(--lime)}
 .dd-btn[aria-expanded="true"] .ic{transform:rotate(180deg)}
-.dd-menu{position:absolute;left:0;top:calc(100% + 12px);z-index:45;min-width:220px;display:grid;gap:2px;padding:8px;border-radius:14px;background:#fff;box-shadow:0 22px 50px -18px rgba(2,20,60,.75);animation:menuIn .18s ease both}
+.dd-menu{position:absolute;left:0;top:calc(100% + 12px);z-index:45;min-width:220px;display:grid;gap:2px;padding:8px;border-radius:14px;background:#fff;box-shadow:0 22px 50px -18px rgba(2,20,60,.75);transform-origin:top left;animation:popIn var(--m-quick) var(--ease) both}
 .dd-menu a{padding:11px 12px;border-radius:9px;text-decoration:none;font-weight:600;color:var(--ink);white-space:nowrap}
 .dd-menu a:hover{background:var(--foam)}
 .dd-menu a[aria-current="page"]{background:#e6effd;color:var(--ocean)}
@@ -88,8 +90,9 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 @media(min-width:1000px){.bar-links{gap:4px}.bar .bar-admit{width:auto;min-height:38px;padding:0 14px}.bar .bar-admit span{display:inline}#menu-btn{display:none}.bar.bar-tight #menu-btn{display:grid}}
 @media(max-width:420px){.bar.has-card #acct-btn{width:44px;padding:0}.bar.has-card #acct-btn span{display:none}}
 
-.menu{position:fixed;inset:var(--bar-h) 0 0 0;z-index:39;background:#052057;overflow:auto;padding:18px 16px 40px;animation:menuIn .26s ease both}
-@keyframes menuIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.menu{position:fixed;inset:var(--bar-h) 0 0 0;z-index:39;background:#052057;overflow:auto;padding:18px 16px 40px;animation:menuIn var(--m-std) var(--ease) both}
+@keyframes menuIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
 .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:640px;margin-inline:auto}
 .menu a{display:flex;align-items:center;gap:10px;min-height:56px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.08);text-decoration:none;font:600 1.02rem/1.2 var(--body)}
 .menu a[aria-current="page"]{background:var(--lime);color:var(--abyss)}
@@ -119,9 +122,9 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .pagehead > *{animation:rise .52s var(--ease-enter) both}
 .pagehead > :nth-child(2){animation-delay:.06s}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.pagehead{padding:30px 0 20px;display:grid;gap:10px}
+.pagehead{padding:clamp(30px,5vw,52px) 0 clamp(20px,3vw,30px);display:grid;gap:10px}
 .pagehead p{max-width:60ch;color:#d6e5fb;font-size:1.12rem}
-.sheet{background:var(--sheet);color:var(--ink);border-radius:var(--r-lg);padding:22px 20px;box-shadow:0 18px 40px -20px rgba(2,20,60,.6)}
+.sheet{background:var(--sheet);color:var(--ink);border-radius:18px;padding:clamp(20px,3vw,26px) clamp(18px,3vw,26px);box-shadow:0 14px 32px -24px rgba(2,20,60,.6)}
 .sheet + .sheet{margin-top:16px}
 .sheet h2{font:700 1.3rem/1.2 var(--body);letter-spacing:-.01em}
 .stack{display:grid;gap:14px}
@@ -169,6 +172,8 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .hero .lede,.hero .btnrow{animation:rise .52s var(--ease-enter) .42s both}
 .hero .btnrow{animation-delay:.48s}
 .stage.settle canvas{animation:settle .9s var(--ease-enter) both}
+.stage.landed::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(154,217,111,.7);pointer-events:none;animation:ringOut .7s var(--ease) both}
+@keyframes ringOut{from{transform:scale(1);opacity:.9}to{transform:scale(1.22);opacity:0}}
 @keyframes settle{from{transform:scale(.96);opacity:.4}to{transform:none;opacity:1}}
 .ht-1{font-size:clamp(1.05rem,4.6vw,2.5rem);color:#fff}
 .hero-title > .ht-1{padding-left:.7em}
@@ -217,9 +222,9 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .door h3{font-size:1.4rem}
 .door p{max-width:34ch;line-height:1.4;color:#cfe0f7}
 .door-go{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-weight:600;color:var(--lime)}
-.door .art{position:absolute;right:-22px;top:-22px;width:104px;height:104px}
-.door h3{padding-right:64px}
-@media(min-width:760px){.door .art{right:-14px;top:-14px;width:128px;height:128px}}
+.door .art{position:absolute;right:-20px;top:-20px;width:92px;height:92px}
+.door h3{padding-right:56px}
+.door{padding-top:64px}
 .door .art g{stroke:var(--lagoon);opacity:.28}
 
 /* notices */
@@ -279,7 +284,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 @keyframes pulse{50%{transform:scale(1.06)}}
 .qtext{font:600 1.22rem/1.4 var(--body)}
 .opts{display:grid;gap:10px}
-.opt{display:flex;gap:12px;align-items:center;text-align:left;min-height:56px;width:100%;padding:10px 14px;border-radius:16px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:transform .12s,border-color .15s,background .15s;-webkit-tap-highlight-color:transparent}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;min-height:56px;width:100%;padding:10px 14px;border-radius:16px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:transform var(--m-press) var(--ease),border-color var(--m-in) var(--ease),background-color var(--m-in) var(--ease);-webkit-tap-highlight-color:transparent}
 .opt:active{transform:scale(.985)}
 .opt .key{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-content:center;background:var(--foam);font:800 1rem/1 var(--display)}
 .opt[aria-checked="true"]{border-color:var(--ocean);background:#e6effd}
@@ -326,7 +331,7 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .lab{display:grid;gap:18px;align-items:center}
 @media(min-width:760px){.lab{grid-template-columns:minmax(0,340px) 1fr}}
 .lab svg{width:100%;max-width:340px;margin-inline:auto;display:block}
-.lab svg circle{cursor:pointer;transition:transform .35s cubic-bezier(.3,1.4,.5,1);transform-origin:160px 160px}
+.lab svg circle{cursor:pointer;transition:transform var(--m-std) var(--ease);transform-origin:160px 160px}
 .lab svg circle.on{transform:scale(1.035)}
 .tabs{display:flex;flex-wrap:wrap;gap:8px}
 .tabs button{border:0;min-height:40px;padding:0 14px;border-radius:10px;background:var(--foam);color:var(--ink);font-weight:600;cursor:pointer}
@@ -380,14 +385,17 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .north{position:fixed;right:14px;bottom:18px;z-index:35;width:54px;height:54px;border-radius:50%;border:0;background:#fff;color:var(--abyss);box-shadow:0 10px 26px -8px rgba(0,0,0,.6);cursor:pointer;display:grid;place-content:center}
 .north svg{transform:rotate(var(--turn,0deg))}
 #toasts{position:fixed;left:0;right:0;bottom:18px;z-index:90;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
-.toast{background:var(--abyss);color:#fff;padding:12px 18px;border-radius:14px;font-weight:600;box-shadow:0 14px 34px -10px rgba(0,0,0,.6);animation:toastIn .3s ease both;max-width:520px;border:1px solid rgba(255,255,255,.2)}
+.toast{background:var(--abyss);color:#fff;padding:12px 18px;border-radius:14px;font-weight:600;box-shadow:0 14px 34px -10px rgba(0,0,0,.6);transition:opacity var(--m-std) var(--ease),transform var(--m-std) var(--ease);animation:toastIn var(--m-std) var(--ease) both;max-width:520px;border:1px solid rgba(255,255,255,.2)}
 .toast.good{border-left:6px solid var(--leaf)}
 .toast.bad{border-left:6px solid var(--coral)}
-.toast.bye{opacity:0;transform:translateY(8px);transition:.3s}
+.toast.bye{opacity:0;transform:translateY(8px);transition-duration:var(--m-quick)}
 @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 dialog.dlg{border:0;border-radius:22px;padding:0;width:min(580px,calc(100% - 24px));max-height:calc(100% - 28px);color:var(--ink);background:#fff;box-shadow:0 30px 80px -20px rgba(2,20,60,.8);font-family:var(--body)}
 dialog.dlg::backdrop{background:rgba(2,18,52,.62)}
-dialog.dlg[open]{animation:rise .3s ease both}
+dialog.dlg[open]{animation:dlgIn var(--m-std) var(--ease) both}
+dialog.dlg[open]::backdrop{animation:fadeIn var(--m-std) var(--ease) both}
+@keyframes dlgIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}}
 .dlg-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 4px}
 .dlg-head h2{font:700 1.25rem/1.2 var(--body);letter-spacing:-.01em}
 .dlg-body{padding:10px 18px 18px;display:grid;gap:14px}
@@ -400,7 +408,7 @@ dialog.dlg[open]{animation:rise .3s ease both}
 .adm-top .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
 .adm-tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:56px;z-index:29;scrollbar-width:none}
 .adm-tabs::-webkit-scrollbar{display:none}
-.adm-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;text-decoration:none;font-weight:600;color:var(--ink-soft);white-space:nowrap}
+.adm-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;text-decoration:none;font-weight:600;color:var(--ink-soft);white-space:nowrap;transition:background-color var(--m-in) var(--ease),color var(--m-in) var(--ease)}
 .adm-tabs a[aria-current="page"]{background:var(--ocean);color:#fff}
 .adm-main{padding:18px 14px 90px;max-width:1100px;margin-inline:auto;display:grid;gap:16px}
 .adm-main > *{min-width:0}
@@ -536,10 +544,17 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 /* opening animation, page wipe, admin entry */
 .intro{position:fixed;inset:0;z-index:120;cursor:pointer;background:#17498e}
 .intro.landing{background:transparent;pointer-events:none}
+.gate{position:absolute;inset:0;z-index:2;display:grid;place-content:center;justify-items:center;gap:26px;padding:24px;text-align:center;background:linear-gradient(90deg,#01296f 0%,#17498e 52%,#336eb4 100%);transition:opacity .32s var(--ease),transform .5s var(--ease)}
+.gate img{width:min(64vw,300px);height:auto;animation:popIn .5s var(--ease) both}
+.gate .btn{min-width:180px;min-height:52px;font-size:1.06rem;opacity:0;transform:translateY(8px);transition:opacity var(--m-std) var(--ease),transform var(--m-std) var(--ease),background-color var(--m-in) var(--ease)}
+.gate small{color:#bcd3f3;opacity:0;transition:opacity var(--m-std) var(--ease)}
+.gate.ask .btn{opacity:1;transform:none}
+.gate.ask small{opacity:1}
+.gate.gone{opacity:0;transform:scale(1.04);pointer-events:none}
 .intro.skipping{opacity:0;pointer-events:none;transition:opacity .22s}
 .intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .intro-skip{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.72);font-size:.9rem;font-weight:500;pointer-events:none;transition:opacity .2s}
-.intro.landing .intro-skip{opacity:0}
+.intro.landing .intro-skip,.intro:not(.going) .intro-skip{opacity:0}
 body.intro-on{overflow:hidden}
 body.intro-globe .stage canvas{opacity:0}
 body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-title i,body.intro-on .nextup{opacity:0;animation:none}
@@ -560,7 +575,7 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-title 
 /* admin entry: the home page's own logo, then Admin slides in beside the last line */
 .aintro{position:fixed;inset:0;z-index:120;display:grid;place-content:center;background:#04214f;color:#fff;cursor:pointer;transition:opacity .4s}
 .aintro.bye{opacity:0}
-.aintro-stage{position:relative;width:min(86vw,520px);aspect-ratio:1/.56;transform:scale(.6);opacity:0;transition:transform .7s cubic-bezier(.2,1.4,.4,1),opacity .35s}
+.aintro-stage{position:relative;width:min(86vw,520px);aspect-ratio:1/.56;transform:scale(.94);opacity:0;transition:transform .6s var(--ease),opacity .35s var(--ease)}
 .aintro.in .aintro-stage{transform:none;opacity:1}
 .aintro-stage canvas{position:absolute;inset:0;width:100%;height:100%}
 .aw{position:absolute;left:21.5%;top:37.5%;width:77.5%;aspect-ratio:960/399;background-size:100% 100%;background-repeat:no-repeat;filter:drop-shadow(0 0 2px #0c3c8c) drop-shadow(0 0 1px #0c3c8c)}
@@ -570,6 +585,19 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-title 
 .aw-admin{position:absolute;left:66%;top:79%;font:800 calc(min(86vw,520px) * .092)/1 var(--display);color:var(--lime);opacity:0;transform:translateX(70px);transition:transform .65s cubic-bezier(.2,.8,.2,1),opacity .35s .1s;white-space:nowrap}
 .aintro.admin .aw-admin{opacity:1;transform:none}
 
+/* the exam portal: one quiet column, the facts of the exam in a row, nothing else to look at */
+#examp{--bar-h:56px;min-height:100vh}
+#exam-view{padding:8px 0 64px}
+#examp.in-exam .dash-top .sp{visibility:hidden}
+#examp.in-exam .dash-top .brand{pointer-events:none}
+.xfacts{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:0 0 16px;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.16)}
+.xfacts > div{padding:14px 16px;background:#052057}
+.xfacts dt{font-size:.875rem;color:#bcd3f3}
+.xfacts dd{margin:2px 0 0;font-weight:600;color:#fff}
+@media(min-width:640px){.xfacts{grid-template-columns:repeat(4,1fr)}}
+.xcount{font:800 clamp(2.4rem,11vw,4rem)/1 var(--display);color:var(--ocean);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.xrules{margin:0;padding-left:1.15em;display:grid;gap:8px;color:var(--ink)}
+.xrules li::marker{color:var(--azure)}
 /* participant dashboard: its own top bar and tabs, apart from the public site */
 #dash{--bar-h:56px;min-height:100vh}
 .dash-top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;height:56px;padding:0 14px;background:rgba(3,31,80,.96);border-bottom:1px solid rgba(255,255,255,.12)}
@@ -580,7 +608,7 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-title 
 .dash-top .sp{min-width:0}
 .dash-tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:rgba(3,31,80,.6);border-bottom:1px solid rgba(255,255,255,.12);scrollbar-width:none}
 .dash-tabs::-webkit-scrollbar{display:none}
-.dash-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;text-decoration:none;font-weight:600;color:#d6e5fb;white-space:nowrap}
+.dash-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;text-decoration:none;font-weight:600;color:#d6e5fb;white-space:nowrap;transition:background-color var(--m-in) var(--ease),color var(--m-in) var(--ease)}
 .dash-tabs a:hover{background:rgba(255,255,255,.08)}
 .dash-tabs a[aria-current="page"]{background:var(--lime);color:var(--abyss)}
 @media(min-width:760px){.dash-tabs{justify-content:center}}
@@ -606,9 +634,15 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-title 
   .news:hover{transform:translateY(-2px);border-color:#b9cbe4;box-shadow:0 16px 28px -22px rgba(10,35,80,.45)}
   .news:hover .news-pic img{transform:scale(1.03)}
   .nextup:hover strong{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+  .opt:not([disabled]):hover{border-color:#aebfd8;background:#f6f9fd}
+  .opt[aria-checked="true"]:hover{border-color:var(--ocean);background:#e6effd}
+  .dash-facts a:hover b{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+  .iconbtn:hover{background:rgba(255,255,255,.18)}
+  .iconbtn.dark:hover{background:#e2ecf8}
 }
+/* reduced motion: things still fade and change colour so states stay readable, but nothing travels, grows or loops */
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none !important;transition:none !important}
+  *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0s !important;animation-iteration-count:1 !important;transition-property:opacity,color,background-color,border-color !important;scroll-behavior:auto !important}
 }
 
 </style>
@@ -618,6 +652,7 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-title 
 <div id="site"></div>
 <div id="dash" hidden></div>
 <div id="admin" hidden></div>
+<div id="examp" hidden></div>
 <div id="toasts" aria-live="polite"></div>
 <button type="button" class="north" id="north" aria-label="Back to the top" hidden><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 3.500l3 8.500h-6z" fill="#e8604c" stroke="none"/><path d="M12 20.500l-3-8.500h6z" fill="#04214f" stroke="none"/></svg></button>
 <script>
@@ -2021,8 +2056,8 @@ const Sound = (() => {
     bad() { tone({ f: 190, f2: 120, t: 0.22, g: 0.2, type: 'triangle' }); },
     tick() { tone({ f: 1250, f2: 900, t: 0.035, g: 0.05, type: 'triangle' }); },
     win() { [523, 659, 784, 1047].forEach((f, i) => tone({ f, t: 0.3, g: 0.14, delay: i * 0.1 })); },
-    /* the opening: wind builds as the land rushes past, then thins out as the camera climbs into space */
-    whoosh() { wind({ t: 1.7, f: 420, f2: 3000, g: 0.13, peak: 0.7 }); tone({ f: 62, f2: 150, t: 1.6, g: 0.14 }); wind({ t: 1.5, f: 2600, f2: 220, g: 0.1, delay: 1.45, peak: 0.2 }); tone({ f: 150, f2: 46, t: 1.4, g: 0.12, delay: 1.45 }); },
+    /* the opening: wind builds through the flight over the land (2.6 s), then thins out as the camera climbs into space (1.3 s) */
+    whoosh() { wind({ t: 2.6, f: 420, f2: 3000, g: 0.13, peak: 0.72 }); tone({ f: 62, f2: 150, t: 2.5, g: 0.14 }); wind({ t: 1.5, f: 2600, f2: 220, g: 0.1, delay: 2.45, peak: 0.2 }); tone({ f: 150, f2: 46, t: 1.4, g: 0.12, delay: 2.45 }); },
     /* a tsunami: a deep surge that swells, breaks and hisses away */
     wave() { wind({ t: 1.05, f: 140, fm: 1100, f2: 260, g: 0.3, type: 'lowpass', peak: 0.45 }); wind({ t: 0.7, f: 2400, f2: 5200, g: 0.05, delay: 0.38, peak: 0.25 }); tone({ f: 58, f2: 40, t: 0.9, g: 0.2 }); },
     land() { tone({ f: 659, t: 0.5, g: 0.1 }); tone({ f: 988, t: 0.7, g: 0.1, delay: 0.12 }); },
@@ -2107,27 +2142,24 @@ function seed() {
   ];
   users.filter(u => u.role === 'participant').forEach((u, i) => { u.regNo = REG_PREFIX + String(i + 1).padStart(4, '0'); });
   const student = users[1];
-  const practice = {
-    id: 'practice1', title: 'Practice quiz: Earth basics', description: 'A warm-up on maps, rocks, rivers and the atmosphere.',
-    opensAt: dAt(-2, 9), closesAt: dAt(40, 22), minutes: 8, published: true, review: true, retake: true, sample: true, questions: QUIZ_POOL.slice(0, 8),
-  };
-  const mock = {
-    id: 'mock1', title: 'Mock regional round', description: 'A timed test in the style of the regional round.',
-    opensAt: dAt(5, 18), closesAt: dAt(5, 20), minutes: 10, published: true, review: false, retake: false, sample: true, questions: QUIZ_POOL.slice(8, 14),
+  /* the one online exam: the E-Regional round */
+  const eregional = {
+    id: 'eregional1', title: 'E-Regional round', description: 'The online round of the olympiad. You take it from home, on a phone or a computer.',
+    opensAt: dAt(-1, 9), closesAt: dAt(6, 22), minutes: 10, published: true, review: false, retake: false, sample: true, questions: QUIZ_POOL.slice(0, 10),
   };
   const others = users.slice(2);
   const attempts = others.slice(0, 4).map((u, i) => {
-    const answers = practice.questions.map((q, qi) => ((qi + i) % (3 + i) === 0 ? (q.answer + 1) % 4 : q.answer));
-    return { id: uid('a'), examId: practice.id, userId: u.id, startedAt: dAt(-1, 10 + i), submittedAt: dAt(-1, 10 + i, 6), answers, score: answers.filter((a, qi) => a === practice.questions[qi].answer).length, secs: 300 + i * 37 };
+    const answers = eregional.questions.map((q, qi) => ((qi + i) % (3 + i) === 0 ? (q.answer + 1) % 4 : q.answer));
+    return { id: uid('a'), examId: eregional.id, userId: u.id, startedAt: dAt(-1, 10 + i), submittedAt: dAt(-1, 10 + i, 6), answers, score: answers.filter((a, qi) => a === eregional.questions[qi].answer).length, secs: 300 + i * 37 };
   });
   return {
-    v: 6,
+    v: 7,
     settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', seq: users.length - 1 },
     users,
     notices: [
       { id: uid('n'), title: 'Registration is open', body: 'Create your account on this website to take part. After you register, your registration card appears in your account.\n\nThis is a sample notice. Replace it from the admin portal.', date: dAt(-1, 9), tag: 'Registration', pinned: true, sample: true },
       { id: uid('n'), title: 'Regional round: date and venues', body: 'The date, time and venue for each region will be published here.\n\nThis is a sample notice.', date: dAt(-3, 15), tag: 'Regional round', pinned: false, sample: true },
-      { id: uid('n'), title: 'Practice quiz now live', body: 'A short practice quiz is open in the Online exams section. You can take it as many times as you like on your phone.\n\nThis is a sample notice.', date: dAt(-5, 11), tag: 'Online exam', pinned: false, sample: true },
+      { id: uid('n'), title: 'E-Regional round: how it works', body: 'The E-Regional round is held online, in the exam portal on this website. Log in, open the portal and press Start when the exam is open.\n\nThis is a sample notice.', date: dAt(-5, 11), tag: 'E-Regional', pinned: false, sample: true },
     ],
     news: [
       { id: uid('w'), title: 'Registration opens for the new season', body: 'Students from Class 6 to Class 12 can now register on this website.\n\nThis is a sample news item. Replace it from the admin portal.', date: dAt(-6, 10), sample: true },
@@ -2144,7 +2176,7 @@ function seed() {
       { id: uid('e'), label: 'Regional round', at: dAt(23, 10), place: 'Venues to be announced', sample: true },
       { id: uid('e'), label: 'National round', at: dAt(58, 10), place: 'Venue to be announced', sample: true },
     ],
-    exams: [practice, mock],
+    exams: [eregional],
     attempts,
     results: [
       { id: uid('rs'), title: 'Sample results (for preview only)', round: 'Regional round', published: true, at: dAt(-1), sample: true,
@@ -2165,7 +2197,7 @@ function seed() {
     faq: [
       { id: uid('f'), q: 'How do I register?', a: 'Press Register, fill in your name, school, class and region, and choose a password. Your registration card appears in your account straight away.' },
       { id: uid('f'), q: 'Who can take part?', a: 'The organisers will publish the eligible classes and categories in Notices.' },
-      { id: uid('f'), q: 'How do the online exams work?', a: 'Each exam is a set of multiple-choice questions with a timer. The timer starts when you press Start and the exam is handed in automatically when the time runs out.' },
+      { id: uid('f'), q: 'How does the E-Regional round work?', a: 'It is one online exam of multiple-choice questions with a timer, held in the exam portal on this website. The timer starts when you press Start, and the exam is handed in by itself when the time runs out. Students in Dhaka district sit the Regional round in person instead, with their admit card.' },
       { id: uid('f'), q: 'Where is my registration card?', a: 'Log in and open My account. You can download the card from there.' },
       { id: uid('f'), q: 'How will I know if I am selected?', a: 'You get a notice in your account, and an email is sent to the address you registered with.' },
     ],
@@ -2228,7 +2260,7 @@ const Store = (() => {
   async function refresh() {
     const sess = ok(await sb.auth.getSession()).session, authed = !!sess;
     const [settings, content, exams] = await Promise.all([sb.from('settings').select('data').eq('id', 1).maybeSingle().then(ok), fetchAll('content', ['kind', 'id']), fetchAll('exams', ['id'])]);
-    const fresh = { v: 6, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
+    const fresh = { v: 7, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
       users: [], notices: [], news: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [] };
     content.forEach(r => { if (KINDS.includes(r.kind)) fresh[r.kind].push({ ...r.data, id: r.id }); });
     let qs = [], keys = []; cardMail = null;
@@ -2264,7 +2296,7 @@ const Store = (() => {
     init() {
       if (CLOUD) return refresh();
       db = read(KEY);
-      if (!db || db.v !== 6) { db = seed(); save(); }
+      if (!db || db.v !== 7) { db = seed(); save(); }
       db.attendance = db.attendance || []; db.news = db.news || [];
       session = read(SKEY);
       if (session && !db.users.some(u => u.id === session)) session = null;
@@ -2358,6 +2390,12 @@ const Store = (() => {
     events: () => db.events.slice().sort((a, b) => new Date(a.at) - new Date(b.at)),
     nextEvent() { const now = Date.now(); return this.events().find(e => new Date(e.at).getTime() > now) || null; },
     participants: () => db.users.filter(u => u.role === 'participant').sort(byDateDesc('createdAt')),
+    /* The E-Regional round is the only online exam. If more than one is published, the one that counts is the one open now,
+       else the next to open, else the last one held. */
+    eRegional() {
+      const now = Date.now(), list = db.exams.filter(e => e.published).sort((a, b) => new Date(a.opensAt) - new Date(b.opensAt));
+      return list.find(e => now >= new Date(e.opensAt) && now <= new Date(e.closesAt)) || list.find(e => now < new Date(e.opensAt)) || list[list.length - 1] || null;
+    },
     examState(ex) { const now = Date.now(); if (!ex.published) return 'draft'; if (now < new Date(ex.opensAt)) return 'soon'; if (now > new Date(ex.closesAt)) return 'done'; return 'live'; },
     messagesFor: uidv => db.messages.filter(m => m.userId === uidv).sort(byDateDesc('at')),
 
@@ -2541,46 +2579,51 @@ const Store = (() => {
 
 /* ---------- the living globe ----------
    The real continents in the logo's own greens and blues: a flat map is wrapped onto a
-   sphere pixel by pixel as it turns, with a few thin clouds on top. */
+   sphere pixel by pixel as it turns, lit by a sun from the upper left. */
 const Globe = (() => {
-  const MW = 2048, MH = 1024, CW = 1024, CH = 512;
-  let tex = null, clouds = null;
+  const MW = 2048, MH = 1024;
+  let tex = null;
   function paintMap() {
     const c = document.createElement('canvas'); c.width = MW; c.height = MH;
     const g = c.getContext('2d', { willReadFrequently: true }); paintEarth(g, MW, MH);
     tex = new Uint32Array(g.getImageData(0, 0, MW, MH).data.buffer);
-    clouds = makeClouds(CW, CH);
   }
   /* one sphere of `size` pixels; paint(rot) redraws it turned by rot radians */
   function create(size) {
     const S = Math.max(32, size | 0), off = document.createElement('canvas'); off.width = off.height = S;
     const og = off.getContext('2d'), img = og.createImageData(S, S), out = new Uint32Array(img.data.buffer);
-    const n = S * S, row = new Int32Array(n), col = new Int32Array(n), crow = new Int32Array(n), r = S / 2;
+    const n = S * S, row = new Int32Array(n), col = new Int32Array(n), lit = new Uint16Array(n), glint = new Uint8Array(n), r = S / 2;
     const tilt = 0.3, roll = 0.26, ct = Math.cos(tilt), st = Math.sin(tilt), cr = Math.cos(roll), sr = Math.sin(roll);
+    /* the sun is up and to the left, a little in front: the lit side is bright, the far side falls into soft shade,
+       and the sea carries one small glint of sunlight. No glow round the edge. */
+    const lx = -0.5, ly = -0.56, lz = 0.66, hl = Math.hypot(lx, ly, lz + 1), hx = lx / hl, hy = ly / hl, hz = (lz + 1) / hl;
     for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
       const i = y * S + x, nx = (x + 0.5 - r) / r, ny = (y + 0.5 - r) / r, d2 = nx * nx + ny * ny;
       if (d2 > 1) { row[i] = -1; continue; }
       const nz = Math.sqrt(1 - d2), x1 = nx * cr + ny * sr, y1 = -nx * sr + ny * cr, y2 = y1 * ct - nz * st, z2 = y1 * st + nz * ct;
       const lat = Math.asin(Math.max(-1, Math.min(1, -y2))), lon = Math.atan2(x1, z2);
       const ry = Math.min(MH - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * MH)));
-      row[i] = ry * MW; crow[i] = (ry >> 1) * CW;
-      col[i] = Math.floor((lon / 6.283185307 + 0.5) * MW) & (MW - 1);
+      row[i] = ry * MW; col[i] = Math.floor((lon / 6.283185307 + 0.5) * MW) & (MW - 1);
+      const diffuse = Math.max(0, nx * lx + ny * ly + nz * lz);
+      lit[i] = Math.round(256 * (0.66 + 0.4 * Math.pow(diffuse, 0.85)) * (0.9 + 0.1 * Math.pow(nz, 0.5)));
+      glint[i] = Math.round(120 * Math.pow(Math.max(0, nx * hx + ny * hy + nz * hz), 64));
     }
-    /* At rot = 0 the globe faces Bangladesh (90° E). As rot grows the Earth turns the way the real one does,
-       west to east, and the clouds drift a little faster than the ground. */
+    /* At rot = 0 the globe faces Bangladesh (90° E). As rot grows the Earth turns the way the real one does, west to east. */
     function paint(rot) {
       if (!tex) paintMap();
-      const sh = Math.floor((0.25 - rot / 6.283185307) * MW) & (MW - 1), shc = Math.floor((0.25 - rot * 1.07 / 6.283185307) * MW) & (MW - 1);
+      const sh = Math.floor((0.25 - rot / 6.283185307) * MW) & (MW - 1);
       for (let i = 0; i < n; i++) {
         const ro = row[i]; if (ro < 0) { out[i] = 0; continue; }
-        let p = tex[ro + ((col[i] + sh) & (MW - 1))]; const a = clouds[crow[i] + (((col[i] + shc) & (MW - 1)) >> 1)];
-        if (a) { let cr2 = p & 255, cg = (p >> 8) & 255, cb = (p >> 16) & 255; cr2 += ((255 - cr2) * a) >> 8; cg += ((255 - cg) * a) >> 8; cb += ((255 - cb) * a) >> 8; p = 0xff000000 | (cb << 16) | (cg << 8) | cr2; }
-        out[i] = p;
+        const p = tex[ro + ((col[i] + sh) & (MW - 1))], k = lit[i]; let cr2 = p & 255, cg = (p >> 8) & 255, cb = (p >> 16) & 255;
+        const s = cb > cg && cb > cr2 + 24 ? glint[i] : 0;   // only water shines
+        cr2 = (cr2 * k) >> 8; cg = (cg * k) >> 8; cb = (cb * k) >> 8;
+        if (s) { cr2 += ((255 - cr2) * s) >> 8; cg += ((255 - cg) * s) >> 8; cb += ((255 - cb) * s) >> 8; }
+        out[i] = 0xff000000 | ((cb > 255 ? 255 : cb) << 16) | ((cg > 255 ? 255 : cg) << 8) | (cr2 > 255 ? 255 : cr2);
       }
       og.putImageData(img, 0, 0);
     }
-    /* draw onto another canvas as a clean-edged disc, with only a hint of shade on the side away from the light.
-       When the disc is far bigger than the screen (vw by vh), only the part that is on screen is drawn. */
+    /* draw onto another canvas as a clean-edged disc. When the disc is far bigger than the screen (vw by vh),
+       only the part that is on screen is drawn. */
     function drawTo(g, cx, cy, R, vw, vh) {
       g.save(); g.beginPath(); g.arc(cx, cy, R - 0.5, 0, 6.2832); g.clip();
       if (vw && 2 * R > 1.5 * Math.max(vw, vh)) {
@@ -2588,9 +2631,7 @@ const Globe = (() => {
         const sx0 = Math.max(0, Math.floor(-x0 * k) - 2), sy0 = Math.max(0, Math.floor(-y0 * k) - 2), sx1 = Math.min(S, Math.ceil((vw - x0) * k) + 2), sy1 = Math.min(S, Math.ceil((vh - y0) * k) + 2);
         if (sx1 > sx0 && sy1 > sy0) g.drawImage(off, sx0, sy0, sx1 - sx0, sy1 - sy0, x0 + sx0 / k, y0 + sy0 / k, (sx1 - sx0) / k, (sy1 - sy0) / k);
       } else g.drawImage(off, cx - R, cy - R, 2 * R, 2 * R);
-      const sh = g.createRadialGradient(cx - R * 0.4, cy - R * 0.44, R * 0.5, cx - R * 0.08, cy - R * 0.08, R * 1.2);
-      sh.addColorStop(0, 'rgba(8,40,90,0)'); sh.addColorStop(1, 'rgba(8,40,90,.2)');
-      g.fillStyle = sh; if (vw) g.fillRect(0, 0, vw, vh); else g.fillRect(cx - R, cy - R, 2 * R, 2 * R); g.restore();
+      g.restore();
     }
     /* where a place sits on the disc: latitude, and longitude counted from the middle of the side facing us (both in radians).
        Returns [x, y, z] with the disc's radius as 1; z below 0 means it is round the back. */
@@ -2679,7 +2720,8 @@ function mountGlobe(cv, turnsPerMinute = 1.2) {
 /* ---------- the Earth's coastlines ----------
    Outlines of the continents and large islands, drawn by hand as longitude and latitude
    (in tenths of a degree). They are simplified: on a small turning globe only the overall
-   shapes show. paintEarth() turns them into a flat map, in the logo's greens and blues, that the globe wraps onto a sphere. */
+   shapes show. paintEarth() turns them into a flat map, in the logo's greens and blues, with relief on the land and depth in
+   the sea, that the globe wraps onto a sphere. There are no clouds: they hid the land and dulled the colours. */
 const EARTH_LAND = {"africa":[-60,360,-20,350,30,370,100,370,110,340,150,325,200,310,250,320,300,310,325,310,340,275,355,240,370,210,385,180,400,155,430,125,450,110,485,115,513,118,505,90,480,50,455,20,420,-15,405,-40,390,-70,400,-105,407,-150,370,-180,350,-205,355,-240,330,-260,325,-290,300,-315,270,-337,220,-343,185,-343,175,-310,160,-280,148,-245,125,-185,120,-150,135,-115,123,-60,95,-20,95,10,95,40,70,44,50,60,20,63,-10,52,-40,52,-75,44,-95,60,-115,70,-133,90,-150,110,-167,125,-173,147,-163,170,-162,205,-170,215,-155,240,-130,277,-100,295,-97,320,-75,338],"eurasia":[-55,360,-90,370,-93,390,-88,430,-20,435,-13,460,-45,485,-15,490,20,510,40,520,60,535,85,540,83,570,105,575,105,555,125,543,140,540,185,547,210,555,215,575,240,575,235,593,280,597,300,600,250,602,225,600,213,615,215,630,250,650,220,657,210,645,180,625,172,607,187,597,165,575,145,560,130,554,127,565,113,585,105,595,80,582,55,590,50,615,70,630,105,643,130,665,150,685,185,698,220,705,260,710,300,700,330,693,360,690,410,676,400,662,350,664,347,646,370,639,403,646,420,664,440,663,440,684,480,677,540,685,600,690,640,693,685,683,670,710,700,730,750,725,800,735,870,750,950,760,1040,777,1120,765,1130,738,1200,730,1270,725,1300,710,1350,716,1400,725,1500,715,1600,697,1700,695,1760,698,1800,688,1850,670,1900,660,1870,645,1820,648,1790,624,1730,610,1700,600,1650,600,1630,580,1620,550,1600,530,1570,512,1556,555,1560,575,1605,606,1630,620,1600,618,1565,615,1520,590,1460,593,1425,590,1380,565,1355,547,1400,532,1410,520,1405,500,1403,485,1385,460,1350,435,1320,431,1307,423,1297,409,1275,395,1285,382,1294,370,1293,353,1280,349,1265,344,1264,368,1248,382,1250,396,1242,399,1216,389,1220,406,1210,408,1190,392,1177,387,1189,374,1207,378,1225,372,1204,360,1193,350,1208,330,1218,318,1220,300,1215,283,1196,256,1173,236,1142,223,1110,214,1096,216,1082,216,1067,207,1058,190,1075,165,1093,130,1092,116,1068,104,1050,87,1048,102,1032,110,1023,122,1009,134,1000,134,992,105,1004,83,1014,68,1034,45,1040,14,1035,14,1013,28,1004,55,983,80,986,110,977,140,977,165,955,160,943,161,945,185,924,208,918,223,906,223,890,218,870,214,864,200,850,195,823,166,803,155,802,130,798,103,782,89,775,81,763,95,750,125,735,160,728,190,727,210,705,208,690,223,685,235,670,248,645,253,616,252,573,256,563,272,540,266,515,279,503,300,488,303,483,295,486,283,500,267,506,250,516,259,516,243,545,242,562,262,566,245,586,236,598,225,585,204,577,189,550,170,520,160,490,140,450,128,435,127,427,150,425,165,407,190,390,215,380,240,355,275,350,295,343,280,326,300,323,312,343,313,350,330,360,350,360,367,330,362,305,363,280,367,265,385,262,400,290,410,315,413,350,420,380,410,415,415,415,428,390,442,370,453,385,470,350,458,335,445,330,460,307,465,296,453,280,435,280,418,265,408,240,408,228,403,235,380,225,365,213,375,195,405,195,420,160,435,137,456,123,453,124,440,140,422,160,418,184,402,180,400,169,405,166,389,160,380,157,400,123,418,103,430,88,444,65,432,32,433,32,418,0,400,-2,387,-20,368],"namerica":[-1680,656,-1660,683,-1620,702,-1565,713,-1500,705,-1410,697,-1350,693,-1280,703,-1210,696,-1150,685,-1080,680,-1010,680,-960,685,-940,715,-910,695,-880,685,-850,695,-820,695,-815,675,-860,665,-870,645,-925,633,-947,603,-945,587,-925,570,-880,563,-830,552,-822,530,-805,513,-790,515,-795,545,-770,560,-775,585,-785,605,-775,623,-730,620,-700,610,-695,590,-660,587,-645,603,-620,580,-600,555,-570,535,-558,520,-585,513,-600,502,-660,502,-675,488,-645,489,-655,475,-640,460,-615,458,-600,462,-610,452,-640,442,-660,437,-662,448,-670,450,-690,440,-707,430,-705,418,-715,414,-740,406,-742,395,-755,385,-760,370,-757,356,-767,347,-790,333,-810,318,-813,295,-803,270,-802,253,-812,252,-827,277,-828,295,-842,300,-855,298,-875,303,-895,302,-894,292,-915,294,-940,296,-965,283,-973,260,-977,225,-972,205,-960,190,-945,182,-920,186,-907,195,-904,210,-880,215,-868,213,-875,190,-882,175,-888,159,-860,158,-835,152,-836,125,-837,110,-825,92,-810,88,-795,95,-775,87,-773,79,-775,70,-795,89,-805,73,-828,83,-850,100,-858,112,-875,130,-900,138,-922,146,-945,162,-965,157,-998,168,-1020,180,-1055,203,-1055,225,-1080,253,-1095,267,-1120,290,-1130,313,-1147,317,-1145,300,-1125,275,-1100,242,-1100,229,-1122,248,-1142,278,-1158,303,-1171,325,-1185,340,-1206,346,-1220,368,-1225,378,-1243,403,-1242,430,-1240,463,-1247,484,-1230,485,-1230,493,-1250,502,-1275,515,-1303,545,-1315,560,-1340,582,-1370,587,-1400,598,-1440,601,-1480,605,-1515,593,-1520,610,-1540,588,-1575,570,-1610,552,-1645,546,-1610,560,-1580,580,-1575,588,-1618,587,-1622,600,-1655,615,-1645,630,-1610,636,-1610,645,-1660,645],"samerica":[-773,85,-755,107,-730,113,-717,124,-715,108,-700,120,-680,106,-640,106,-620,107,-600,85,-570,60,-540,58,-515,43,-500,10,-500,-5,-480,-7,-445,-25,-415,-29,-385,-37,-353,-53,-348,-80,-370,-110,-390,-130,-390,-175,-408,-210,-420,-230,-445,-232,-465,-240,-485,-258,-486,-280,-505,-305,-525,-330,-540,-347,-565,-348,-583,-340,-570,-363,-576,-380,-620,-390,-623,-408,-650,-410,-637,-427,-653,-450,-675,-460,-660,-478,-685,-500,-690,-523,-683,-530,-652,-547,-665,-552,-700,-553,-725,-540,-745,-520,-755,-485,-745,-460,-735,-420,-738,-395,-732,-370,-716,-330,-715,-290,-705,-254,-702,-200,-704,-184,-720,-170,-755,-150,-765,-135,-773,-120,-790,-80,-810,-60,-813,-45,-800,-33,-809,-22,-800,8,-788,15,-775,38,-775,65],"greenland":[-730,782,-680,805,-600,820,-450,832,-300,835,-220,820,-180,800,-190,770,-210,740,-225,715,-260,698,-320,682,-390,657,-415,630,-435,600,-480,610,-510,640,-535,670,-530,695,-550,715,-580,755,-660,762,-710,772],"baffin":[-800,737,-760,728,-710,713,-670,693,-620,670,-645,650,-655,623,-700,628,-735,645,-775,653,-735,675,-770,697,-820,700,-860,715,-890,730,-850,738],"victoria":[-1170,710,-1100,730,-1040,715,-1015,697,-1050,687,-1100,686,-1160,693],"ellesmere":[-920,813,-850,825,-700,831,-620,825,-640,810,-700,798,-760,785,-800,765,-880,765,-880,785,-850,800],"banks":[-1250,720,-1230,743,-1170,742,-1155,730,-1210,713],"melville":[-1160,750,-1100,764,-1040,766,-980,760,-960,750,-1040,747,-1100,746],"newfoundland":[-593,476,-558,516,-530,487,-530,467,-560,468],"cuba":[-850,219,-820,232,-780,223,-742,202,-777,198,-780,210,-815,221],"hispaniola":[-744,184,-728,199,-698,196,-684,186,-710,177],"iceland":[-243,655,-225,664,-180,662,-145,663,-136,650,-160,640,-190,634,-225,639],"britain":[-52,500,-35,503,2,508,14,512,17,527,3,530,-2,545,-16,555,-22,560,-20,576,-33,586,-50,586,-62,575,-56,562,-48,548,-32,542,-31,533,-46,532,-42,523,-52,518,-30,514,-45,511],"ireland":[-60,522,-62,535,-56,546,-73,553,-85,545,-100,542,-100,522,-95,515],"madagascar":[493,-120,504,-155,495,-180,475,-248,452,-255,433,-223,443,-200,439,-175,462,-157,480,-135],"srilanka":[798,96,809,83,818,73,816,63,804,59,798,72],"honshu":[1309,340,1330,355,1360,357,1370,374,1390,383,1400,405,1414,414,1420,395,1410,380,1409,363,1403,352,1392,352,1380,346,1368,345,1355,335,1350,346,1328,343],"hokkaido":[1403,415,1400,432,1417,454,1432,443,1454,434,1435,420,1412,425],"kyushu":[1297,333,1317,336,1315,314,1303,312],"shikoku":[1325,339,1345,343,1343,333,1328,328],"sakhalin":[1420,543,1433,520,1433,490,1428,466,1420,460,1420,495,1418,520],"taiwan":[1210,252,1220,249,1210,220,1202,228,1202,240],"hainan":[1087,193,1105,201,1110,196,1100,184,1088,186],"luzon":[1205,185,1222,184,1220,160,1240,135,1235,127,1210,138,1200,155],"mindanao":[1220,70,1235,86,1255,98,1265,75,1255,58,1240,65],"visayas":[1220,118,1245,120,1255,110,1245,98,1225,98],"palawan":[1173,85,1195,112,1196,104,1177,83],"borneo":[1090,15,1103,18,1114,24,1130,32,1155,50,1168,69,1180,63,1192,52,1180,42,1175,25,1188,10,1175,-5,1163,-25,1160,-38,1145,-40,1130,-32,1115,-33,1103,-29,1100,-15,1090,0],"sumatra":[953,55,975,52,995,32,1015,18,1036,0,1045,-23,1060,-30,1058,-58,1045,-59,1023,-40,1008,-20,995,0,985,18,970,35],"java":[1052,-68,1068,-60,1086,-67,1108,-64,1127,-69,1145,-77,1144,-87,1115,-83,1085,-78,1065,-74],"sulawesi":[1197,7,1210,12,1240,9,1252,16,1246,4,1225,4,1205,0,1212,-10,1233,-8,1218,-18,1225,-33,1232,-48,1220,-47,1213,-30,1205,-27,1204,-55,1195,-55,1195,-35,1188,-27,1195,-10],"newguinea":[1310,-8,1335,-7,1350,-33,1378,-15,1410,-26,1445,-39,1460,-55,1478,-63,1470,-70,1506,-106,1475,-100,1460,-82,1435,-90,1410,-91,1390,-80,1385,-67,1376,-52,1355,-45,1330,-40,1328,-28],"australia":[1137,-225,1142,-260,1150,-300,1157,-320,1150,-343,1180,-350,1200,-340,1235,-340,1260,-323,1290,-316,1312,-315,1342,-327,1358,-348,1375,-330,1378,-355,1395,-359,1409,-380,1435,-388,1463,-390,1480,-378,1500,-373,1512,-340,1525,-320,1535,-285,1532,-255,1510,-235,1495,-220,1485,-200,1463,-190,1455,-150,1436,-140,1425,-108,1417,-130,1415,-165,1395,-175,1375,-160,1355,-150,1367,-120,1327,-115,1305,-125,1295,-149,1270,-140,1255,-145,1240,-165,1222,-180,1210,-195,1190,-200,1167,-207,1142,-220],"tasmania":[1447,-408,1482,-409,1482,-422,1470,-435,1460,-435,1452,-422],"nz_north":[1727,-344,1743,-353,1755,-367,1783,-376,1770,-395,1769,-405,1752,-416,1748,-399,1738,-393,1748,-379,1730,-352],"nz_south":[1727,-405,1742,-415,1727,-435,1712,-444,1705,-460,1683,-466,1665,-460,1675,-445,1700,-430,1715,-418],"antarctica":[-1800,-765,-1600,-780,-1500,-760,-1350,-745,-1200,-740,-1050,-745,-1000,-725,-900,-730,-750,-730,-650,-680,-600,-640,-570,-635,-620,-665,-610,-720,-500,-780,-350,-780,-200,-735,-100,-710,0,-700,150,-695,300,-690,400,-685,500,-670,600,-675,700,-685,780,-680,900,-665,1000,-660,1100,-660,1200,-665,1300,-660,1400,-665,1500,-680,1600,-700,1700,-720,1800,-765,1800,-900,-1800,-900],"svalbard":[110,797,160,800,220,803,270,800,210,783,170,767,140,777],"novaya":[520,712,550,735,600,760,680,770,630,750,570,720,550,707],"sicily":[124,380,156,383,152,367,124,376],"sardinia":[82,410,97,409,95,391,84,390]};
 const EARTH_LAKES = {"caspian":[470,450,490,465,510,468,530,453,525,425,540,405,535,373,510,368,490,375,495,403,477,425]};
 /* deserts and dry land: [longitude, latitude, half-width, half-height] in degrees */
@@ -2703,54 +2745,58 @@ function paintEarth(g, W, H) {
     return pts;
   };
   const shapes = Object.keys(EARTH_LAND).map(k => [k, rough(EARTH_LAND[k])]);
-  const trace = (pts, off) => { g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(X(p[0] + off), Y(p[1])) : g.moveTo(X(p[0] + off), Y(p[1])))); g.closePath(); };
-  const allLand = fn => shapes.forEach(([k, pts]) => { for (const off of [-360, 0, 360]) { trace(pts, off); fn(k); } });
-  /* The colours are the logo's: soft blue sea, teal shallows along every coast, lime-green land.
-     Forests are a deeper green, dry country a yellower green, and the poles are pale. */
-  const sea = g.createLinearGradient(0, 0, 0, H); sea.addColorStop(0, '#4a76ad'); sea.addColorStop(0.5, '#5a8cc2'); sea.addColorStop(1, '#4a76ad');
+  const trace = (c, pts, off) => { c.beginPath(); pts.forEach((p, i) => (i ? c.lineTo(X(p[0] + off), Y(p[1])) : c.moveTo(X(p[0] + off), Y(p[1])))); c.closePath(); };
+  const allLand = (c, fn) => shapes.forEach(([k, pts]) => { for (const off of [-360, 0, 360]) { trace(c, pts, off); fn(k); } });
+  /* soft value noise, the same at the left and right edges so the map wraps round the globe without a seam */
+  const noise = (cells, oct) => {
+    const lay = []; for (let o = 0; o < oct; o++) { const nx = cells << o, ny = Math.max(2, nx >> 1); lay.push({ nx, ny, amp: 1 / (1 << o), v: Float32Array.from({ length: nx * (ny + 1) }, () => R()) }); }
+    const sm = t => t * t * (3 - 2 * t);
+    return (u, v) => { let n = 0, w = 0; for (const o of lay) { const fx = u * o.nx, fy = v * o.ny, x0 = Math.floor(fx) % o.nx, y0 = Math.min(o.ny - 1, Math.floor(fy)), tx = sm(fx - Math.floor(fx)), ty = sm(fy - Math.floor(fy)), x1 = (x0 + 1) % o.nx, A = o.v[y0 * o.nx + x0], B = o.v[y0 * o.nx + x1], C = o.v[(y0 + 1) * o.nx + x0], E = o.v[(y0 + 1) * o.nx + x1]; n += o.amp * (A + (B - A) * tx + (C - A) * ty + (A - B - C + E) * tx * ty); w += o.amp; } return n / w; };
+  };
+
+  /* ---- the sea: the logo's blue, a little deeper far from land, with teal shallows along every coast ---- */
+  const sea = g.createLinearGradient(0, 0, 0, H); sea.addColorStop(0, '#4474b2'); sea.addColorStop(0.5, '#5590cc'); sea.addColorStop(1, '#4474b2');
   g.fillStyle = sea; g.fillRect(0, 0, W, H);
-  g.save(); g.shadowColor = '#5dc9d6'; g.shadowBlur = 7 * D; g.fillStyle = '#5dc9d6'; allLand(() => g.fill()); g.shadowBlur = 3 * D; allLand(() => g.fill()); g.restore();
-  g.fillStyle = '#93d667'; allLand(() => g.fill());
-  /* everything below is painted only where there is land */
-  g.save(); g.globalCompositeOperation = 'source-atop';
-  const band = (lat0, lat1, color0, color1) => { const b = g.createLinearGradient(0, Y(lat0), 0, Y(lat1)); b.addColorStop(0, color0); b.addColorStop(1, color1); g.fillStyle = b; g.fillRect(0, Math.min(Y(lat0), Y(lat1)), W, Math.abs(Y(lat1) - Y(lat0))); };
-  band(14, 0, 'rgba(84,186,84,0)', 'rgba(84,186,84,.85)'); band(0, -14, 'rgba(84,186,84,.85)', 'rgba(84,186,84,0)');                 // rainforest belt
-  band(44, 54, 'rgba(92,184,96,0)', 'rgba(92,184,96,.8)'); band(54, 66, 'rgba(92,184,96,.8)', 'rgba(170,212,150,.9)');                // northern forest, then tundra
-  band(66, 78, 'rgba(170,212,150,.9)', 'rgba(236,246,238,1)'); band(78, 90, 'rgba(236,246,238,1)', 'rgba(246,251,248,1)');            // fading to ice
-  band(-56, -64, 'rgba(236,246,238,0)', 'rgba(240,248,243,1)'); band(-64, -90, 'rgba(240,248,243,1)', 'rgba(248,252,250,1)');         // Antarctica
-  const blob = (lon, lat, rx, ry, color) => { for (const off of [-360, 0, 360]) { g.save(); g.translate(X(lon + off), Y(lat)); g.scale(rx * D, ry * D); const rg = g.createRadialGradient(0, 0, 0.25, 0, 0, 1); rg.addColorStop(0, color); rg.addColorStop(1, color.replace(/[\d.]+\)$/, '0)')); g.fillStyle = rg; g.beginPath(); g.arc(0, 0, 1, 0, 6.2832); g.fill(); g.restore(); } };
-  EARTH_DRY.forEach(d => blob(d[0], d[1], d[2] * 1.25, d[3] * 1.35, 'rgba(214,224,128,.9)'));
-  blob(18, 13.500, 28, 4, 'rgba(190,220,110,.5)');                                                                                    // the Sahel
-  g.lineCap = 'round'; g.lineJoin = 'round';
-  EARTH_PEAKS.forEach(line => { g.strokeStyle = 'rgba(70,160,78,.55)'; g.lineWidth = 2.4 * D; g.beginPath(); line.forEach((p, i) => (i ? g.lineTo(X(p[0]), Y(p[1])) : g.moveTo(X(p[0]), Y(p[1])))); g.stroke(); });
-  /* fine speckle so the land does not look like flat paint */
-  for (let i = 0; i < 2600; i++) { const x = R() * W, y = H * (0.08 + R() * 0.8), r = (0.3 + R() * 0.9) * D; g.fillStyle = R() < 0.5 ? 'rgba(60,150,70,.14)' : 'rgba(225,245,170,.12)'; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill(); }
-  g.restore();
-  g.fillStyle = '#eef7f1'; shapes.filter(s => s[0] === 'greenland').forEach(s => { trace(s[1], 0); g.fill(); });
-  g.fillStyle = '#5dc9d6'; Object.values(EARTH_LAKES).forEach(arr => { trace(rough(arr), 0); g.fill(); });
+  /* slow changes of tone across the open ocean, so it reads as water and not as flat paint */
+  { const sw = 256, sh = 128, c = document.createElement('canvas'); c.width = sw; c.height = sh; const cx = c.getContext('2d'), im = cx.createImageData(sw, sh), nz = noise(6, 3);
+    for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) { const t = nz(x / sw, y / sh) - 0.5, i = (y * sw + x) * 4, deep = t < 0; im.data[i] = deep ? 22 : 150; im.data[i + 1] = deep ? 62 : 214; im.data[i + 2] = deep ? 140 : 236; im.data[i + 3] = Math.min(70, Math.abs(t) * 300); }
+    cx.putImageData(im, 0, 0); g.imageSmoothingEnabled = true; g.drawImage(c, 0, 0, W, H); }
+  g.save(); g.shadowColor = '#62d0da'; g.shadowBlur = 6 * D; g.fillStyle = '#62d0da'; allLand(g, () => g.fill()); g.shadowBlur = 2.4 * D; allLand(g, () => g.fill()); g.restore();
+
+  /* ---- the land, painted on a sheet of its own so that nothing meant for land spills onto the sea ---- */
+  const sheet = document.createElement('canvas'); sheet.width = W; sheet.height = H; const l = sheet.getContext('2d');
+  l.fillStyle = '#8fd45f'; allLand(l, () => l.fill());
+  l.globalCompositeOperation = 'source-atop';
+  const band = (lat0, lat1, color0, color1) => { const b = l.createLinearGradient(0, Y(lat0), 0, Y(lat1)); b.addColorStop(0, color0); b.addColorStop(1, color1); l.fillStyle = b; l.fillRect(0, Math.min(Y(lat0), Y(lat1)), W, Math.abs(Y(lat1) - Y(lat0))); };
+  band(15, 0, 'rgba(62,170,74,0)', 'rgba(62,170,74,.9)'); band(0, -15, 'rgba(62,170,74,.9)', 'rgba(62,170,74,0)');                    // rainforest belt
+  band(44, 54, 'rgba(78,172,88,0)', 'rgba(78,172,88,.85)'); band(54, 66, 'rgba(78,172,88,.85)', 'rgba(164,208,146,.9)');              // northern forest, then tundra
+  band(66, 78, 'rgba(164,208,146,.9)', 'rgba(238,247,240,1)'); band(78, 90, 'rgba(238,247,240,1)', 'rgba(248,252,249,1)');            // fading to ice
+  band(-56, -64, 'rgba(238,247,240,0)', 'rgba(242,249,244,1)'); band(-64, -90, 'rgba(242,249,244,1)', 'rgba(250,253,251,1)');         // Antarctica
+  const blob = (lon, lat, rx, ry, color) => { for (const off of [-360, 0, 360]) { l.save(); l.translate(X(lon + off), Y(lat)); l.scale(rx * D, ry * D); const rg = l.createRadialGradient(0, 0, 0.25, 0, 0, 1); rg.addColorStop(0, color); rg.addColorStop(1, color.replace(/[\d.]+\)$/, '0)')); l.fillStyle = rg; l.beginPath(); l.arc(0, 0, 1, 0, 6.2832); l.fill(); l.restore(); } };
+  EARTH_DRY.forEach(d => blob(d[0], d[1], d[2] * 1.25, d[3] * 1.35, 'rgba(222,214,128,.92)'));
+  blob(18, 13.500, 28, 4, 'rgba(196,216,110,.55)');                                                                                   // the Sahel
+  /* patches of woodland and grassland, so the green varies the way real country does */
+  { const sw = 512, sh = 256, c = document.createElement('canvas'); c.width = sw; c.height = sh; const cx = c.getContext('2d'), im = cx.createImageData(sw, sh), nz = noise(14, 4);
+    for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) { const t = nz(x / sw, y / sh) - 0.5, i = (y * sw + x) * 4, dark = t < 0; im.data[i] = dark ? 30 : 214; im.data[i + 1] = dark ? 120 : 236; im.data[i + 2] = dark ? 52 : 150; im.data[i + 3] = Math.min(96, Math.abs(t) * 420); }
+    cx.putImageData(im, 0, 0); l.drawImage(c, 0, 0, W, H); }
+  /* relief: hills and ranges catch the light from the upper left and fall into shade on the other side */
+  { const sw = 1024, sh = 512, c = document.createElement('canvas'); c.width = sw; c.height = sh; const cx = c.getContext('2d'), im = cx.createImageData(sw, sh), nz = noise(24, 4), hgt = new Float32Array(sw * sh);
+    for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) hgt[y * sw + x] = nz(x / sw, y / sh);
+    /* the mountain chains stand higher than the country round them */
+    const bump = (lon, lat, rad, amt) => { const cxp = (lon + 180) / 360 * sw, cyp = (90 - lat) / 180 * sh, rr = rad / 360 * sw; for (let y = Math.max(0, Math.floor(cyp - rr)); y < Math.min(sh, cyp + rr); y++) for (let x = Math.floor(cxp - rr); x < cxp + rr; x++) { const d = Math.hypot(x - cxp, y - cyp) / rr; if (d < 1) { const f = 1 - d * d; hgt[y * sw + ((x % sw) + sw) % sw] += amt * f * f; } } };
+    EARTH_PEAKS.forEach(line => { for (let i = 0; i < line.length - 1; i++) for (let t = 0; t < 1; t += 0.25) bump(line[i][0] + (line[i + 1][0] - line[i][0]) * t, line[i][1] + (line[i + 1][1] - line[i][1]) * t, 3.4, 0.07); });
+    for (let y = 1; y < sh - 1; y++) { const even = Math.min(1, Math.cos((0.5 - y / sh) * Math.PI) * 1.6);   // the map is stretched near the poles, so the relief is eased off there
+      for (let x = 0; x < sw; x++) { const xa = (x + sw - 1) % sw, xb = (x + 1) % sw, sl = (hgt[(y - 1) * sw + xa] - hgt[(y + 1) * sw + xb]) * 7 * even, i = (y * sw + x) * 4, lit = sl < 0; im.data[i] = lit ? 255 : 14; im.data[i + 1] = lit ? 255 : 60; im.data[i + 2] = lit ? 210 : 34; im.data[i + 3] = Math.min(104, Math.abs(sl) * 255); } }
+    cx.putImageData(im, 0, 0); l.drawImage(c, 0, 0, W, H); }
+  l.globalCompositeOperation = 'source-over';
+  l.fillStyle = '#f0f8f3'; shapes.filter(s => s[0] === 'greenland').forEach(s => { trace(l, s[1], 0); l.fill(); });
+  /* a thin pale line of beach where the land meets the sea */
+  g.save(); g.strokeStyle = 'rgba(236,246,214,.55)'; g.lineWidth = 0.5 * D; g.lineJoin = 'round'; allLand(g, () => g.stroke()); g.restore();
+  g.drawImage(sheet, 0, 0);
+  g.fillStyle = '#62d0da'; Object.values(EARTH_LAKES).forEach(arr => { trace(g, rough(arr), 0); g.fill(); });
   /* sea ice over the Arctic Ocean */
-  const ice = g.createLinearGradient(0, 0, 0, Y(76)); ice.addColorStop(0, 'rgba(240,249,245,.95)'); ice.addColorStop(0.55, 'rgba(236,247,243,.75)'); ice.addColorStop(1, 'rgba(236,247,243,0)');
+  const ice = g.createLinearGradient(0, 0, 0, Y(76)); ice.addColorStop(0, 'rgba(244,250,247,.96)'); ice.addColorStop(0.55, 'rgba(240,248,245,.75)'); ice.addColorStop(1, 'rgba(240,248,245,0)');
   g.fillStyle = ice; g.fillRect(0, 0, W, Y(76));
-}
-/* clouds: a soft, patchy layer of white, thicker near the equator and in the windy middle latitudes */
-function makeClouds(W, H) {
-  const out = new Uint8Array(W * H); let seed = 99; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const octaves = [[8, 4, 0.5], [16, 8, 0.27], [32, 16, 0.14], [64, 32, 0.09]].map(([nx, ny, amp]) => ({ nx, ny, amp, v: Float32Array.from({ length: nx * (ny + 1) }, () => R()) }));
-  const sm = t => t * t * (3 - 2 * t);
-  for (let y = 0; y < H; y++) {
-    const lat = 90 - (y + 0.5) / H * 180, belt = 0.52 + 0.2 * Math.exp(-Math.pow((lat - 6) / 9, 2)) + 0.1 * Math.exp(-Math.pow((Math.abs(lat) - 52) / 14, 2)) - 0.14 * Math.exp(-Math.pow((Math.abs(lat) - 24) / 9, 2));
-    for (let x = 0; x < W; x++) {
-      let n = 0;
-      for (const o of octaves) {
-        const fx = x / W * o.nx, fy = y / H * o.ny, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = sm(fx - x0), ty = sm(fy - y0), x1 = (x0 + 1) % o.nx;
-        const a = o.v[y0 * o.nx + x0], b = o.v[y0 * o.nx + x1], c = o.v[(y0 + 1) * o.nx + x0], d = o.v[(y0 + 1) * o.nx + x1];
-        n += o.amp * (a + (b - a) * tx + (c - a) * ty + (a - b - c + d) * tx * ty);
-      }
-      const v = (n - (1.14 - belt)) * 3;
-      out[y * W + x] = v <= 0 ? 0 : Math.min(120, Math.round(v * 255));
-    }
-  }
-  return out;
 }
 
 /* ---------- entry animations ----------
@@ -2772,9 +2818,13 @@ const HeroSync = { rot: null, speed: 0, globe: null, live: false, kick: null };
 function siteIntro() {
   if (reducedMotion() || seenOnce('bgeo-intro') || routeName() !== 'home') return null;
   markSeen('bgeo-intro');
-  const el = document.createElement('div'); el.className = 'intro'; el.innerHTML = '<canvas aria-hidden="true"></canvas><p class="intro-skip">Tap to skip</p>';
+  /* The opening has sound, and a browser only lets a page make sound after a tap. So the first thing shown is the logo
+     with an Enter button; the tap starts the flight and its sound together. If this browser already allows sound
+     (or the visitor has muted the site), the flight simply starts. */
+  const el = document.createElement('div'); el.className = 'intro';
+  el.innerHTML = `<canvas aria-hidden="true"></canvas><div class="gate"><img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263" draggable="false"><button type="button" class="btn btn-lime" id="enter">Enter</button><small>The opening plays with sound</small></div><p class="intro-skip">Tap to skip</p>`;
   document.body.appendChild(el); document.body.classList.add('intro-on', 'intro-globe');
-  const cv = el.firstChild, g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+  const cv = el.firstChild, gate = el.querySelector('.gate'), g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
   /* the ground is drawn on a square sheet as wide as the screen's diagonal, then laid onto the screen */
   const layer = document.createElement('canvas'), lg = layer.getContext('2d'), decal = document.createElement('canvas');
   let W = 0, H = 0, D = 0, F = 0, DS = 0;
@@ -2822,7 +2872,12 @@ function siteIntro() {
     const c = lg, cx = D / 2, cy = D / 2, sp = sin(cam.pitch), cp = Math.cos(cam.pitch), STEP = 2;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     const yh = cam.pitch > 1.35 ? -1 : cy - F * Math.tan(cam.pitch);
-    if (yh > 0) { const sky = c.createLinearGradient(0, yh - D * 0.7, 0, yh); sky.addColorStop(0, '#3f8fe0'); sky.addColorStop(0.7, '#9fd0f5'); sky.addColorStop(1, '#e3f3fd'); c.fillStyle = sky; c.fillRect(0, 0, D, Math.min(D, yh) + 1); }
+    if (yh > 0) {
+      const sky = c.createLinearGradient(0, yh - D * 0.7, 0, yh); sky.addColorStop(0, '#3f8fe0'); sky.addColorStop(0.7, '#9fd0f5'); sky.addColorStop(1, '#e3f3fd'); c.fillStyle = sky; c.fillRect(0, 0, D, Math.min(D, yh) + 1);
+      /* a low sun ahead, with its light spread wide across the sky */
+      const sx = cx - D * 0.17, sy = yh - D * 0.045, sun = c.createRadialGradient(sx, sy, 0, sx, sy, D * 0.44); sun.addColorStop(0, 'rgba(255,252,236,.98)'); sun.addColorStop(0.07, 'rgba(255,244,208,.7)'); sun.addColorStop(0.3, 'rgba(255,238,196,.22)'); sun.addColorStop(1, 'rgba(255,238,196,0)');
+      c.fillStyle = sun; c.fillRect(0, 0, D, Math.min(D, yh) + 1);
+    }
     /* the ground, one thin strip of the map for each row of the picture */
     for (let y = Math.max(0, Math.floor(yh) + 1); y < D; y += STEP) {
       const s = (cy - (y + STEP / 2)) / F, dz = -sp + s * cp; if (dz > -0.0005) continue;
@@ -2896,7 +2951,7 @@ function siteIntro() {
   /* how fast the Earth turns while the camera leaves (slow, then quick, then easing), and how far it has turned by each moment */
   const spinAt = r => 0.25 + 4.15 * smooth(clamp((r - 0.08) / 0.5)) - 1.8 * smooth(clamp((r - 0.62) / 0.38)), TURN = [0];
   for (let i = 1; i <= 65; i++) TURN.push(TURN[i - 1] + spinAt((i - 0.5) / 64) * OUT / 64);
-  let clock = 0, last = 0, raf = 0, rot = 0, extra = 0, spin = 0.25, target = null, landed = false, landT = 0, skipped = false, finished = false, revealed = false, tick = 0;
+  let started = false, clock = 0, last = 0, raf = 0, rot = 0, extra = 0, spin = 0.25, target = null, landed = false, landT = 0, skipped = false, finished = false, revealed = false, tick = 0;
   const Rf = () => Math.min(W, H) * 0.17;
   function place() {
     if (!landed) return;
@@ -2916,7 +2971,7 @@ function siteIntro() {
     if (finished) return; raf = requestAnimationFrame(frame);
     const dt = last ? Math.min(0.045, (now - last) / 1000) : 0; last = now;
     /* the clock only starts once two frames have been drawn, so the first movement is not lost while the page is still loading */
-    if (++tick > 2) clock += dt; if (typeof window.__introT === 'number') clock = window.__introT;
+    if (started && ++tick > 2) clock += dt; if (typeof window.__introT === 'number') clock = window.__introT;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     const t = clock;
     if (t < RUN) {
@@ -2962,12 +3017,21 @@ function siteIntro() {
     if (!skipped && target) { HeroSync.rot = rot; HeroSync.speed = spin; }
     HeroSync.live = false; if (HeroSync.kick) HeroSync.kick();   // the page's globe draws itself in the same place, at the same turn, before this one goes
     document.body.classList.remove('intro-on', 'intro-globe'); el.remove();
-    if (!skipped) Sound.play('land');
+    /* the landing: the chime, and one ring of light leaving the globe as it settles */
+    if (!skipped) { Sound.play('land'); const st = document.querySelector('#stage'); if (st && target) { st.classList.add('landed'); setTimeout(() => st.classList.remove('landed'), 900); } }
   }
   const quit = () => { el.classList.add('skipping'); setTimeout(end, 240); };
   const skip = () => { if (skipped || finished || revealed) return; skipped = true; if (landed) quit(); };
-  el.addEventListener('click', skip); window.addEventListener('keydown', skip, { once: true });
-  Sound.unlock(); Sound.play('whoosh');   // plays if this browser already allows sound; a first visit is usually silent
+  function begin() {
+    if (started) return; started = true; el.classList.add('going'); gate.classList.add('gone'); setTimeout(() => gate.remove(), 560);
+    Sound.unlock(); Sound.play('whoosh');
+  }
+  const press = () => (started ? skip() : begin());
+  el.addEventListener('click', press);
+  const onKey = e => { if (finished) return window.removeEventListener('keydown', onKey); if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') press(); };
+  window.addEventListener('keydown', onKey);
+  if (!Sound.on) begin();
+  else { Sound.unlock(); setTimeout(() => { if (started || finished) return; if (Sound.ready()) begin(); else { gate.classList.add('ask'); const b = gate.querySelector('button'); if (b) b.focus({ preventScroll: true }); } }, 280); }
   raf = requestAnimationFrame(frame);
   return {
     /* the page is drawn underneath now, so the Earth knows where its place is */
@@ -3103,21 +3167,21 @@ async function saveAndTell(filename, blob) {
 /* ---------- the public shell: top bar, menu, footer ---------- */
 const NAV = [
   ['home', 'Home', 'compass'], ['about', 'About', 'flag'], ['notices', 'Notice', 'mail'], ['countdown', 'Schedule', 'clock'],
-  ['explore', 'Explore the Earth', 'globe'], ['results', 'Results', 'trophy'],
+  ['explore', 'Explore the Earth', 'globe'], ['eregional', 'E-Regional exam', 'edit'], ['results', 'Results', 'trophy'],
   ['team', 'Team', 'people'], ['faq', 'Questions', 'help'], ['contact', 'Contact', 'pin'],
 ];
 /* the links on the top bar of a tablet or computer: two drop-down groups, then the pages people open most.
    On a phone the bar keeps only the logo and buttons, and every page is listed under the menu button. */
 const BAR_MENU = [
   { label: 'About', items: [['about', 'About the olympiad'], ['team', 'Team and partners'], ['faq', 'Questions and answers'], ['contact', 'Contact']] },
-  { label: 'Resources', items: [['explore', 'Explore the Earth'], ['dashboard-resources', 'Study resources'], ['dashboard-exams', 'Online exams']] },
+  { label: 'Resources', items: [['explore', 'Explore the Earth'], ['dashboard-resources', 'Study resources'], ['eregional', 'E-Regional exam']] },
   { label: 'Notice', to: 'notices' }, { label: 'Schedule', to: 'countdown' }, { label: 'Results', to: 'results' }, { label: 'Registration', to: 'register' },
 ];
 const closeDrops = () => $$('.dd-btn[aria-expanded="true"]').forEach(b => { b.setAttribute('aria-expanded', 'false'); b.nextElementSibling.hidden = true; });
 function buildShell() {
   $('#site').innerHTML = `
   <header class="bar">
-    <a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, home"><img src="${LOGO_FULL}" alt="" width="560" height="263"></a>
+    <a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, home"><img src="${LOGO_FULL}" alt="" width="560" height="263" draggable="false"></a>
     <nav class="bar-links" aria-label="Main">
       ${BAR_MENU.map((m, i) => (m.items ? `<div class="dd"><button type="button" class="dd-btn" aria-expanded="false" data-dd="${i}">${m.label} ${icon('down', 14)}</button><div class="dd-menu" hidden>${m.items.map(x => `<a href="#${x[0]}" data-nav="${x[0]}">${x[1]}</a>`).join('')}</div></div>` : `<a href="#${m.to}" data-nav="${m.to}">${m.label}</a>`)).join('')}
     </nav>
@@ -3135,7 +3199,7 @@ function buildShell() {
   </nav></div>
   <main id="view" tabindex="-1"></main>
   <footer class="foot"><div class="wrap">
-    <img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263"><small>${CLOUD ? 'Bangladesh Geography Olympiad (BGeO)' : 'Preview build with sample data. Sign-ups made here stay in this browser only.'}</small>
+    <img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263" draggable="false"><small>${CLOUD ? 'Bangladesh Geography Olympiad (BGeO)' : 'Preview build with sample data. Sign-ups made here stay in this browser only.'}</small>
   </div><div class="wrap foot-base"><small>&copy; ${new Date().getFullYear()} Bangladesh Geography Olympiad. All rights reserved.</small></div></footer>`;
   const sb = $('#sound-btn');
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
@@ -3183,14 +3247,17 @@ function render() {
   const name = routeName();
   cleanups.forEach(f => { try { f(); } catch (e) { /* keep going */ } }); cleanups = [];
   closeMenu();
-  const isAdmin = name === 'admin' || name.startsWith('admin-');
+  /* old addresses of the exam list now lead to the exam portal */
+  if (name === 'exams' || name === 'dashboard-exams' || name === 'exam') { history.replaceState(null, '', '#eregional'); return render(); }
+  const isAdmin = name === 'admin' || name.startsWith('admin-'), isPortal = isExamRoute(name);
   /* the dashboard is its own screen, only for people who are logged in; visitors get the public site */
   const isDash = !isAdmin && isDashRoute(name) && !!Store.me();
-  document.body.classList.toggle('is-admin', isAdmin); document.body.classList.toggle('is-dash', isDash);
-  $('#site').hidden = isAdmin || isDash; $('#admin').hidden = !isAdmin; $('#dash').hidden = !isDash;
+  document.body.classList.toggle('is-admin', isAdmin); document.body.classList.toggle('is-dash', isDash || isPortal);
+  $('#site').hidden = isAdmin || isDash || isPortal; $('#admin').hidden = !isAdmin; $('#dash').hidden = !isDash; $('#examp').hidden = !isPortal;
+  if (isPortal) { renderPortal(name); window.scrollTo(0, 0); return; }
   if (isAdmin) { renderAdmin(name); window.scrollTo(0, 0); return; }
   if (isDash) { renderDash(DASH_ALIAS[name] || name); window.scrollTo(0, 0); setTimeout(mailMyCard, 600); return; }
-  const view = $('#view'), isExam = name.startsWith('exam-');
+  const view = $('#view');
   const page = isDashRoute(name) ? PAGES.dashgate() : (PAGES[name] || PAGES.home)();
   /* a fresh holder for every page, so one page's tap handlers can never fire on the next */
   const holder = document.createElement('div'); holder.innerHTML = page.html; view.replaceChildren(holder);
@@ -3241,16 +3308,16 @@ function newsDialog(n) {
 }
 const STEPS = [
   ['Register', 'Create your account on this website. It takes about two minutes.'],
-  ['Regional round', 'Sit the first test in your own region.'],
+  ['Regional round', 'Dhaka district sits it in person, with an admit card. Everyone else takes the E-Regional round online.'],
   ['National round', 'The best students from every region meet for the final.'],
   ['Team Bangladesh', 'Top performers train to represent the country at international olympiads.'],
 ];
 
 PAGES.home = () => {
-  const me = Store.me(), ev = Store.nextEvent(), notices = Store.notices().slice(0, 3), news = Store.news();
+  const me = Store.me(), ev = Store.nextEvent(), ex = Store.eRegional(), notices = Store.notices().slice(0, 3), news = Store.news();
   const gallery = (Store.db.settings.media || []).map(mediaItemHtml).filter(Boolean);
   const cta = me ? `<a class="btn btn-lime" href="#${me.role === 'admin' ? 'admin' : 'dashboard'}">${me.role === 'admin' ? 'Open the admin portal' : 'Open my dashboard'}</a>`
-    : Store.db.settings.regOpen ? '<a class="btn btn-lime" href="#register">Register now</a>' : '<span class="chip chip-sea">Registration is closed</span>';
+    : Store.db.settings.regOpen ? '<a class="btn btn-lime" href="#register">Register now!</a>' : '<span class="chip chip-sea">Registration is closed</span>';
   const year = REG_PREFIX.slice(0, 4), bn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
   return {
     html: `<div class="home">
@@ -3287,9 +3354,10 @@ PAGES.home = () => {
     </div></section>
     <section class="band"><div class="wrap">
       <h2>Learn and take part</h2>
-      <div class="doors doors-2">
-        <a class="door" href="#${me ? (me.role === 'admin' ? 'admin' : 'dashboard') : 'login'}"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke-width="3"><ellipse cx="70" cy="52" rx="54" ry="44"/><ellipse cx="72" cy="50" rx="40" ry="32"/><ellipse cx="74" cy="48" rx="26" ry="20"/><ellipse cx="76" cy="46" rx="12" ry="9"/></g></svg><h3>Participant dashboard</h3><p>${me ? 'Your admit card, online exams and study resources.' : 'Registered students log in here for their admit card, online exams and study resources.'}</p><span class="door-go">${me ? 'Open the dashboard' : 'Log in'} ${icon('next', 16)}</span></a>
+      <div class="doors">
+        <a class="door" href="#${me ? (me.role === 'admin' ? 'admin' : 'dashboard') : 'login'}"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke-width="3"><ellipse cx="70" cy="52" rx="54" ry="44"/><ellipse cx="72" cy="50" rx="40" ry="32"/><ellipse cx="74" cy="48" rx="26" ry="20"/><ellipse cx="76" cy="46" rx="12" ry="9"/></g></svg><h3>Participant dashboard</h3><p>${me ? 'Your admit card, study resources and notices.' : 'Registered students log in here for their admit card, study resources and notices.'}</p><span class="door-go">${me ? 'Open the dashboard' : 'Log in'} ${icon('next', 16)}</span></a>
         <a class="door" href="#explore"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke-width="3"><circle cx="68" cy="52" r="46"/><ellipse cx="68" cy="52" rx="20" ry="46"/><path d="M22 52h92M30 28h76M30 76h76"/></g></svg><h3>Explore the Earth</h3><p>Open to everyone: quick facts, small labs and a five-question quiz.</p><span class="door-go">Start exploring ${icon('next', 16)}</span></a>
+        <a class="door" href="#eregional"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke-width="3"><rect x="30" y="14" width="76" height="92" rx="10"/><path d="M46 40h44M46 58h44M46 76h26"/></g></svg><h3>E-Regional round</h3><p>${ex ? (Store.examState(ex) === 'live' ? 'The online round is open now.' : Store.examState(ex) === 'soon' ? `The online round opens on ${fmtDate(ex.opensAt)}.` : 'The online round has been held. See your result.') : 'The online round, taken from home in the exam portal.'}</p><span class="door-go">Open the exam portal ${icon('next', 16)}</span></a>
       </div>
       ${gallery.length ? `<div class="sub reel-wrap"><h2>Photos and videos</h2><div class="reel media-reel" tabindex="0" aria-label="Photos and videos" style="margin-top:22px">${gallery.join('')}</div></div>` : ''}
     </div></section>
@@ -3390,35 +3458,12 @@ PAGES.countdown = () => {
   };
 };
 
-/* ---------- online exams (list) ---------- */
+/* ---------- the exam's leaderboard ---------- */
 async function boardDialog(ex) {
   let rows; try { rows = (await Store.loadBoard(ex.id)).slice(0, 20); } catch (e) { return toast(e.message, 'bad'); }
   const me = Store.me();
   openDialog({ title: 'Leaderboard', html: `<p class="muted">${esc(ex.title)}</p>${rows.length ? `<div class="tablewrap"><table style="min-width:0"><thead><tr><th>Rank</th><th>Name</th><th class="num">Score</th><th class="num">Time</th></tr></thead><tbody>${rows.map(r => `<tr class="${me && r.user.id === me.id ? 'me' : ''}"><td><span class="rank r${r.rank}">${r.rank}</span></td><td>${esc(r.user.name)}<br><small class="muted">${esc(r.user.region || '')}</small></td><td class="num">${r.attempt.score}/${ex.questions.length}</td><td class="num">${Math.floor(r.attempt.secs / 60)}:${pad2(r.attempt.secs % 60)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="empty">Nobody has finished this exam yet.</p>'}` });
 }
-PAGES.exams = () => {
-  const me = Store.me(), exams = Store.all('exams').filter(e => e.published).sort((a, b) => new Date(a.opensAt) - new Date(b.opensAt));
-  const card = ex => {
-    const st = Store.examState(ex), at = me ? Store.attempt(ex.id, me.id) : null;
-    const chip = st === 'live' ? '<span class="chip chip-live">Open now</span>' : st === 'soon' ? `<span class="chip chip-soon">Opens in ${shortSpan(new Date(ex.opensAt) - Date.now()).replace(/ \d+s$/, '')}</span>` : '<span class="chip chip-done">Closed</span>';
-    let act = '';
-    if (st === 'live') act = `<a class="btn btn-ocean" href="#exam-${ex.id}">${at && !at.submittedAt ? 'Continue exam' : at ? 'See my result' : 'Start exam'}</a>`;
-    else if (st === 'done' && at) act = `<a class="btn btn-ocean" href="#exam-${ex.id}">See my result</a>`;
-    return `<article class="ticket ${st === 'live' ? 'live' : ''}">
-      <div class="between"><h3 style="font-size:1.4rem">${esc(ex.title)}</h3><div class="chips">${chip}${sampleChip(ex)}</div></div>
-      ${ex.description ? `<p>${esc(ex.description)}</p>` : ''}
-      <div class="ticket-facts"><span>${icon('list', 18)} ${plural(ex.questions.length, 'question')}</span><span>${icon('clock', 18)} ${plural(ex.minutes, 'minute')}</span><span>${icon('calendar', 18)} ${st === 'soon' ? 'Opens ' + fmtDateTime(ex.opensAt) : 'Closes ' + fmtDateTime(ex.closesAt)}</span></div>
-      <div class="btnrow">${act}<button type="button" class="btn btn-quiet btn-sm" data-board="${ex.id}">Leaderboard</button></div>
-    </article>`;
-  };
-  return {
-    html: `<div class="wrap">${pageHead('Online exams', 'Multiple-choice tests with a timer. The clock starts when you press Start.')}
-      <div class="stack">${exams.map(card).join('') || '<div class="sheet"><p class="empty">No online exams are scheduled yet.</p></div>'}</div>
-      ${me ? '' : '<p class="note onblue" style="margin-top:16px">Log in or register first, then come back here to start an exam.</p>'}</div>`,
-    mount(v) { v.addEventListener('click', e => { const b = e.target.closest('[data-board]'); if (b) boardDialog(Store.get('exams', b.dataset.board)); }); },
-  };
-};
-
 /* ---------- resources ---------- */
 PAGES.resources = () => {
   const list = Store.all('resources').slice().sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
@@ -3689,6 +3734,8 @@ PAGES.contact = () => {
 /* ---------- log in, register, my account ---------- */
 const logoImg = new Image(); logoImg.src = LOGO_FULL;
 const simplePage = (title, text, href, label) => ({ html: `<div class="wrap narrow">${pageHead(title)}<section class="sheet stack"><p>${esc(text)}</p><div><a class="btn btn-ocean" href="${href}">${esc(label)}</a></div></section></div>` });
+let loginNext = '';
+const afterLogin = role => { const n = loginNext; loginNext = ''; return role === 'admin' ? 'admin' : (n || 'dashboard'); };
 const needLogin = text => ({ html: `<div class="wrap narrow">${pageHead('Please log in')}<section class="sheet stack"><p>${esc(text)}</p><div class="btnrow"><a class="btn btn-ocean" href="#login">Log in</a><a class="btn btn-quiet" href="#register">Register</a></div></section></div>` });
 const previewNote = CLOUD ? '' : '<p class="note">Preview: accounts made here are saved in this browser only. Real sign-up starts when the online database is connected.</p>';
 function forgotDialog() {
@@ -3702,10 +3749,10 @@ function recoveryDialog() {
 }
 
 PAGES.login = () => {
-  if (Store.me()) return Store.me().role === 'admin' ? simplePage('You are logged in', 'This is an admin account.', '#admin', 'Open the admin portal') : simplePage('You are logged in', 'Your exams, resources and admit card are in your dashboard.', '#dashboard', 'Open my dashboard');
+  if (Store.me()) return Store.me().role === 'admin' ? simplePage('You are logged in', 'This is an admin account.', '#admin', 'Open the admin portal') : simplePage('You are logged in', 'Your exam, resources and admit card are in your dashboard.', '#dashboard', 'Open my dashboard');
   const fields = [{ key: 'email', label: 'Email', type: 'email', required: true, auto: 'email' }, { key: 'password', label: 'Password', type: 'password', required: true, auto: 'current-password' }];
   return {
-    html: `<div class="wrap narrow">${pageHead('Log in', 'Open your account to see your registration card, exams and notices.')}
+    html: `<div class="wrap narrow">${pageHead('Log in', 'Open your account to see your admit card, the E-Regional exam and your notices.')}
       <section class="sheet"><form class="form" id="login-form" novalidate>${fields.map(f => fieldHtml(f, '', 'li')).join('')}
         <p class="err" role="alert" hidden></p>
         <div class="btnrow"><button class="btn btn-ocean" type="submit">Log in</button><button type="button" class="btn btn-quiet btn-sm" id="forgot">Forgot password</button></div>
@@ -3718,7 +3765,7 @@ PAGES.login = () => {
         e.preventDefault(); const vals = readForm(form, fields), btn = $('button[type=submit]', form);
         btn.disabled = true; const r = await Store.signIn(vals.email, form.elements.password.value); if (btn.isConnected) btn.disabled = false;
         if (r.error) { err.textContent = r.error; err.hidden = false; Sound.play('bad'); return; }
-        toast(`Welcome back, ${r.user.name.split(' ')[0]}`, 'good'); go(r.user.role === 'admin' ? 'admin' : 'dashboard');
+        toast(`Welcome back, ${r.user.name.split(' ')[0]}`, 'good'); go(afterLogin(r.user.role));
       });
       v.addEventListener('click', e => { const b = e.target.closest('[data-sample]'); if (!b) return; const [em, pw] = SAMPLE_LOGIN[b.dataset.sample]; form.elements.email.value = em; form.elements.password.value = pw; Sound.play('pick'); form.elements.password.focus(); });
       $('#forgot', v).onclick = forgotDialog;
@@ -3816,7 +3863,7 @@ PAGES.register = () => {
         if (btn.isConnected) { btn.disabled = false; btn.textContent = label; }
         if (r.error) { err.textContent = r.error; err.hidden = false; Sound.play('bad'); err.scrollIntoView({ block: 'center' }); return; }
         if (r.confirm) { Sound.play('good'); v.innerHTML = `<div class="wrap narrow">${pageHead('Check your email')}<section class="sheet stack"><p>We sent a confirmation link to <b>${esc(r.email)}</b>. Open it, then log in here.</p><div><a class="btn btn-ocean" href="#login">Go to log in</a></div></section></div>`; return window.scrollTo(0, 0); }
-        Sound.play('win'); toast('You are registered. Welcome to BGeO.', 'good'); go('dashboard');
+        Sound.play('win'); toast('You are registered. Welcome to BGeO.', 'good'); go(afterLogin('participant'));
       });
     },
   };
@@ -3972,7 +4019,7 @@ DASH.dashboard = () => {
   if (u.role === 'admin') return simplePage('Admin account', 'You are logged in as an admin. The admin portal is where you manage the olympiad. The Exams and Resources tabs above show what students see.', '#admin', 'Open the admin portal');
   const msgs = Store.messagesFor(u.id), s = Store.db.settings, national = hasNationalCard(u), regional = regionalOpen(u), ev = Store.nextEvent();
   const done = Store.all('attempts').filter(a => a.userId === u.id && a.submittedAt).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-  const live = Store.all('exams').filter(e => e.published && Store.examState(e) === 'live').length;
+  const ex = Store.eRegional(), exState = ex ? Store.examState(ex) : '', exDone = ex ? done.find(a => a.examId === ex.id) : null;
   const cardBox = (kind, title, note) => { const id = kind === 'national' ? 'card-nat' : 'card'; return `<div class="cardbox"><div><h3>${title}</h3><p class="muted">${note}</p></div><div class="cardprev" id="${id}"></div>
     <div class="btnrow"><button type="button" class="btn btn-ocean" id="${id}-pdf">${icon('download', 18)} Download PDF</button><button type="button" class="btn btn-quiet" id="${id}-dl">${icon('image', 18)} Save as a picture</button></div></div>`; };
   return {
@@ -3984,7 +4031,7 @@ DASH.dashboard = () => {
       </header>
       <div class="dash-facts">
         <a href="#countdown"><small>Next date</small><b>${ev ? esc(ev.label) : 'To be announced'}</b><span>${ev ? fmtDateTime(ev.at) : 'Watch Notices'}</span></a>
-        <a href="#dashboard-exams"><small>Online exams</small><b>${live ? plural(live, 'exam') + ' open now' : 'None open now'}</b><span>${plural(done.length, 'exam')} finished</span></a>
+        <a href="#eregional"><small>E-Regional round</small><b>${!ex ? 'Not scheduled yet' : exDone ? 'Handed in' : exState === 'live' ? 'Open now' : exState === 'soon' ? 'Opens ' + fmtDate(ex.opensAt) : 'Closed'}</b><span>${exDone ? `Your score: ${exDone.score} of ${ex.questions.length}` : 'The online exam, in its own portal'}</span></a>
         <a href="#dashboard-resources"><small>Resources</small><b>${plural(Store.all('resources').length, 'item')}</b><span>Notes, papers and reading</span></a>
       </div>
       <div class="acct-grid">
@@ -3999,8 +4046,9 @@ DASH.dashboard = () => {
         </div>
         <aside class="acct-side">
           <section class="sheet"><h2>My notices</h2><div class="stack" style="margin-top:12px">${msgs.map(m => `<div class="msg ${m.kind === 'selected' ? 'sel' : ''}"><h3>${esc(m.title)}</h3><p>${esc(m.body)}</p><small class="muted">${fmtDateTime(m.at)}</small></div>`).join('') || '<p class="muted">No personal notices yet.</p>'}</div></section>
-          <section class="sheet"><div class="between"><h2>My exam results</h2><a class="btn btn-quiet btn-sm" href="#dashboard-exams">All exams</a></div>
-            <div style="margin-top:6px">${done.slice(0, 5).map(a => { const ex = Store.get('exams', a.examId); return ex ? `<div class="rowi"><div class="grow"><h3>${esc(ex.title)}</h3><p>${fmtDateTime(a.submittedAt)}</p></div><b class="chip chip-live">${a.score} / ${ex.questions.length}</b></div>` : ''; }).join('') || '<p class="muted" style="padding-top:8px">You have not finished an exam yet.</p>'}</div></section>
+          <section class="sheet"><h2>E-Regional round</h2>
+            <p class="muted" style="margin-top:8px">${!ex ? 'The online round has not been scheduled yet. Watch Notices for the date.' : exDone ? `You handed in the exam on ${fmtDateTime(exDone.submittedAt)}. Your score is ${exDone.score} of ${ex.questions.length}.` : exState === 'live' ? `The exam is open until ${fmtDateTime(ex.closesAt)}. You get ${plural(ex.minutes, 'minute')} once you press Start.` : exState === 'soon' ? `The exam opens on ${fmtDateTime(ex.opensAt)}, Bangladesh time.` : 'The exam is closed.'}</p>
+            <div style="margin-top:12px"><a class="btn ${exState === 'live' && !exDone ? 'btn-ocean' : 'btn-quiet'} btn-sm" href="#eregional">Open the exam portal ${icon('next', 16)}</a></div></section>
         </aside>
       </div>
     </div>`,
@@ -4021,7 +4069,6 @@ DASH.dashboard = () => {
     },
   };
 };
-DASH['dashboard-exams'] = () => PAGES.exams();
 DASH['dashboard-resources'] = () => PAGES.resources();
 DASH['dashboard-me'] = () => {
   const u = Store.me();
@@ -4043,13 +4090,13 @@ DASH['dashboard-me'] = () => {
     },
   };
 };
-const DASH_TABS = [['dashboard', 'Overview', 'compass'], ['dashboard-exams', 'Online exams', 'edit'], ['dashboard-resources', 'Resources', 'book'], ['dashboard-me', 'My details', 'user']];
+const DASH_TABS = [['dashboard', 'Overview', 'compass'], ['dashboard-resources', 'Resources', 'book'], ['dashboard-me', 'My details', 'user']];
 /* old addresses that now live inside the dashboard */
-const DASH_ALIAS = { account: 'dashboard', exams: 'dashboard-exams', resources: 'dashboard-resources' };
-const isDashRoute = name => { const n = DASH_ALIAS[name] || name; return n === 'dashboard' || n.startsWith('dashboard-') || n.startsWith('exam-'); };
+const DASH_ALIAS = { account: 'dashboard', resources: 'dashboard-resources' };
+const isDashRoute = name => { const n = DASH_ALIAS[name] || name; return n === 'dashboard' || n.startsWith('dashboard-'); };
 function renderDash(name) {
-  const root = $('#dash'), u = Store.me(), isExam = name.startsWith('exam-');
-  const tab = isExam ? 'dashboard-exams' : DASH_TABS.some(t => t[0] === name) ? name : 'dashboard';
+  const root = $('#dash'), u = Store.me();
+  const tab = DASH_TABS.some(t => t[0] === name) ? name : 'dashboard';
   root.innerHTML = `<header class="dash-top"><a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, public site"><img src="${LOGO_FULL}" alt="" width="560" height="263"></a><b>${u.role === 'admin' ? 'Dashboard preview' : 'Dashboard'}</b>
       <div class="sp">${cardOpenFor(u) ? `<button type="button" class="btn btn-lime btn-sm" id="dash-card">Admit card ${icon('download', 16)}</button>` : ''}<a class="btn btn-ghost btn-sm" href="#home" aria-label="Public site">${icon('globe', 18)}<span>Public site</span></a><button type="button" class="iconbtn" id="logout" aria-label="Log out" title="Log out">${icon('out')}</button></div></header>
     <nav class="dash-tabs" aria-label="Dashboard sections">${DASH_TABS.map(t => `<a href="#${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${icon(t[2], 18)} ${t[1]}</a>`).join('')}</nav>
@@ -4058,56 +4105,89 @@ function renderDash(name) {
   /* one tap downloads the admit card as a PDF: the National round card if the student has one, otherwise the Regional round card */
   const dc = $('#dash-card', root); if (dc) dc.onclick = () => downloadMyCard(dc);
   const cur = $('.dash-tabs [aria-current]', root); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
-  const page = isExam ? pageExam(name.slice(5)) : DASH[tab]();
+  const page = DASH[tab]();
   const holder = document.createElement('div'); holder.innerHTML = page.html; $('#dash-view', root).replaceChildren(holder);
   if (page.mount) page.mount(holder);
-  document.title = `${isExam ? 'Online exam' : DASH_TABS.find(t => t[0] === tab)[1]} | BGeO dashboard`;
+  document.title = `${DASH_TABS.find(t => t[0] === tab)[1]} | BGeO dashboard`;
 }
 /* what a visitor sees if they open a dashboard address without being logged in */
-PAGES.dashgate = () => ({ html: `<div class="wrap narrow">${pageHead('Participant dashboard', 'Online exams, study resources and your admit card are in the dashboard, for registered students.')}
+PAGES.dashgate = () => ({ html: `<div class="wrap narrow">${pageHead('Participant dashboard', 'Your admit card, study resources and notices are in the dashboard, for registered students.')}
   <section class="sheet stack"><p>Log in to open your dashboard. New here? Register first. It takes about two minutes.</p><div class="btnrow"><a class="btn btn-ocean" href="#login">Log in</a>${Store.db.settings.regOpen ? '<a class="btn btn-quiet" href="#register">Register</a>' : ''}</div></section></div>` });
 
 /* ---------- taking an exam ---------- */
 const examDeadline = (ex, at) => (at.deadline ? new Date(at.deadline).getTime() : Math.min(new Date(at.startedAt).getTime() + ex.minutes * 60000, new Date(ex.closesAt).getTime()));
 const examFresh = {};
 const clock = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${pad2(s % 60)}`; };
+/* ---------- the exam portal: a screen of its own, only for the E-Regional round ---------- */
+const isExamRoute = name => name === 'eregional' || name.startsWith('exam-');
+/* students who sit the Regional round in person do not take the online one, when the organisers have switched that rule on */
+const offlineOnly = u => !!(Store.db.settings.examSplit && u && u.role === 'participant' && Store.cardDistricts().length && Store.districtOpen(u));
+const examFacts = ex => `<dl class="xfacts"><div><dt>Opens</dt><dd>${fmtDateTime(ex.opensAt)}</dd></div><div><dt>Closes</dt><dd>${fmtDateTime(ex.closesAt)}</dd></div><div><dt>Time allowed</dt><dd>${plural(ex.minutes, 'minute')}</dd></div><div><dt>Questions</dt><dd>${ex.questions.length || 'To be announced'}</dd></div></dl>`;
+const examShell = (ex, body, lead) => `<div class="wrap narrow xwrap">${pageHead(ex ? ex.title : 'E-Regional round', lead || (ex && ex.description) || 'The online round of the olympiad.')}${ex ? examFacts(ex) : ''}${body}</div>`;
+function renderPortal(name) {
+  const root = $('#examp'), u = Store.me(), ex = name.startsWith('exam-') ? Store.get('exams', name.slice(5)) : Store.eRegional();
+  root.classList.remove('in-exam');
+  root.innerHTML = `<header class="dash-top"><a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, public site"><img src="${LOGO_FULL}" alt="" width="560" height="263" draggable="false"></a><b>Exam portal</b>
+      <div class="sp">${u ? `<a class="btn btn-ghost btn-sm" href="#${u.role === 'admin' ? 'admin' : 'dashboard'}" aria-label="${u.role === 'admin' ? 'Admin portal' : 'Dashboard'}">${icon('account', 18)}<span>${u.role === 'admin' ? 'Admin' : 'Dashboard'}</span></a><button type="button" class="iconbtn" id="x-logout" aria-label="Log out" title="Log out">${icon('out')}</button>`
+        : `<a class="btn btn-ghost btn-sm" href="#login" data-login>${icon('account', 18)}<span>Login</span></a>`}</div></header>
+    <main id="exam-view"></main>`;
+  const out = $('#x-logout', root); if (out) out.onclick = async () => { await Store.signOut(); toast('You are logged out'); render(); };
+  const page = portalPage(ex, u), holder = document.createElement('div'); holder.innerHTML = page.html; $('#exam-view', root).replaceChildren(holder);
+  /* logging in from here brings the student straight back to the exam */
+  $$('[data-login]', root).forEach(a => a.addEventListener('click', () => { loginNext = 'eregional'; }));
+  if (page.mount) page.mount(holder);
+  document.title = 'E-Regional exam | Bangladesh Geography Olympiad';
+}
+function portalPage(ex, u) {
+  if (!ex || !ex.published) return { html: examShell(null, `<section class="sheet stack"><h2>Not scheduled yet</h2><p>The date of the E-Regional round has not been announced. It will be posted in Notices, and this page will show the exam when it is ready.</p><div><a class="btn btn-ocean" href="#notices">See notices</a></div></section>`) };
+  const st = Store.examState(ex), when = st === 'soon' ? `The exam opens on ${fmtDateTime(ex.opensAt)}, Bangladesh time.` : st === 'live' ? `The exam is open now, until ${fmtDateTime(ex.closesAt)}.` : 'The exam is closed.';
+  if (!u) return { html: examShell(ex, `<section class="sheet stack"><h2>Log in to take the exam</h2><p>${when} You take it with your olympiad account.</p><div class="btnrow"><a class="btn btn-ocean" href="#login" data-login>Log in</a>${Store.db.settings.regOpen ? '<a class="btn btn-quiet" href="#register" data-login>Register</a>' : ''}</div></section>`) };
+  if (u.role !== 'participant') return { html: examShell(ex, `<section class="sheet stack"><h2>You are logged in as an admin</h2><p>${when} Students take the exam here. You set it up, add the questions and see the results in the admin portal.</p><div><a class="btn btn-ocean" href="#admin-exams">Open the exam settings</a></div></section>`) };
+  if (offlineOnly(u)) return { html: examShell(ex, `<section class="sheet stack"><h2>You sit the Regional round in person</h2><p>Students from ${esc(u.district)} take the Regional round at the venue, not online. Your admit card is in your dashboard.</p><div><a class="btn btn-ocean" href="#dashboard">Open my dashboard</a></div></section>`) };
+  return pageExam(ex.id);
+}
 function pageExam(id) {
   const ex = Store.get('exams', id), me = Store.me();
-  if (!ex || !ex.published) return simplePage('Exam not found', 'This exam does not exist or is not open to students.', '#dashboard-exams', 'Back to exams');
-  if (!me) return needLogin('Log in to take this exam.');
-  if (me.role !== 'participant') return simplePage(ex.title, 'Admins manage exams from the admin portal. Log in as a student to take one.', '#admin-exams', 'Open exam admin');
   /* online: fetch this exam's questions and my attempts first, then draw the page */
   if (CLOUD && Date.now() - (examFresh[id] || 0) > 4000) return {
-    html: `<div class="wrap narrow">${pageHead(ex.title)}<section class="sheet"><p class="empty">Loading the exam…</p></section></div>`,
-    mount() { Store.loadExam(id).then(() => { examFresh[id] = Date.now(); if (routeName() === 'exam-' + id) render(); }, e => toast(e.message, 'bad')); },
+    html: examShell(ex, '<section class="sheet"><p class="empty">Loading the exam…</p></section>'),
+    mount() { Store.loadExam(id).then(() => { examFresh[id] = Date.now(); if (isExamRoute(routeName())) render(); }, e => toast(e.message, 'bad')); },
   };
   let at = Store.attempt(ex.id, me.id);
   if (!CLOUD && at && !at.submittedAt && examDeadline(ex, at) <= Date.now()) at = Store.finish(at.id);
   const st = Store.examState(ex);
   if (at && at.submittedAt) return examResult(ex, at, st);
-  if (st === 'soon') return simplePage(ex.title, `This exam opens on ${fmtDateTime(ex.opensAt)}, Bangladesh time.`, '#dashboard-exams', 'Back to exams');
-  if (st === 'done') return simplePage(ex.title, 'This exam is closed.', '#dashboard-exams', 'Back to exams');
-  if (at && !ex.questions.every(Boolean)) return simplePage(ex.title, 'The questions could not be loaded. Go back and open the exam again.', '#dashboard-exams', 'Back to exams');
+  if (st === 'soon') return examSoon(ex);
+  if (st === 'done') return { html: examShell(ex, '<section class="sheet stack"><h2>The exam is closed</h2><p>The E-Regional round has ended, and you did not take it. Results are posted on the Results page.</p><div><a class="btn btn-ocean" href="#results">See results</a></div></section>') };
+  if (at && !ex.questions.every(Boolean)) return { html: examShell(ex, '<section class="sheet stack"><h2>The questions did not load</h2><p>Check your internet connection and load the exam again. Your time is still running.</p><div><button type="button" class="btn btn-ocean" onclick="location.reload()">Load again</button></div></section>') };
   return at ? examRun(ex, at) : examIntro(ex);
 }
+/* before the exam opens: the time left, counted down; the Start button appears by itself when it reaches zero */
+function examSoon(ex) {
+  return {
+    html: examShell(ex, `<section class="sheet stack xsoon"><h2>Opens in</h2><p class="xcount" id="xcount" role="timer">${shortSpan(new Date(ex.opensAt) - Date.now())}</p><p class="muted">Keep this page open, or come back at ${fmtDateTime(ex.opensAt)}, Bangladesh time. The Start button appears here when the exam opens.</p></section>${examRules(ex)}`),
+    mount(v) { const el = $('#xcount', v), t = setInterval(() => { if (!el.isConnected) return clearInterval(t); const left = new Date(ex.opensAt) - Date.now(); if (left <= 0) { clearInterval(t); render(); } else el.textContent = shortSpan(left); }, 1000); onLeave(() => clearInterval(t)); },
+  };
+}
+const examRules = ex => `<section class="sheet stack"><h2>How the exam works</h2><ul class="xrules">
+  <li>The timer starts when you press Start. It cannot be paused.</li><li>Each question has one correct answer. You can go back and change an answer until you hand in.</li>
+  <li>The exam is handed in by itself when your time runs out, or when the exam closes.</li><li>${ex.retake ? 'You may take the exam more than once.' : 'You get one try. Make sure your internet connection is steady before you start.'}</li></ul></section>`;
 function examIntro(ex) {
   return {
-    html: `<div class="wrap narrow">${pageHead(ex.title, ex.description)}
-      <section class="sheet stack"><h2>Before you start</h2>
-        <div class="ticket-facts"><span>${icon('list', 18)} ${plural(ex.questions.length, 'question')}</span><span>${icon('clock', 18)} ${plural(ex.minutes, 'minute')}</span></div>
-        <p>The timer starts when you press Start and cannot be paused. Each question has one correct answer. The exam is handed in automatically when the time runs out.</p>
-        <div class="btnrow"><button type="button" class="btn btn-ocean" id="begin">Start the exam</button><a class="btn btn-quiet" href="#dashboard-exams">Not now</a></div></section></div>`,
+    html: examShell(ex, `${examRules(ex)}<section class="sheet stack"><h2>Ready?</h2><p>You have ${plural(ex.minutes, 'minute')} for ${plural(ex.questions.length, 'question')}, from the moment you press Start.</p>
+        <div class="btnrow"><button type="button" class="btn btn-ocean" id="begin">Start the exam</button><a class="btn btn-quiet" href="#dashboard">Not now</a></div></section>`),
     mount(v) { $('#begin', v).onclick = e => busy(e.currentTarget, async () => { await Store.begin(ex.id); examFresh[ex.id] = Date.now(); Sound.play('good'); render(); }); },
   };
 }
 function examRun(ex, at) {
   const n = ex.questions.length; let cur = Math.max(0, at.answers.findIndex(a => a == null)); if (at.answers.every(a => a != null)) cur = n - 1;
   return {
-    html: `<div class="wrap narrow">
+    html: `<div class="wrap narrow xwrap">
       <div class="exam-top"><b>${esc(ex.title)}</b><span class="timer" id="timer" role="timer" aria-label="Time left">${icon('clock', 22)}<span></span></span></div>
       <section class="sheet stack" id="qbox"></section>
       <section class="sheet stack"><h3>All questions</h3><div class="qmap" id="qmap"></div><div><button type="button" class="btn btn-ocean" id="handin">Hand in the exam</button></div></section></div>`,
     mount(v) {
+      $('#examp').classList.add('in-exam'); onLeave(() => $('#examp').classList.remove('in-exam'));
       const qbox = $('#qbox', v), qmap = $('#qmap', v), timer = $('#timer', v), tspan = $('span', timer), end = examDeadline(ex, at);
       const draw = () => {
         const q = ex.questions[cur];
@@ -4146,11 +4226,11 @@ function examResult(ex, at, st) {
   const n = ex.questions.length, canRetake = ex.retake && st === 'live';
   const canReview = ex.review && n > 0 && ex.questions.every(q => q && q.answer != null);
   return {
-    html: `<div class="wrap narrow">${pageHead(ex.title, 'Your result')}
+    html: `<div class="wrap narrow xwrap">${pageHead(ex.title, 'Your result')}
       <section class="sheet stack">
         <p class="score">${at.score}<small> / ${n}</small></p>
         <div class="ticket-facts"><span>${icon('clock', 18)} ${Math.floor(at.secs / 60)} min ${at.secs % 60} s</span><span id="rank"></span></div>
-        <div class="btnrow">${canRetake ? '<button type="button" class="btn btn-ocean" id="again">Try again</button>' : ''}<button type="button" class="btn btn-quiet" id="board">Leaderboard</button><a class="btn btn-quiet" href="#dashboard-exams">Back to exams</a></div>
+        <div class="btnrow">${canRetake ? '<button type="button" class="btn btn-ocean" id="again">Try again</button>' : ''}<button type="button" class="btn btn-quiet" id="board">Leaderboard</button><a class="btn btn-quiet" href="#dashboard">Back to my dashboard</a></div>
       </section>
       ${canReview ? `<section class="sheet"><h2>Check your answers</h2><div class="review">${ex.questions.map((q, i) => `<div class="stack"><p class="qtext">${i + 1}. ${esc(q.q)}</p><div class="opts">${q.options.map((o, k) => `<button type="button" class="opt ${k === q.answer ? 'right' : at.answers[i] === k ? 'wrong' : ''}" disabled><span class="key">${'ABCD'[k]}</span><span>${esc(o)}${k === q.answer ? ' (correct)' : at.answers[i] === k ? ' (your answer)' : ''}</span></button>`).join('')}</div>${at.answers[i] == null ? '<small class="muted">You did not answer this one.</small>' : ''}</div>`).join('')}</div></section>` : '<p class="note onblue" style="margin-top:16px">The correct answers for this exam are not shown.</p>'}
     </div>`,
@@ -4165,7 +4245,7 @@ function examResult(ex, at, st) {
 /* ---------- admin portal: its own screen, only for admin accounts ---------- */
 const ADMIN_TABS = [
   ['admin', 'Overview', 'compass'], ['admin-people', 'Participants', 'people'], ['admin-attend', 'Attendance', 'check'], ['admin-notices', 'Notices', 'mail'], ['admin-news', 'News', 'list'], ['admin-resources', 'Resources', 'book'],
-  ['admin-home', 'Home page', 'image'], ['admin-dates', 'Dates', 'calendar'], ['admin-exams', 'Exams', 'edit'], ['admin-results', 'Results', 'trophy'], ['admin-emails', 'Emails', 'mail'], ['admin-site', 'Site', 'gear'],
+  ['admin-home', 'Home page', 'image'], ['admin-dates', 'Dates', 'calendar'], ['admin-exams', 'E-Regional exam', 'edit'], ['admin-results', 'Results', 'trophy'], ['admin-emails', 'Emails', 'mail'], ['admin-site', 'Site', 'gear'],
 ];
 const ADMIN = {};
 function renderAdmin(name) {
@@ -4212,7 +4292,7 @@ function setupSteps() {
     { done: real('notices').length > 0, title: 'Post your first notice', why: 'Quick notices are ready to fill in.', href: '#admin-notices', go: 'Write a notice' },
     { done: real('team').some(t => t.name && t.name !== 'Name to be added'), title: 'Name the team and partners', why: 'They appear on the Team page.', href: '#admin-site', go: 'Add names' },
     { done: real('resources').some(r => safeUrl(r.url)), title: 'Add a study resource', why: 'Paste a link to a file or video.', href: '#admin-resources', go: 'Add a resource' },
-    { done: real('exams').some(e => e.published && e.questions.length > 0), title: 'Publish an online exam', why: 'You can paste all the questions in one go.', href: '#admin-exams', go: 'Set up an exam' },
+    { done: real('exams').some(e => e.published && e.questions.length > 0), title: 'Set up the E-Regional exam', why: 'The one online exam. You can paste all the questions in one go.', href: '#admin-exams', go: 'Set up the exam' },
   ];
 }
 ADMIN.admin = main => {
@@ -4255,7 +4335,7 @@ function personDialog(p, after) {
       <dt>Class</dt><dd>Class ${esc(p.klass)} (${esc(p.category)})</dd><dt>Division</dt><dd>${esc(p.region || 'Not given')}</dd><dt>District</dt><dd>${esc(p.district || 'Not chosen yet')}</dd><dt>Registered</dt><dd>${fmtDateTime(p.createdAt)}</dd>
       <dt>Selected for</dt><dd>${(p.selected || []).map(s => esc(s.round)).join(', ') || 'Nothing yet'}</dd>
       <dt>Attendance</dt><dd id="pd-att"></dd>
-      <dt>Online exams</dt><dd>${tries.map(a => { const ex = Store.get('exams', a.examId); return ex ? `${esc(ex.title)}: ${a.score}/${ex.questions.length}` : ''; }).filter(Boolean).join('<br>') || 'None finished'}</dd></dl>
+      <dt>E-Regional exam</dt><dd>${tries.map(a => { const ex = Store.get('exams', a.examId); return ex ? `${esc(ex.title)}: ${a.score}/${ex.questions.length}` : ''; }).filter(Boolean).join('<br>') || 'None finished'}</dd></dl>
     <div class="cardprev" id="pd-card"></div>
     <div class="dlg-actions"><button type="button" class="btn btn-danger btn-sm" data-rm>Remove participant</button><button type="button" class="btn btn-quiet btn-sm" data-ed>Edit details</button><button type="button" class="btn btn-quiet btn-sm" data-att>Mark present</button>${(p.selected || []).length ? '<button type="button" class="btn btn-quiet btn-sm" data-unsel>Clear selection</button>' : ''}<button type="button" class="btn btn-ocean btn-sm" data-sel>Mark as selected</button></div>` });
   const pdCard = $('#pd-card', d), paintCards = () => { pdCard.innerHTML = ''; if (hasNationalCard(p)) pdCard.appendChild(drawCard(p, 'national')); pdCard.appendChild(drawCard(p, 'regional')); };
@@ -4466,11 +4546,11 @@ const NOTICE_TEMPLATES = [
   { name: 'Date and venue of a round',
     fields: [{ key: 'round', label: 'Which round', type: 'select', options: ROUNDS.slice(0, 2) }, { key: 'region', label: 'Region (leave empty if it is for everyone)' }, { key: 'date', label: 'Date', placeholder: 'For example: Saturday, 19 December 2026', required: true }, { key: 'time', label: 'Reporting time', placeholder: 'For example: 9:00 am', required: true }, { key: 'venue', label: 'Venue', required: true }, { key: 'bring', label: 'What to bring', placeholder: 'For example: registration card, school ID, pen' }],
     make: v => [`${v.round}${v.region ? ', ' + v.region : ''}: date and venue`, `The ${v.round}${v.region ? ' for ' + v.region : ''} will be held on ${v.date}.\n\nVenue: ${v.venue}\nReporting time: ${v.time}${v.bring ? '\nBring with you: ' + v.bring : ''}\n\nPlease arrive on time.`], tagFrom: 'round' },
-  { name: 'Online exam announced', tag: 'Online exam',
+  { name: 'E-Regional exam announced', tag: 'E-Regional',
     fields: [{ key: 'exam', label: 'Name of the exam', required: true }, { key: 'opens', label: 'When it opens', placeholder: 'For example: Friday, 4 December, 6:00 pm', required: true }, { key: 'closes', label: 'When it closes', placeholder: 'For example: the same day, 8:00 pm', required: true }, { key: 'mins', label: 'Time allowed, in minutes', type: 'number', min: 1, required: true }],
-    make: v => [`Online exam: ${v.exam}`, `${v.exam} will be held on this website.\n\nOpens: ${v.opens}\nCloses: ${v.closes}\nTime allowed: ${v.mins} minutes\n\nLog in and open Online exams in your dashboard to take it. The timer starts when you press Start and cannot be paused.`] },
+    make: v => [`Online exam: ${v.exam}`, `${v.exam} will be held on this website.\n\nOpens: ${v.opens}\nCloses: ${v.closes}\nTime allowed: ${v.mins} minutes\n\nLog in and open the exam portal (E-Regional exam, under Resources) to take it. The timer starts when you press Start and cannot be paused.`] },
   { name: 'Results are out', tag: 'Results',
-    fields: [{ key: 'round', label: 'Which round', type: 'select', options: ROUNDS.slice(0, 2).concat('Online exam') }, { key: 'next', label: 'What happens next (optional)', type: 'textarea', rows: 3 }],
+    fields: [{ key: 'round', label: 'Which round', type: 'select', options: ROUNDS.slice(0, 2).concat('E-Regional round') }, { key: 'next', label: 'What happens next (optional)', type: 'textarea', rows: 3 }],
     make: v => [`Results: ${v.round}`, `The results of the ${v.round} are now on the Results page. Search for your name there.${v.next ? '\n\n' + v.next : ''}`] },
   { name: 'Registration closes soon', tag: 'Registration', pinned: true,
     fields: [{ key: 'last', label: 'Last day to register', placeholder: 'For example: 10 December 2026', required: true }],
@@ -4670,12 +4750,12 @@ function questionsDialog(ex, after) {
 }
 ADMIN['admin-exams'] = main => {
   const panel = crudPanel({
-    table: 'exams', title: 'Online exams', addLabel: 'Add an exam', hint: 'Students only see published exams. Add the questions with the list button on each exam.',
+    table: 'exams', title: 'E-Regional exam', addLabel: 'Add the exam', hint: 'This is the one online exam. Students take it in the exam portal. If more than one is published, the portal shows the one that is open now, or the next to open. Add the questions with the list button.',
     fields: [{ key: 'title', label: 'Exam name', required: true }, { key: 'description', label: 'Short description', type: 'textarea', rows: 2 },
       { key: 'opensAt', label: 'Opens (Bangladesh time)', type: 'datetime', required: true }, { key: 'closesAt', label: 'Closes (Bangladesh time)', type: 'datetime', required: true },
       { key: 'minutes', label: 'Time allowed, in minutes', type: 'number', min: 1, max: 300, required: true },
       { key: 'published', label: 'Published (students can see it)', type: 'checkbox' }, { key: 'review', label: 'Show the correct answers after hand-in', type: 'checkbox' }, { key: 'retake', label: 'Allow more than one try', type: 'checkbox' }],
-    defaults: () => ({ opensAt: dAt(1, 18), closesAt: dAt(1, 20), minutes: 15, published: false, review: false, retake: false, questions: [] }),
+    defaults: () => ({ title: 'E-Regional round', description: 'The online round of the olympiad. You take it from home, on a phone or a computer.', opensAt: dAt(1, 18), closesAt: dAt(1, 20), minutes: 15, published: false, review: false, retake: false, questions: [] }),
     sort: (a, b) => new Date(a.opensAt) - new Date(b.opensAt),
     extra: ex => `<button type="button" class="mini" data-qs="${ex.id}" aria-label="Questions for ${esc(ex.title)}" title="Questions">${icon('list', 18)}</button>`,
     row: ex => { const st = Store.examState(ex), tries = Store.all('attempts').filter(a => a.examId === ex.id && a.submittedAt).length;
@@ -4702,7 +4782,7 @@ ADMIN['admin-results'] = main => {
     const exams = Store.all('exams');
     const v = await formDialog({ title: 'Add results', submit: 'Add results', fields: [
       { key: 'title', label: 'Title', required: true, placeholder: 'For example: Regional round, Dhaka' }, { key: 'round', label: 'Round', type: 'select', options: ROUNDS },
-      { key: 'source', label: 'Where the list comes from', type: 'select', options: [['manual', 'I will type the list'], ...exams.map(x => ['exam:' + x.id, 'Online exam: ' + x.title])] },
+      { key: 'source', label: 'Where the list comes from', type: 'select', options: [['manual', 'I will type the list'], ...exams.map(x => ['exam:' + x.id, 'From the online exam: ' + x.title])] },
       { key: 'list', label: 'Typed list', type: 'textarea', rows: 6, placeholder: 'Name | School | Region | Score | Award', help: 'One student per line, best first. Only needed when you type the list yourself.' },
       { key: 'published', label: 'Publish straight away', type: 'checkbox' }] });
     if (!v) return;
@@ -4779,12 +4859,14 @@ ADMIN['admin-site'] = main => {
   top.innerHTML = `<section class="panel"><h2>Switches</h2>
       <label class="check" for="sw-reg"><input type="checkbox" id="sw-reg"${s.regOpen ? ' checked' : ''}><span>Registration is open</span></label>
       <label class="check" for="sw-card"><input type="checkbox" id="sw-card"${s.cardsOpen ? ' checked' : ''}><span>Students can download their admit card</span></label>
+      <label class="check" for="sw-split"><input type="checkbox" id="sw-split"${s.examSplit ? ' checked' : ''}><span>Students in the admit card districts sit the Regional round in person only (the E-Regional exam is closed to them)</span></label>
       <form class="form" id="cd" novalidate style="margin-top:14px"><div class="field"><label for="cd-list">Admit cards are only for these districts</label><input id="cd-list" name="list" value="${esc(Store.cardDistricts().join(', '))}" placeholder="Every district"><small>Write district names with commas between them, for example: Dhaka, Gazipur. Leave it empty to give the card to every district. A student selected for the National round always gets the National card.</small></div>
         <p class="err" role="alert" hidden></p><div><button class="btn btn-ocean btn-sm" type="submit">Save districts</button></div></form></section>
     <section class="panel"><h2>Contact details</h2><form class="form" id="cf" novalidate>${cf.map(f => fieldHtml(f, s[f.key], 'cf')).join('')}<div><button class="btn btn-ocean btn-sm" type="submit">Save contact details</button></div></form></section>`;
   main.appendChild(top);
   $('#sw-reg', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('regOpen', on); toast(on ? 'Registration is open' : 'Registration is closed', 'good'); });
   $('#sw-card', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('cardsOpen', on); toast(on ? 'Cards can be downloaded' : 'Cards are hidden', 'good'); });
+  $('#sw-split', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('examSplit', on); toast(on ? 'The online exam is closed to the admit card districts' : 'Every student can take the online exam', 'good'); });
   $('#cd', top).addEventListener('submit', e => {
     e.preventDefault(); const err = $('.err', e.target), names = e.target.elements.list.value.split(/[,\n]/).map(x => x.trim()).filter(Boolean);
     const list = [], bad = []; names.forEach(n => { const hit = ALL_DISTRICTS.find(d => d.toLowerCase() === n.toLowerCase()); if (!hit) bad.push(n); else if (!list.includes(hit)) list.push(hit); });
@@ -4823,6 +4905,9 @@ async function boot() {
     if (reducedMotion() || isAdminRoute(to) || (inDash(to) && inDash(from))) { Sound.play('tap'); render(); return; }
     Sound.play('wave'); pageWave(); swapT = setTimeout(render, WAVE_SWAP);
   });
+  /* the logo, the headline and the globe cannot be copied or saved with a long press or a right click */
+  document.addEventListener('contextmenu', e => { if (e.target.closest('.brand, .hero-title, .foot img, .stage, .intro, .aintro, .dash-top .brand')) e.preventDefault(); });
+  document.addEventListener('dragstart', e => { if (e.target.closest('.brand, .foot, .hero-title')) e.preventDefault(); });
   /* the first tap anywhere switches sound on (browsers only allow audio after a tap) */
   document.addEventListener('click', e => {
     Sound.unlock();
