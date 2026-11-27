@@ -164,6 +164,13 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .notice summary::-webkit-details-marker{display:none}
 .notice details p{margin-top:6px;white-space:pre-line}
 .notice-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.attach{display:grid;gap:10px;margin-top:12px;justify-items:start}
+.attach img,.attach video{width:100%;max-width:520px;height:auto;border-radius:14px;display:block;background:var(--foam)}
+.media-reel figure{flex:0 0 min(86%,440px);scroll-snap-align:start;margin:0;display:grid;gap:8px;align-content:start}
+.frame16{aspect-ratio:16/10;border-radius:22px 22px 22px 6px;overflow:hidden;background:var(--abyss);border:1px solid rgba(255,255,255,.16)}
+.frame16 img,.frame16 video,.frame16 iframe{width:100%;height:100%;display:block;border:0;object-fit:cover}
+.media-reel figcaption{color:#d6e5fb;font-weight:600}
+.thumb{width:64px;height:48px;border-radius:10px;object-fit:cover;flex:none;background:var(--foam);display:grid;place-content:center;color:var(--ocean)}
 
 /* countdown */
 .cd{display:grid;gap:16px;text-align:center;padding-top:26px;justify-items:center}
@@ -401,6 +408,11 @@ const dayMonth = iso => { const p = new Intl.DateTimeFormat('en-GB', { timeZone:
 const toDhakaInput = iso => new Date(new Date(iso).getTime() + 6 * 3600e3).toISOString().slice(0, 16);
 const fromDhakaInput = v => (v ? new Date(v + ':00+06:00').toISOString() : '');
 const safeUrl = u => (/^https?:\/\//i.test(u || '') ? u : '');
+/* an uploaded photo, PDF or video: a secure web address, or (preview only) a file held in the page */
+const mediaUrl = u => (/^https:\/\//i.test(u || '') || /^data:(image\/(png|jpeg|webp|gif)|application\/pdf|video\/(mp4|webm));/i.test(u || '') ? u : '');
+const youTubeId = u => { const m = String(u || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/))([A-Za-z0-9_-]{11})/); return m ? m[1] : ''; };
+const FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf', 'video/mp4', 'video/webm'];
+const FILE_WORD = { image: 'Photo', pdf: 'PDF', video: 'Video', youtube: 'YouTube video' };
 const plural = (n, one, many) => `${n} ${n === 1 ? one : (many || one + 's')}`;
 function span(ms) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -439,6 +451,9 @@ const IC = {
   next: '<path d="M10 6l6 6-6 6"/>',
   list: '<path d="M9 7h11M9 12h11M9 17h11"/><circle cx="4.500" cy="7" r="1"/><circle cx="4.500" cy="12" r="1"/><circle cx="4.500" cy="17" r="1"/>',
   gear: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.600 5.600l2.100 2.100M16.300 16.300l2.100 2.100M5.600 18.400l2.100-2.100M16.300 7.700l2.100-2.100"/>',
+  clip: '<path d="M20 11.500l-8.200 8.200a5 5 0 01-7.100-7.100l8.500-8.500a3.500 3.500 0 015 5l-8.500 8.500a2 2 0 01-2.800-2.800l7.800-7.800"/>',
+  image: '<rect x="3.500" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.500"/><path d="M4 17l5-4 4 3 3-2 4 3"/>',
+  play: '<circle cx="12" cy="12" r="9"/><path d="M10 8.500l5 3.500-5 3.500z"/>',
   help: '<circle cx="12" cy="12" r="9"/><path d="M9.500 9.500a2.500 2.500 0 114 2c-.900.700-1.500 1.200-1.500 2.500M12 17.500v.010"/>',
 };
 const icon = (n, s = 22) => `<svg class="ic" viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n] || ''}</svg>`;
@@ -855,6 +870,22 @@ const Store = (() => {
       picked.forEach(p => { p.u.selected = p.selected; }); db.messages.push(...msgs); db.emails.push(...mails);
       save(); return picked.length;
     },
+    /* upload a photo, PDF or video chosen by an admin; returns where it now lives */
+    async upload(file, folder) {
+      const kind = file.type.startsWith('image/') ? 'image' : file.type === 'application/pdf' ? 'pdf' : file.type.startsWith('video/') ? 'video' : '';
+      if (!kind || !FILE_TYPES.includes(file.type)) throw new Error(`"${file.name}" is not a kind of file the site accepts. Use a JPG, PNG, WebP or GIF photo, a PDF, or an MP4 video.`);
+      if (file.size > 48 * 1024 * 1024) throw new Error(`"${file.name}" is larger than 48 MB. For a long video, put it on YouTube and paste the link instead.`);
+      if (!CLOUD) {
+        if (file.size > 600 * 1024) throw new Error('In this preview only small files (under 600 KB) can be attached. The live site takes full-size files.');
+        const url = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(new Error('That file could not be read.')); fr.readAsDataURL(file); });
+        return { url, path: '', name: file.name, kind };
+      }
+      const clean = file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '').slice(-60) || 'file';
+      const path = `${folder}/${Date.now().toString(36)}-${clean}`;
+      ok(await sb.storage.from('site-files').upload(path, file, { cacheControl: '31536000', contentType: file.type }));
+      return { url: sb.storage.from('site-files').getPublicUrl(path).data.publicUrl, path, name: file.name, kind };
+    },
+    async removeFile(path) { if (CLOUD && path) { try { await sb.storage.from('site-files').remove([path]); } catch (e) { /* a stray file does no harm */ } } },
     /* put one email per person in the queue; {name} in the text becomes that person's name */
     async queueMail(users, subject, body) {
       const at = new Date().toISOString();
@@ -1154,8 +1185,8 @@ function buildShell() {
   <footer class="foot"><div class="wrap foot-grid">
     <div><img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263"><small>${CLOUD ? 'Bangladesh Geography Olympiad (BGeO)' : 'Preview build with sample data. Sign-ups made here stay in this browser only.'}</small></div>
     <nav aria-label="Olympiad"><a href="#about">About the olympiad</a><a href="#notices">Notices</a><a href="#countdown">Key dates</a><a href="#results">Results</a></nav>
-    <nav aria-label="Help"><a href="#faq">Questions and answers</a><a href="#team">Team and partners</a><a href="#contact">Contact</a><a href="#admin">Admin portal</a></nav>
-  </div></footer>`;
+    <nav aria-label="Help"><a href="#faq">Questions and answers</a><a href="#team">Team and partners</a><a href="#contact">Contact</a></nav>
+  </div><div class="wrap"><small>Website by Tawsikul Islam</small></div></footer>`;
   const sb = $('#sound-btn');
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
   paintSound(); sb.addEventListener('click', () => { Sound.toggle(); paintSound(); });
@@ -1198,12 +1229,26 @@ const pageHead = (title, lead) => `<header class="pagehead"><h1>${esc(title)}</h
 const sampleChip = r => (r && r.sample ? '<span class="chip chip-sample">Sample</span>' : '');
 
 /* ---------- public pages ---------- */
+/* photos, PDFs and videos attached to a notice */
+function filesHtml(files) {
+  const fs = (files || []).filter(f => mediaUrl(f.url)); if (!fs.length) return '';
+  return `<div class="attach">${fs.map(f => (f.kind === 'image' ? `<a href="${esc(f.url)}" target="_blank" rel="noopener"><img src="${esc(f.url)}" alt="${esc(f.name || 'Photo')}" loading="lazy"></a>`
+    : f.kind === 'video' ? `<video src="${esc(f.url)}" controls preload="metadata" playsinline></video>`
+    : `<a class="btn btn-quiet btn-sm" href="${esc(f.url)}" target="_blank" rel="noopener">${icon('clip', 18)} ${esc(f.name || 'Open the PDF')}</a>`)).join('')}</div>`;
+}
+/* one photo or video on the home page */
+function mediaItemHtml(m) {
+  const cap = m.caption ? `<figcaption>${esc(m.caption)}</figcaption>` : '', yt = m.kind === 'youtube' ? youTubeId(m.url) : '';
+  if (yt) return `<figure><div class="frame16"><iframe src="https://www.youtube-nocookie.com/embed/${yt}" title="${esc(m.caption || 'Video')}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>${cap}</figure>`;
+  const u = mediaUrl(m.url); if (!u || m.kind === 'youtube') return '';
+  return `<figure><div class="frame16">${m.kind === 'video' ? `<video src="${esc(u)}" controls preload="metadata" playsinline></video>` : `<img src="${esc(u)}" alt="${esc(m.caption || 'Photo')}" loading="lazy">`}</div>${cap}</figure>`;
+}
 function noticeRow(n) {
   const [d, m] = dayMonth(n.date);
   return `<article class="notice"><div class="stamp"><b>${d}</b><span>${m}</span></div><div>
     <h3>${esc(n.title)}</h3>
-    <div class="notice-meta">${n.pinned ? '<span class="chip chip-soon">Pinned</span>' : ''}${n.tag ? `<span class="chip">${esc(n.tag)}</span>` : ''}${sampleChip(n)}</div>
-    <details><summary>Read notice</summary><p>${esc(n.body)}</p></details>
+    <div class="notice-meta">${n.pinned ? '<span class="chip chip-soon">Pinned</span>' : ''}${n.tag ? `<span class="chip">${esc(n.tag)}</span>` : ''}${(n.files || []).length ? `<span class="chip">${icon('clip', 14)} ${plural(n.files.length, 'file')}</span>` : ''}${sampleChip(n)}</div>
+    <details><summary>Read notice</summary><p>${esc(n.body)}</p>${filesHtml(n.files)}</details>
   </div></article>`;
 }
 const STEPS = [
@@ -1215,6 +1260,7 @@ const STEPS = [
 
 PAGES.home = () => {
   const me = Store.me(), ev = Store.nextEvent(), notices = Store.notices().slice(0, 3);
+  const gallery = (Store.db.settings.media || []).map(mediaItemHtml).filter(Boolean);
   const cta = me ? `<a class="btn btn-lime" href="#${me.role === 'admin' ? 'admin' : 'account'}">Open my account</a>`
     : Store.db.settings.regOpen ? '<a class="btn btn-lime" href="#register">Register now</a>' : '<span class="chip chip-sea">Registration is closed</span>';
   return {
@@ -1248,6 +1294,7 @@ PAGES.home = () => {
         <a class="door door-c" href="#explore"><svg class="art" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#04214f" stroke-width="3" opacity=".3"><circle cx="68" cy="52" r="46"/><ellipse cx="68" cy="52" rx="20" ry="46"/><path d="M22 52h92M30 28h76M30 76h76"/></g></svg><h3>Explore the Earth</h3><p>Tap through the planet's layers and test yourself.</p></a>
       </div>
     </section>
+    ${gallery.length ? `<section class="band reel-wrap"><h2>Photos and videos</h2><div class="reel media-reel" tabindex="0" aria-label="Photos and videos" style="margin-top:18px">${gallery.join('')}</div></section>` : ''}
     <section class="podium">
       <div class="medal" aria-hidden="true">2<sup>nd</sup></div>
       <div><h2>Second in the world, first time out</h2><p>In 2026 Bangladesh finished second overall at the first Multinational Youth Geography Olympiad (MY-GEO) in Russia. All five team members won medals.</p></div>
@@ -1799,7 +1846,7 @@ function examResult(ex, at, st) {
 /* ---------- admin portal: its own screen, only for admin accounts ---------- */
 const ADMIN_TABS = [
   ['admin', 'Overview', 'compass'], ['admin-people', 'Participants', 'people'], ['admin-notices', 'Notices', 'mail'], ['admin-resources', 'Resources', 'book'],
-  ['admin-dates', 'Dates', 'calendar'], ['admin-exams', 'Exams', 'edit'], ['admin-results', 'Results', 'trophy'], ['admin-emails', 'Emails', 'mail'], ['admin-site', 'Site', 'gear'],
+  ['admin-home', 'Home page', 'image'], ['admin-dates', 'Dates', 'calendar'], ['admin-exams', 'Exams', 'edit'], ['admin-results', 'Results', 'trophy'], ['admin-emails', 'Emails', 'mail'], ['admin-site', 'Site', 'gear'],
 ];
 const ADMIN = {};
 function renderAdmin(name) {
@@ -1991,23 +2038,92 @@ function noticeTemplates(main, panel) {
   main.appendChild(box);
 }
 ADMIN['admin-notices'] = main => { const noticePanel = crudPanel({
-  table: 'notices', title: 'Notices', addLabel: 'Add a notice', hint: 'Notices show on the public Notices page straight away. Pinned notices stay at the top. Use the envelope button to also email a notice to students.',
+  table: 'notices', title: 'Notices', addLabel: 'Add a notice', hint: 'Notices show on the public Notices page straight away. Pinned notices stay at the top. The paperclip button adds photos and PDFs to a notice. The envelope button emails it to students.',
   fields: [{ key: 'title', label: 'Title', required: true }, { key: 'body', label: 'Notice text', type: 'textarea', rows: 6, required: true }, { key: 'tag', label: 'Label (optional)', placeholder: 'For example: Regional round' },
     { key: 'date', label: 'Date shown', type: 'datetime', required: true }, { key: 'pinned', label: 'Pin to the top', type: 'checkbox' }],
   defaults: () => ({ date: nowIso(), pinned: false }),
   sort: (a, b) => new Date(b.date) - new Date(a.date),
   row: n => `<h3>${esc(n.title)} ${n.pinned ? '<span class="chip chip-soon">Pinned</span>' : ''} ${sampleChip(n)}</h3><p>${fmtDate(n.date)}${n.tag ? ', ' + esc(n.tag) : ''}</p>`,
-  extra: n => `<button type="button" class="mini" data-mailn="${n.id}" aria-label="Email this notice" title="Email this notice">${icon('mail', 18)}</button>`,
-}); noticePanel.addEventListener('click', e => { const b = e.target.closest('[data-mailn]'); if (b) emailNoticeDialog(Store.get('notices', b.dataset.mailn)); });
+  extra: n => `<button type="button" class="mini" data-filesn="${n.id}" aria-label="Photos and PDFs for this notice" title="Photos and PDFs">${icon('clip', 18)}</button><button type="button" class="mini" data-mailn="${n.id}" aria-label="Email this notice" title="Email this notice">${icon('mail', 18)}</button>`,
+}); noticePanel.addEventListener('click', e => {
+    const b = e.target.closest('[data-mailn]'); if (b) return emailNoticeDialog(Store.get('notices', b.dataset.mailn));
+    const f = e.target.closest('[data-filesn]'); if (f) attachDialog(Store.get('notices', f.dataset.filesn), noticePanel.redraw);
+  });
   noticeTemplates(main, noticePanel); main.appendChild(noticePanel); };
-ADMIN['admin-resources'] = main => main.appendChild(crudPanel({
-  table: 'resources', title: 'Resources', addLabel: 'Add a resource', hint: 'Paste a link to each file or video, for example a Google Drive or YouTube link.',
+/* let the admin pick files from their device; resolves with the chosen files (or none) */
+function pickFiles(multiple) {
+  return new Promise(res => {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = FILE_TYPES.join(','); inp.multiple = !!multiple; inp.style.display = 'none';
+    inp.addEventListener('change', () => { res([...inp.files]); inp.remove(); }); inp.addEventListener('cancel', () => { res([]); inp.remove(); });
+    document.body.appendChild(inp); inp.click();
+  });
+}
+function attachDialog(n, after) {
+  const d = openDialog({ title: 'Photos and PDFs', html: `<p class="muted">${esc(n.title)}</p><div id="at-list"></div>
+    <div class="field"><label for="at-file">Add photos, PDFs or a short video</label><input id="at-file" type="file" multiple accept="${FILE_TYPES.join(',')}"><small>Photos show inside the notice. A PDF shows as a button that opens it.</small></div>
+    <p class="err" role="alert" hidden></p>
+    <div class="dlg-actions"><button type="button" class="btn btn-quiet btn-sm" data-close>Done</button><button type="button" class="btn btn-ocean btn-sm" id="at-up">Upload</button></div>` });
+  const list = $('#at-list', d), err = $('.err', d), input = $('#at-file', d);
+  const draw = () => { list.innerHTML = (n.files || []).map((f, i) => `<div class="rowi"><div class="grow"><h3>${esc(f.name)}</h3><p>${FILE_WORD[f.kind] || 'File'}</p></div><div class="acts"><button type="button" class="mini del" data-rmf="${i}" aria-label="Remove ${esc(f.name)}">${icon('trash', 18)}</button></div></div>`).join('') || '<p class="empty">No files on this notice yet.</p>'; };
+  $('#at-up', d).onclick = e => {
+    const picked = [...input.files]; err.hidden = true;
+    if (!picked.length) { err.textContent = 'Choose one or more files first.'; err.hidden = false; return; }
+    busy(e.currentTarget, async () => {
+      const added = []; for (const f of picked) added.push(await Store.upload(f, 'notices'));
+      await Store.patch('notices', n.id, { files: [...(n.files || []), ...added] });
+      input.value = ''; toast(`${plural(added.length, 'file')} added to the notice`, 'good'); draw(); after();
+    });
+  };
+  list.addEventListener('click', async e => {
+    const b = e.target.closest('[data-rmf]'); if (!b) return; const i = +b.dataset.rmf, f = (n.files || [])[i];
+    if (f && await confirmDialog(`Remove "${f.name}" from this notice?`, 'Remove', true)) busy(null, async () => { await Store.patch('notices', n.id, { files: n.files.filter((_, k) => k !== i) }); await Store.removeFile(f.path); draw(); after(); });
+  });
+  draw();
+}
+ADMIN['admin-resources'] = main => { const resPanel = crudPanel({
+  table: 'resources', title: 'Resources', addLabel: 'Add a resource', hint: 'Paste a link to a file or video, or use the paperclip button to upload a PDF or photo from your device.',
   fields: [{ key: 'title', label: 'Title', required: true }, { key: 'desc', label: 'Short description', type: 'textarea', rows: 3 }, { key: 'cat', label: 'Topic', type: 'select', options: RES_CATS },
     { key: 'url', label: 'Link', type: 'url', placeholder: 'https://', help: 'Must start with https://' }],
   defaults: () => ({ addedAt: nowIso(), cat: RES_CATS[0] }),
   sort: (a, b) => new Date(b.addedAt) - new Date(a.addedAt),
-  row: r => `<h3>${esc(r.title)} ${sampleChip(r)}</h3><p>${esc(r.cat)}${safeUrl(r.url) ? '' : ', no link yet'}</p>`,
-}));
+  row: r => `<h3>${esc(r.title)} ${sampleChip(r)}</h3><p>${esc(r.cat)}${safeUrl(r.url) ? (r.fileName ? ', file: ' + esc(r.fileName) : '') : ', no link yet'}</p>`,
+  extra: r => `<button type="button" class="mini" data-upr="${r.id}" aria-label="Upload a file for this resource" title="Upload a file">${icon('clip', 18)}</button>`,
+}); resPanel.addEventListener('click', async e => {
+    const b = e.target.closest('[data-upr]'); if (!b) return; const r = Store.get('resources', b.dataset.upr), files = await pickFiles(false);
+    if (files.length) busy(null, async () => { const f = await Store.upload(files[0], 'resources'), old = r.filePath; await Store.patch('resources', r.id, { url: f.url, filePath: f.path, fileName: f.name }); await Store.removeFile(old); toast('File uploaded. Students can now open it.', 'good'); resPanel.redraw(); });
+  });
+  main.appendChild(resPanel); };
+/* ---------- photos and videos on the home page ---------- */
+ADMIN['admin-home'] = main => {
+  const el = document.createElement('section'); el.className = 'panel'; main.appendChild(el);
+  const list = () => (Store.db.settings.media || []).slice();
+  const saveList = async arr => { await Store.setting('media', arr); draw(); };
+  const draw = () => {
+    const items = list();
+    el.innerHTML = `<div class="panel-head"><h2>Photos and videos on the home page</h2></div>
+      <p class="muted">These show in a row on the home page, in this order. With none added, the section stays hidden.</p>
+      <div class="btnrow"><button type="button" class="btn btn-ocean btn-sm" data-addfile>${icon('image', 18)} Add a photo or video</button><button type="button" class="btn btn-quiet btn-sm" data-addyt>${icon('play', 18)} Add a YouTube video</button></div>
+      <div>${items.map((m, i) => `<div class="rowi">${m.kind === 'image' && mediaUrl(m.url) ? `<img class="thumb" src="${esc(m.url)}" alt="">` : `<span class="thumb">${icon(m.kind === 'image' ? 'image' : 'play')}</span>`}
+        <div class="grow"><h3>${esc(m.caption || 'No caption')}</h3><p>${FILE_WORD[m.kind] || 'File'}</p></div>
+        <div class="acts">${i > 0 ? `<button type="button" class="mini" data-up="${i}" aria-label="Move earlier">${icon('back', 18)}</button>` : ''}<button type="button" class="mini" data-cap="${i}" aria-label="Change the caption">${icon('edit', 18)}</button><button type="button" class="mini del" data-rm="${i}" aria-label="Remove">${icon('trash', 18)}</button></div></div>`).join('') || '<p class="empty">Nothing added yet.</p>'}</div>`;
+  };
+  el.addEventListener('click', async e => {
+    const items = list(), at = k => { const b = e.target.closest(`[data-${k}]`); return b ? +b.dataset[k] : -1; };
+    if (e.target.closest('[data-addfile]')) {
+      const files = await pickFiles(true); if (!files.length) return;
+      return busy(null, async () => { for (const f of files) { const up = await Store.upload(f, 'home'); if (up.kind === 'pdf') { await Store.removeFile(up.path); throw new Error('The home page takes photos and videos, not PDFs. Add PDFs to a notice or a resource.'); } items.push({ id: uid('h'), kind: up.kind, url: up.url, path: up.path, caption: '' }); } await saveList(items); toast(`${plural(files.length, 'item')} added to the home page`, 'good'); });
+    }
+    if (e.target.closest('[data-addyt]')) {
+      const v = await formDialog({ title: 'Add a YouTube video', submit: 'Add', fields: [{ key: 'url', label: 'YouTube link', type: 'url', required: true, placeholder: 'https://youtu.be/...' }, { key: 'caption', label: 'Caption (optional)' }] });
+      if (!v) return; if (!youTubeId(v.url)) return toast('That does not look like a YouTube video link.', 'bad');
+      return busy(null, async () => { items.push({ id: uid('h'), kind: 'youtube', url: v.url, path: '', caption: v.caption }); await saveList(items); toast('Video added to the home page', 'good'); });
+    }
+    let i = at('up'); if (i > 0) return busy(null, async () => { [items[i - 1], items[i]] = [items[i], items[i - 1]]; await saveList(items); });
+    i = at('cap'); if (i >= 0) { const v = await formDialog({ title: 'Caption', submit: 'Save', values: items[i], fields: [{ key: 'caption', label: 'Caption shown under it' }] }); if (v) busy(null, async () => { items[i] = { ...items[i], caption: v.caption }; await saveList(items); }); return; }
+    i = at('rm'); if (i >= 0 && await confirmDialog('Remove this from the home page?', 'Remove', true)) busy(null, async () => { const gone = items.splice(i, 1)[0]; await saveList(items); await Store.removeFile(gone.path); });
+  });
+  draw();
+};
 ADMIN['admin-dates'] = main => main.appendChild(crudPanel({
   table: 'events', title: 'Dates and countdown', addLabel: 'Add a date', hint: 'The big public countdown always runs to the nearest date that has not passed yet. Times are Bangladesh time.',
   fields: [{ key: 'label', label: 'What is happening', required: true, placeholder: 'For example: Regional round' }, { key: 'at', label: 'Date and time', type: 'datetime', required: true }, { key: 'place', label: 'Place (optional)' }],
