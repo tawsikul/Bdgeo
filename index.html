@@ -22,7 +22,7 @@
   --sun:#ffc94d; --coral:#e8604c;
   --display:"Baloo Da 2","Hind Siliguri","Noto Sans Bengali",system-ui,sans-serif;
   --body:"Anek Bangla","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --r-md:14px; --r-lg:22px; --bar-h:60px;
+  --r-md:14px; --r-lg:22px; --bar-h:100px;
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -52,11 +52,13 @@ body.is-admin .sea{display:none}
 body.is-admin{background:var(--foam);color:var(--ink)}
 
 /* top bar */
-.bar{position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:40;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(3,31,80,.93);border-bottom:1px solid rgba(255,255,255,.12)}
+/* Two rows on a phone (logo and buttons, then the page links, which scroll sideways); one row on a wide screen. */
+.bar{position:fixed;top:0;left:0;right:0;height:var(--bar-h);z-index:40;display:flex;flex-wrap:wrap;align-items:center;align-content:center;gap:4px 10px;padding:0 14px;background:rgba(3,31,80,.96);border-bottom:1px solid rgba(255,255,255,.12)}
 .brand{display:flex;align-items:center;flex:none}
 .brand img{height:44px;width:auto;display:block}
-.bar-links{display:none;gap:2px;margin-left:10px;min-width:0}
-.bar-links a{padding:8px 11px;border-radius:10px;text-decoration:none;font-weight:600;font-size:.98rem;white-space:nowrap}
+.bar-links{display:flex;gap:2px;min-width:0;order:3;flex:0 0 calc(100% + 28px);margin:0 -14px;padding:0 10px;overflow-x:auto;scrollbar-width:none;border-top:1px solid rgba(255,255,255,.1)}
+.bar-links::-webkit-scrollbar{display:none}
+.bar-links a{padding:8px 11px;border-radius:10px;text-decoration:none;font-weight:600;font-size:.95rem;white-space:nowrap;color:#d6e5fb}
 .bar-links a:hover{background:rgba(255,255,255,.1)}
 .bar-links a[aria-current="page"]{background:rgba(154,217,111,.22);color:var(--lime)}
 .bar-tools{margin-left:auto;display:flex;align-items:center;gap:8px}
@@ -64,7 +66,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .iconbtn:active{transform:scale(.9)}
 .iconbtn.dark{background:var(--foam);color:var(--ink)}
 .iconbtn[aria-pressed="false"]{opacity:.7}
-@media(min-width:1040px){.bar-links{display:flex}}
+@media(min-width:1100px){:root{--bar-h:60px}.bar{flex-wrap:nowrap}.bar-links{order:0;flex:0 1 auto;margin:0 0 0 10px;padding:0;overflow:visible;border-top:0}}
 
 .menu{position:fixed;inset:var(--bar-h) 0 0 0;z-index:39;background:#04214f;overflow:auto;padding:18px 16px 40px;animation:menuIn .26s ease both}
 @keyframes menuIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
@@ -303,11 +305,7 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 
 /* footer, compass, toasts, dialogs */
 .foot{background:var(--abyss);padding:34px 0 40px;margin-top:20px}
-.foot-grid{display:grid;gap:22px}
-@media(min-width:760px){.foot-grid{grid-template-columns:1.3fr 1fr 1fr}}
 .foot img{height:74px;width:auto}
-.foot nav{display:grid;gap:8px;align-content:start}
-.foot nav a{text-decoration:none;color:#d6e5fb;min-height:30px}
 .foot small{color:#a9c0e4;display:block;margin-top:10px}
 .foot-base{display:flex;flex-wrap:wrap;gap:4px 24px;justify-content:space-between;margin-top:26px;padding-top:16px;border-top:1px solid rgba(255,255,255,.14)}
 .foot-base small{margin-top:0;font-size:.85rem}
@@ -2442,64 +2440,76 @@ const Store = (() => {
 })();
 
 /* ---------- the living globe ----------
-   A flat-colour planet in the logo's own greens and blues. A small map of land and
-   water is painted once, then wrapped onto a sphere pixel by pixel as it turns. */
+   The real Earth: a flat map of the continents (and, when it loads, a photograph taken
+   from space) is wrapped onto a sphere pixel by pixel as it turns, with clouds on top. */
 const Globe = (() => {
-  const TW = 1024, TH = 512, K = 2, MW = TW * K, MH = TH * K;   // the map is painted at twice its drawing size for clean edges
-  let tex = null;
-  function rng(seed) { return () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296); }
+  const MW = 2048, MH = 1024, CW = 1024, CH = 512;
+  let tex = null, clouds = null;
+  /* A photograph of the real Earth from space (NASA's "Blue Marble"), fetched from a public file host.
+     The hand-drawn map is used until it arrives, and stays if it never does. */
+  const PHOTOS = ['https://cdn.jsdelivr.net/npm/three-globe@2.43.0/example/img/earth-blue-marble.jpg', 'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg', 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg', 'https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-day.jpg'];
+  function loadPhoto(i) {
+    if (i >= PHOTOS.length) return;
+    const img = new Image(); img.crossOrigin = 'anonymous';
+    img.onerror = () => loadPhoto(i + 1);
+    img.onload = () => {
+      try {
+        if (img.naturalWidth < 1000 || Math.abs(img.naturalWidth / img.naturalHeight - 2) > 0.06) return loadPhoto(i + 1);
+        const c = document.createElement('canvas'); c.width = MW; c.height = MH;
+        const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0, MW, MH);
+        tex = new Uint32Array(g.getImageData(0, 0, MW, MH).data.buffer); Globe.photo = true;
+      } catch (e) { loadPhoto(i + 1); }
+    };
+    img.src = PHOTOS[i];
+  }
   function paintMap() {
     const c = document.createElement('canvas'); c.width = MW; c.height = MH;
-    const g = c.getContext('2d', { willReadFrequently: true }), R = rng(11); g.scale(K, K);
-    g.fillStyle = '#9ad96f'; g.fillRect(0, 0, TW, TH);
-    const wrap = draw => { for (const dx of [-TW, 0, TW]) { g.save(); g.translate(dx, 0); draw(); g.restore(); } };
-    const blob = (cx, cy, rx, ry) => {
-      const p = [R() * 6.283, R() * 6.283, R() * 6.283], pts = [];
-      for (let i = 0; i < 56; i++) { const t = i / 56 * 6.283, k = 1 + 0.24 * Math.sin(2 * t + p[0]) + 0.15 * Math.sin(3 * t + p[1]) + 0.08 * Math.sin(5 * t + p[2]); pts.push([cx + Math.cos(t) * rx * k, cy + Math.sin(t) * ry * k]); }
-      return pts;
-    };
-    const fill = (pts, color) => wrap(() => { g.fillStyle = color; g.beginPath(); pts.forEach((q, i) => (i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]))); g.closePath(); g.fill(); });
-    for (let i = 0; i < 10; i++) fill(blob(R() * TW, 80 + R() * (TH - 160), 60 + R() * 95, 30 + R() * 48), '#65c65b');
-    /* rivers and seas: meandering bands of teal with a deeper blue channel */
-    const river = (x0, w, a1, a2) => {
-      const p1 = R() * 6.283, p2 = R() * 6.283, pts = [];
-      for (let y = -30; y <= TH + 30; y += 10) pts.push([x0 + Math.sin(y * 0.012 + p1) * a1 + Math.sin(y * 0.031 + p2) * a2, y]);
-      const stroke = (width, color) => wrap(() => { g.strokeStyle = color; g.lineWidth = width; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); pts.forEach((q, i) => (i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]))); g.stroke(); });
-      stroke(w, '#5dc9d6');
-      for (let i = 0; i < 3; i++) { const q = pts[6 + Math.floor(R() * (pts.length - 12))]; fill(blob(q[0], q[1], w * (0.7 + R() * 0.5), w * (0.5 + R() * 0.4)), '#5dc9d6'); }
-      stroke(w * 0.42, '#5480b0');
-    };
-    river(150, 58, 70, 22); river(520, 74, 90, 26); river(845, 50, 60, 20);
-    for (let i = 0; i < 5; i++) fill(blob(R() * TW, 110 + R() * (TH - 220), 16 + R() * 20, 12 + R() * 14), '#5dc9d6');
+    const g = c.getContext('2d', { willReadFrequently: true }); paintEarth(g, MW, MH);
     tex = new Uint32Array(g.getImageData(0, 0, MW, MH).data.buffer);
+    clouds = makeClouds(CW, CH);
+    if (location.protocol.indexOf('http') === 0) loadPhoto(0);
   }
   /* one sphere of `size` pixels; paint(rot) redraws it turned by rot radians */
   function create(size) {
     const S = Math.max(32, size | 0), off = document.createElement('canvas'); off.width = off.height = S;
     const og = off.getContext('2d'), img = og.createImageData(S, S), out = new Uint32Array(img.data.buffer);
-    const n = S * S, row = new Int32Array(n), col = new Int32Array(n), r = S / 2;
-    const tilt = -0.42, roll = 0.38, ct = Math.cos(tilt), st = Math.sin(tilt), cr = Math.cos(roll), sr = Math.sin(roll);
+    const n = S * S, row = new Int32Array(n), col = new Int32Array(n), crow = new Int32Array(n), r = S / 2;
+    const tilt = -0.36, roll = 0.3, ct = Math.cos(tilt), st = Math.sin(tilt), cr = Math.cos(roll), sr = Math.sin(roll);
     for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
       const i = y * S + x, nx = (x + 0.5 - r) / r, ny = (y + 0.5 - r) / r, d2 = nx * nx + ny * ny;
       if (d2 > 1) { row[i] = -1; continue; }
       const nz = Math.sqrt(1 - d2), x1 = nx * cr + ny * sr, y1 = -nx * sr + ny * cr, y2 = y1 * ct - nz * st, z2 = y1 * st + nz * ct;
       const lat = Math.asin(Math.max(-1, Math.min(1, -y2))), lon = Math.atan2(x1, z2);
-      row[i] = Math.min(MH - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * MH))) * MW;
+      const ry = Math.min(MH - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * MH)));
+      row[i] = ry * MW; crow[i] = (ry >> 1) * CW;
       col[i] = Math.floor((lon / 6.283185307 + 0.5) * MW) & (MW - 1);
     }
+    /* At rot = 0 the globe faces Bangladesh (90° E). As rot grows the Earth turns the way the real one does,
+       west to east, and the clouds drift a little faster than the ground. */
     function paint(rot) {
       if (!tex) paintMap();
-      const sh = Math.floor(rot / 6.283185307 * MW) & (MW - 1);
-      for (let i = 0; i < n; i++) { const ro = row[i]; out[i] = ro < 0 ? 0 : tex[ro + ((col[i] + sh) & (MW - 1))]; }
+      const sh = Math.floor((0.25 - rot / 6.283185307) * MW) & (MW - 1), shc = Math.floor((0.25 - rot * 1.07 / 6.283185307) * MW) & (MW - 1);
+      for (let i = 0; i < n; i++) {
+        const ro = row[i]; if (ro < 0) { out[i] = 0; continue; }
+        let p = tex[ro + ((col[i] + sh) & (MW - 1))]; const a = clouds[crow[i] + (((col[i] + shc) & (MW - 1)) >> 1)];
+        if (a) { let cr2 = p & 255, cg = (p >> 8) & 255, cb = (p >> 16) & 255; cr2 += ((255 - cr2) * a) >> 8; cg += ((255 - cg) * a) >> 8; cb += ((255 - cb) * a) >> 8; p = 0xff000000 | (cb << 16) | (cg << 8) | cr2; }
+        out[i] = p;
+      }
       og.putImageData(img, 0, 0);
     }
-    /* draw onto another canvas as a clean-edged disc with a soft shadow on one side */
+    /* draw onto another canvas, lit from the upper left like the Earth seen from space, with a thin glow of air round the edge */
     function drawTo(g, cx, cy, R) {
+      const halo = g.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.09);
+      halo.addColorStop(0, 'rgba(120,180,255,.55)'); halo.addColorStop(1, 'rgba(120,180,255,0)');
+      g.fillStyle = halo; g.beginPath(); g.arc(cx, cy, R * 1.09, 0, 6.2832); g.fill();
       g.save(); g.beginPath(); g.arc(cx, cy, R - 0.5, 0, 6.2832); g.clip();
       g.drawImage(off, cx - R, cy - R, 2 * R, 2 * R);
-      const sh = g.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.5, cx, cy, R * 1.05);
-      sh.addColorStop(0, 'rgba(4,33,79,0)'); sh.addColorStop(1, 'rgba(4,33,79,.1)');
-      g.fillStyle = sh; g.fillRect(cx - R, cy - R, 2 * R, 2 * R); g.restore();
+      const sh = g.createRadialGradient(cx - R * 0.42, cy - R * 0.46, R * 0.15, cx - R * 0.12, cy - R * 0.12, R * 1.3);
+      sh.addColorStop(0, 'rgba(255,255,255,.10)'); sh.addColorStop(0.42, 'rgba(2,10,36,0)'); sh.addColorStop(1, 'rgba(2,8,30,.72)');
+      g.fillStyle = sh; g.fillRect(cx - R, cy - R, 2 * R, 2 * R);
+      const rim = g.createRadialGradient(cx, cy, R * 0.82, cx, cy, R);
+      rim.addColorStop(0, 'rgba(130,190,255,0)'); rim.addColorStop(1, 'rgba(140,196,255,.42)');
+      g.fillStyle = rim; g.fillRect(cx - R, cy - R, 2 * R, 2 * R); g.restore();
     }
     return { paint, drawTo, size: S };
   }
@@ -2525,7 +2535,7 @@ const Globe = (() => {
 function mountHeroStage(stage) {
   const cv = $('canvas', stage), img = $('img', stage);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  let W = 0, g = null, globe = null, moat = null, rot = 0.6, speed = reducedMotion() ? 0 : 2.4, moatA = 1;
+  let W = 0, g = null, globe = null, moat = null, rot = reducedMotion() ? 0 : -2.0, speed = reducedMotion() ? 0 : 2.4, moatA = 1;   // the spin eases off just as Bangladesh comes round to face the visitor
   function setup() {
     W = stage.clientWidth; if (!W) return;
     cv.width = Math.round(W * dpr); cv.height = Math.round(W * 0.56 * dpr); g = cv.getContext('2d');
@@ -2589,11 +2599,89 @@ function drawContours(cv) {
   }
 }
 
+/* ---------- the Earth's coastlines ----------
+   Outlines of the continents and large islands, drawn by hand as longitude and latitude
+   (in tenths of a degree). They are simplified: on a small turning globe only the overall
+   shapes show. paintEarth() turns them into a flat map that the globe wraps onto a sphere. */
+const EARTH_LAND = {"africa":[-60,360,-20,350,30,370,100,370,110,340,150,325,200,310,250,320,300,310,325,310,340,275,355,240,370,210,385,180,400,155,430,125,450,110,485,115,513,118,505,90,480,50,455,20,420,-15,405,-40,390,-70,400,-105,407,-150,370,-180,350,-205,355,-240,330,-260,325,-290,300,-315,270,-337,220,-343,185,-343,175,-310,160,-280,148,-245,125,-185,120,-150,135,-115,123,-60,95,-20,95,10,95,40,70,44,50,60,20,63,-10,52,-40,52,-75,44,-95,60,-115,70,-133,90,-150,110,-167,125,-173,147,-163,170,-162,205,-170,215,-155,240,-130,277,-100,295,-97,320,-75,338],"eurasia":[-55,360,-90,370,-93,390,-88,430,-20,435,-13,460,-45,485,-15,490,20,510,40,520,60,535,85,540,83,570,105,575,105,555,125,543,140,540,185,547,210,555,215,575,240,575,235,593,280,597,300,600,250,602,225,600,213,615,215,630,250,650,220,657,210,645,180,625,172,607,187,597,165,575,145,560,130,554,127,565,113,585,105,595,80,582,55,590,50,615,70,630,105,643,130,665,150,685,185,698,220,705,260,710,300,700,330,693,360,690,410,676,400,662,350,664,347,646,370,639,403,646,420,664,440,663,440,684,480,677,540,685,600,690,640,693,685,683,670,710,700,730,750,725,800,735,870,750,950,760,1040,777,1120,765,1130,738,1200,730,1270,725,1300,710,1350,716,1400,725,1500,715,1600,697,1700,695,1760,698,1800,688,1850,670,1900,660,1870,645,1820,648,1790,624,1730,610,1700,600,1650,600,1630,580,1620,550,1600,530,1570,512,1556,555,1560,575,1605,606,1630,620,1600,618,1565,615,1520,590,1460,593,1425,590,1380,565,1355,547,1400,532,1410,520,1405,500,1403,485,1385,460,1350,435,1320,431,1307,423,1297,409,1275,395,1285,382,1294,370,1293,353,1280,349,1265,344,1264,368,1248,382,1250,396,1242,399,1216,389,1220,406,1210,408,1190,392,1177,387,1189,374,1207,378,1225,372,1204,360,1193,350,1208,330,1218,318,1220,300,1215,283,1196,256,1173,236,1142,223,1110,214,1096,216,1082,216,1067,207,1058,190,1075,165,1093,130,1092,116,1068,104,1050,87,1048,102,1032,110,1023,122,1009,134,1000,134,992,105,1004,83,1014,68,1034,45,1040,14,1035,14,1013,28,1004,55,983,80,986,110,977,140,977,165,955,160,943,161,945,185,924,208,918,223,906,223,890,218,870,214,864,200,850,195,823,166,803,155,802,130,798,103,782,89,775,81,763,95,750,125,735,160,728,190,727,210,705,208,690,223,685,235,670,248,645,253,616,252,573,256,563,272,540,266,515,279,503,300,488,303,483,295,486,283,500,267,506,250,516,259,516,243,545,242,562,262,566,245,586,236,598,225,585,204,577,189,550,170,520,160,490,140,450,128,435,127,427,150,425,165,407,190,390,215,380,240,355,275,350,295,343,280,326,300,323,312,343,313,350,330,360,350,360,367,330,362,305,363,280,367,265,385,262,400,290,410,315,413,350,420,380,410,415,415,415,428,390,442,370,453,385,470,350,458,335,445,330,460,307,465,296,453,280,435,280,418,265,408,240,408,228,403,235,380,225,365,213,375,195,405,195,420,160,435,137,456,123,453,124,440,140,422,160,418,184,402,180,400,169,405,166,389,160,380,157,400,123,418,103,430,88,444,65,432,32,433,32,418,0,400,-2,387,-20,368],"namerica":[-1680,656,-1660,683,-1620,702,-1565,713,-1500,705,-1410,697,-1350,693,-1280,703,-1210,696,-1150,685,-1080,680,-1010,680,-960,685,-940,715,-910,695,-880,685,-850,695,-820,695,-815,675,-860,665,-870,645,-925,633,-947,603,-945,587,-925,570,-880,563,-830,552,-822,530,-805,513,-790,515,-795,545,-770,560,-775,585,-785,605,-775,623,-730,620,-700,610,-695,590,-660,587,-645,603,-620,580,-600,555,-570,535,-558,520,-585,513,-600,502,-660,502,-675,488,-645,489,-655,475,-640,460,-615,458,-600,462,-610,452,-640,442,-660,437,-662,448,-670,450,-690,440,-707,430,-705,418,-715,414,-740,406,-742,395,-755,385,-760,370,-757,356,-767,347,-790,333,-810,318,-813,295,-803,270,-802,253,-812,252,-827,277,-828,295,-842,300,-855,298,-875,303,-895,302,-894,292,-915,294,-940,296,-965,283,-973,260,-977,225,-972,205,-960,190,-945,182,-920,186,-907,195,-904,210,-880,215,-868,213,-875,190,-882,175,-888,159,-860,158,-835,152,-836,125,-837,110,-825,92,-810,88,-795,95,-775,87,-773,79,-775,70,-795,89,-805,73,-828,83,-850,100,-858,112,-875,130,-900,138,-922,146,-945,162,-965,157,-998,168,-1020,180,-1055,203,-1055,225,-1080,253,-1095,267,-1120,290,-1130,313,-1147,317,-1145,300,-1125,275,-1100,242,-1100,229,-1122,248,-1142,278,-1158,303,-1171,325,-1185,340,-1206,346,-1220,368,-1225,378,-1243,403,-1242,430,-1240,463,-1247,484,-1230,485,-1230,493,-1250,502,-1275,515,-1303,545,-1315,560,-1340,582,-1370,587,-1400,598,-1440,601,-1480,605,-1515,593,-1520,610,-1540,588,-1575,570,-1610,552,-1645,546,-1610,560,-1580,580,-1575,588,-1618,587,-1622,600,-1655,615,-1645,630,-1610,636,-1610,645,-1660,645],"samerica":[-773,85,-755,107,-730,113,-717,124,-715,108,-700,120,-680,106,-640,106,-620,107,-600,85,-570,60,-540,58,-515,43,-500,10,-500,-5,-480,-7,-445,-25,-415,-29,-385,-37,-353,-53,-348,-80,-370,-110,-390,-130,-390,-175,-408,-210,-420,-230,-445,-232,-465,-240,-485,-258,-486,-280,-505,-305,-525,-330,-540,-347,-565,-348,-583,-340,-570,-363,-576,-380,-620,-390,-623,-408,-650,-410,-637,-427,-653,-450,-675,-460,-660,-478,-685,-500,-690,-523,-683,-530,-652,-547,-665,-552,-700,-553,-725,-540,-745,-520,-755,-485,-745,-460,-735,-420,-738,-395,-732,-370,-716,-330,-715,-290,-705,-254,-702,-200,-704,-184,-720,-170,-755,-150,-765,-135,-773,-120,-790,-80,-810,-60,-813,-45,-800,-33,-809,-22,-800,8,-788,15,-775,38,-775,65],"greenland":[-730,782,-680,805,-600,820,-450,832,-300,835,-220,820,-180,800,-190,770,-210,740,-225,715,-260,698,-320,682,-390,657,-415,630,-435,600,-480,610,-510,640,-535,670,-530,695,-550,715,-580,755,-660,762,-710,772],"baffin":[-800,737,-760,728,-710,713,-670,693,-620,670,-645,650,-655,623,-700,628,-735,645,-775,653,-735,675,-770,697,-820,700,-860,715,-890,730,-850,738],"victoria":[-1170,710,-1100,730,-1040,715,-1015,697,-1050,687,-1100,686,-1160,693],"ellesmere":[-920,813,-850,825,-700,831,-620,825,-640,810,-700,798,-760,785,-800,765,-880,765,-880,785,-850,800],"banks":[-1250,720,-1230,743,-1170,742,-1155,730,-1210,713],"melville":[-1160,750,-1100,764,-1040,766,-980,760,-960,750,-1040,747,-1100,746],"newfoundland":[-593,476,-558,516,-530,487,-530,467,-560,468],"cuba":[-850,219,-820,232,-780,223,-742,202,-777,198,-780,210,-815,221],"hispaniola":[-744,184,-728,199,-698,196,-684,186,-710,177],"iceland":[-243,655,-225,664,-180,662,-145,663,-136,650,-160,640,-190,634,-225,639],"britain":[-52,500,-35,503,2,508,14,512,17,527,3,530,-2,545,-16,555,-22,560,-20,576,-33,586,-50,586,-62,575,-56,562,-48,548,-32,542,-31,533,-46,532,-42,523,-52,518,-30,514,-45,511],"ireland":[-60,522,-62,535,-56,546,-73,553,-85,545,-100,542,-100,522,-95,515],"madagascar":[493,-120,504,-155,495,-180,475,-248,452,-255,433,-223,443,-200,439,-175,462,-157,480,-135],"srilanka":[798,96,809,83,818,73,816,63,804,59,798,72],"honshu":[1309,340,1330,355,1360,357,1370,374,1390,383,1400,405,1414,414,1420,395,1410,380,1409,363,1403,352,1392,352,1380,346,1368,345,1355,335,1350,346,1328,343],"hokkaido":[1403,415,1400,432,1417,454,1432,443,1454,434,1435,420,1412,425],"kyushu":[1297,333,1317,336,1315,314,1303,312],"shikoku":[1325,339,1345,343,1343,333,1328,328],"sakhalin":[1420,543,1433,520,1433,490,1428,466,1420,460,1420,495,1418,520],"taiwan":[1210,252,1220,249,1210,220,1202,228,1202,240],"hainan":[1087,193,1105,201,1110,196,1100,184,1088,186],"luzon":[1205,185,1222,184,1220,160,1240,135,1235,127,1210,138,1200,155],"mindanao":[1220,70,1235,86,1255,98,1265,75,1255,58,1240,65],"visayas":[1220,118,1245,120,1255,110,1245,98,1225,98],"palawan":[1173,85,1195,112,1196,104,1177,83],"borneo":[1090,15,1103,18,1114,24,1130,32,1155,50,1168,69,1180,63,1192,52,1180,42,1175,25,1188,10,1175,-5,1163,-25,1160,-38,1145,-40,1130,-32,1115,-33,1103,-29,1100,-15,1090,0],"sumatra":[953,55,975,52,995,32,1015,18,1036,0,1045,-23,1060,-30,1058,-58,1045,-59,1023,-40,1008,-20,995,0,985,18,970,35],"java":[1052,-68,1068,-60,1086,-67,1108,-64,1127,-69,1145,-77,1144,-87,1115,-83,1085,-78,1065,-74],"sulawesi":[1197,7,1210,12,1240,9,1252,16,1246,4,1225,4,1205,0,1212,-10,1233,-8,1218,-18,1225,-33,1232,-48,1220,-47,1213,-30,1205,-27,1204,-55,1195,-55,1195,-35,1188,-27,1195,-10],"newguinea":[1310,-8,1335,-7,1350,-33,1378,-15,1410,-26,1445,-39,1460,-55,1478,-63,1470,-70,1506,-106,1475,-100,1460,-82,1435,-90,1410,-91,1390,-80,1385,-67,1376,-52,1355,-45,1330,-40,1328,-28],"australia":[1137,-225,1142,-260,1150,-300,1157,-320,1150,-343,1180,-350,1200,-340,1235,-340,1260,-323,1290,-316,1312,-315,1342,-327,1358,-348,1375,-330,1378,-355,1395,-359,1409,-380,1435,-388,1463,-390,1480,-378,1500,-373,1512,-340,1525,-320,1535,-285,1532,-255,1510,-235,1495,-220,1485,-200,1463,-190,1455,-150,1436,-140,1425,-108,1417,-130,1415,-165,1395,-175,1375,-160,1355,-150,1367,-120,1327,-115,1305,-125,1295,-149,1270,-140,1255,-145,1240,-165,1222,-180,1210,-195,1190,-200,1167,-207,1142,-220],"tasmania":[1447,-408,1482,-409,1482,-422,1470,-435,1460,-435,1452,-422],"nz_north":[1727,-344,1743,-353,1755,-367,1783,-376,1770,-395,1769,-405,1752,-416,1748,-399,1738,-393,1748,-379,1730,-352],"nz_south":[1727,-405,1742,-415,1727,-435,1712,-444,1705,-460,1683,-466,1665,-460,1675,-445,1700,-430,1715,-418],"antarctica":[-1800,-765,-1600,-780,-1500,-760,-1350,-745,-1200,-740,-1050,-745,-1000,-725,-900,-730,-750,-730,-650,-680,-600,-640,-570,-635,-620,-665,-610,-720,-500,-780,-350,-780,-200,-735,-100,-710,0,-700,150,-695,300,-690,400,-685,500,-670,600,-675,700,-685,780,-680,900,-665,1000,-660,1100,-660,1200,-665,1300,-660,1400,-665,1500,-680,1600,-700,1700,-720,1800,-765,1800,-900,-1800,-900],"svalbard":[110,797,160,800,220,803,270,800,210,783,170,767,140,777],"novaya":[520,712,550,735,600,760,680,770,630,750,570,720,550,707],"sicily":[124,380,156,383,152,367,124,376],"sardinia":[82,410,97,409,95,391,84,390]};
+const EARTH_LAKES = {"caspian":[470,450,490,465,510,468,530,453,525,425,540,405,535,373,510,368,490,375,495,403,477,425]};
+/* deserts and dry land: [longitude, latitude, half-width, half-height] in degrees */
+const EARTH_DRY = [[8,23,34,9],[28,22,12,8],[47,23,10,9],[58,33,12,6],[62,42,12,5],[71,27,4,4],[92,41,20,5],[105,43,10,4],[88,33,11,4],[133,-25,14,8],[20,-24,7,6],[15,-22,3,8],[46,7,5,5],[-70,-24,2.500,8],[-69,-45,3,8],[-110,30,8,6],[-115,39,5,5]];
+/* mountain chains, as lines: [[lon, lat], ...] */
+const EARTH_PEAKS = [[[72,36],[78,33],[84,29],[90,28],[97,28.500]],[[-72,10],[-76,0],[-78,-8],[-72,-16],[-68,-22],[-70,-32],[-72,-45]],[[-126,58],[-120,50],[-113,44],[-108,38],[-106,33]],[[6,45],[10,47],[14,47]],[[40,43],[46,42]],[[86,49],[94,50],[100,51]]];
+function paintEarth(g, W, H) {
+  const X = lon => (lon + 180) / 360 * W, Y = lat => (90 - lat) / 180 * H, D = W / 360;   // D: pixels per degree
+  let seed = 7; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  /* a coastline with small natural wiggles added between the hand-placed points */
+  const rough = arr => {
+    let pts = []; for (let i = 0; i < arr.length; i += 2) pts.push([arr[i] / 10, arr[i + 1] / 10]);
+    for (let pass = 0; pass < 2; pass++) {
+      const out = [];
+      for (let i = 0; i < pts.length; i++) {
+        const a = pts[i], b = pts[(i + 1) % pts.length], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+        out.push(a); if (len > 1.2 && Math.abs(a[1]) < 88 && Math.abs(b[1]) < 88 && Math.abs(a[0]) < 180 && Math.abs(b[0]) < 180) { const k = (R() - 0.5) * 0.22; out.push([(a[0] + b[0]) / 2 - dy * k, (a[1] + b[1]) / 2 + dx * k]); }
+      }
+      pts = out;
+    }
+    return pts;
+  };
+  const shapes = Object.keys(EARTH_LAND).map(k => [k, rough(EARTH_LAND[k])]);
+  const trace = (pts, off) => { g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(X(p[0] + off), Y(p[1])) : g.moveTo(X(p[0] + off), Y(p[1])))); g.closePath(); };
+  const allLand = fn => shapes.forEach(([k, pts]) => { for (const off of [-360, 0, 360]) { trace(pts, off); fn(k); } });
+  /* the sea: deep blue, a little lighter toward the equator, with pale shallows hugging the coasts */
+  const sea = g.createLinearGradient(0, 0, 0, H); sea.addColorStop(0, '#082a55'); sea.addColorStop(0.3, '#0c4484'); sea.addColorStop(0.5, '#10559c'); sea.addColorStop(0.7, '#0c4484'); sea.addColorStop(1, '#082a55');
+  g.fillStyle = sea; g.fillRect(0, 0, W, H);
+  g.save(); g.shadowColor = '#3d93d4'; g.shadowBlur = 5 * D; g.fillStyle = '#2c7fc4'; allLand(() => g.fill()); g.restore();
+  /* the land, then everything below is painted only where there is land */
+  g.fillStyle = '#5a9548'; allLand(() => g.fill());
+  g.save(); g.globalCompositeOperation = 'source-atop';
+  const band = (lat0, lat1, color0, color1) => { const b = g.createLinearGradient(0, Y(lat0), 0, Y(lat1)); b.addColorStop(0, color0); b.addColorStop(1, color1); g.fillStyle = b; g.fillRect(0, Math.min(Y(lat0), Y(lat1)), W, Math.abs(Y(lat1) - Y(lat0))); };
+  band(14, 0, 'rgba(38,112,48,0)', 'rgba(38,112,48,.75)'); band(0, -14, 'rgba(38,112,48,.75)', 'rgba(38,112,48,0)');             // rainforest belt
+  band(44, 54, 'rgba(46,96,58,0)', 'rgba(46,96,58,.8)'); band(54, 64, 'rgba(46,96,58,.8)', 'rgba(110,122,96,.9)');                // northern forest, then tundra
+  band(64, 76, 'rgba(110,122,96,.9)', 'rgba(240,245,250,1)'); band(76, 90, 'rgba(240,245,250,1)', 'rgba(250,252,255,1)');         // tundra fading to ice
+  band(-56, -64, 'rgba(240,245,250,0)', 'rgba(244,248,252,1)'); band(-64, -90, 'rgba(244,248,252,1)', 'rgba(252,253,255,1)');     // Antarctica
+  band(34, 44, 'rgba(150,160,84,0)', 'rgba(150,160,84,.35)'); band(-28, -38, 'rgba(150,160,84,0)', 'rgba(150,160,84,.3)');        // drier grassland
+  const blob = (lon, lat, rx, ry, color) => { for (const off of [-360, 0, 360]) { g.save(); g.translate(X(lon + off), Y(lat)); g.scale(rx * D, ry * D); const rg = g.createRadialGradient(0, 0, 0.25, 0, 0, 1); rg.addColorStop(0, color); rg.addColorStop(1, color.replace(/[\d.]+\)$/, '0)')); g.fillStyle = rg; g.beginPath(); g.arc(0, 0, 1, 0, 6.2832); g.fill(); g.restore(); } };
+  EARTH_DRY.forEach(d => blob(d[0], d[1], d[2] * 1.25, d[3] * 1.35, 'rgba(214,186,128,.95)'));
+  blob(18, 13.500, 28, 4, 'rgba(176,170,92,.55)');                                                                                   // the Sahel
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  EARTH_PEAKS.forEach(line => { for (const [w, color] of [[3, 'rgba(126,110,88,.5)'], [0.7, 'rgba(232,234,238,.5)']]) { g.strokeStyle = color; g.lineWidth = w * D; g.beginPath(); line.forEach((p, i) => (i ? g.lineTo(X(p[0]), Y(p[1])) : g.moveTo(X(p[0]), Y(p[1])))); g.stroke(); } });
+  /* fine speckle so the land does not look like flat paint */
+  for (let i = 0; i < 2600; i++) { const x = R() * W, y = H * (0.08 + R() * 0.8), r = (0.3 + R() * 0.9) * D; g.fillStyle = R() < 0.5 ? 'rgba(30,70,30,.10)' : 'rgba(235,225,170,.08)'; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill(); }
+  g.restore();
+  g.fillStyle = '#f4f8fc'; shapes.filter(s => s[0] === 'greenland').forEach(s => { trace(s[1], 0); g.fill(); });
+  g.fillStyle = '#0f4f94'; Object.values(EARTH_LAKES).forEach(arr => { trace(rough(arr), 0); g.fill(); });
+  /* sea ice over the Arctic Ocean */
+  const ice = g.createLinearGradient(0, 0, 0, Y(74)); ice.addColorStop(0, 'rgba(246,250,253,.96)'); ice.addColorStop(0.55, 'rgba(240,246,251,.8)'); ice.addColorStop(1, 'rgba(240,246,251,0)');
+  g.fillStyle = ice; g.fillRect(0, 0, W, Y(74));
+}
+/* clouds: a soft, patchy layer of white, thicker near the equator and in the windy middle latitudes */
+function makeClouds(W, H) {
+  const out = new Uint8Array(W * H); let seed = 99; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const octaves = [[8, 4, 0.5], [16, 8, 0.27], [32, 16, 0.14], [64, 32, 0.09]].map(([nx, ny, amp]) => ({ nx, ny, amp, v: Float32Array.from({ length: nx * (ny + 1) }, () => R()) }));
+  const sm = t => t * t * (3 - 2 * t);
+  for (let y = 0; y < H; y++) {
+    const lat = 90 - (y + 0.5) / H * 180, belt = 0.52 + 0.2 * Math.exp(-Math.pow((lat - 6) / 9, 2)) + 0.1 * Math.exp(-Math.pow((Math.abs(lat) - 52) / 14, 2)) - 0.14 * Math.exp(-Math.pow((Math.abs(lat) - 24) / 9, 2));
+    for (let x = 0; x < W; x++) {
+      let n = 0;
+      for (const o of octaves) {
+        const fx = x / W * o.nx, fy = y / H * o.ny, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = sm(fx - x0), ty = sm(fy - y0), x1 = (x0 + 1) % o.nx;
+        const a = o.v[y0 * o.nx + x0], b = o.v[y0 * o.nx + x1], c = o.v[(y0 + 1) * o.nx + x0], d = o.v[(y0 + 1) * o.nx + x1];
+        n += o.amp * (a + (b - a) * tx + (c - a) * ty + (a - b - c + d) * tx * ty);
+      }
+      const v = (n - (1.1 - belt)) * 3.4;
+      out[y * W + x] = v <= 0 ? 0 : Math.min(175, Math.round(v * 255));
+    }
+  }
+  return out;
+}
+
 /* ---------- entry animations ----------
-   Opening the site: the camera starts low over a jungle, at an angle. The ground then
-   rushes past as if the Earth were turning under it (jungle, river, farmland, beach,
-   open sea) while the camera climbs. From high above the sea the whole Earth comes
-   into view, spinning fast, and slows as it settles into its place in the logo.
+   Opening the site: the camera starts inside a forest, a few feet above the ground, looking
+   straight ahead between the trunks. In one unbroken movement it speeds forward and up:
+   out through the treetops, over a river, farmland and desert, to a beach. There it swings
+   round and tips down to look straight at the ground, keeps climbing, and the whole Earth
+   comes into view, spinning fast, then slows as it settles into its place in the logo.
    Between pages: a tsunami washes across the screen.
    Opening the admin portal: the logo appears, its Earth turns bluer, and "Admin" slides in. */
 const seenOnce = k => { try { return sessionStorage.getItem(k) === '1'; } catch (e) { return false; } };
@@ -2605,68 +2693,113 @@ function siteIntro() {
   markSeen('bgeo-intro');
   const el = document.createElement('div'); el.className = 'intro waiting'; el.innerHTML = '<canvas aria-hidden="true"></canvas><p class="intro-skip">Tap to start with sound</p>';
   document.body.appendChild(el); document.body.classList.add('intro-on');
-  const cv = el.firstChild, g = cv.getContext('2d'), label = el.lastChild, dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  const layer = document.createElement('canvas'), lg = layer.getContext('2d');   // the ground is drawn here, then laid over the last frame to smear it at speed
-  let W = 0, H = 0, M = 0; const size = () => { W = window.innerWidth; H = window.innerHeight; M = Math.max(W, H); cv.width = layer.width = Math.round(W * dpr); cv.height = layer.height = Math.round(H * dpr); };
+  const cv = el.firstChild, g = cv.getContext('2d'), label = el.lastChild, dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+  /* the scene is drawn on a square sheet big enough to be turned to any angle, then laid onto the screen */
+  const layer = document.createElement('canvas'), lg = layer.getContext('2d');
+  let W = 0, H = 0, M = 0, D = 0, F = 0; const size = () => { W = window.innerWidth; H = window.innerHeight; M = Math.max(W, H); D = Math.ceil(Math.hypot(W, H)); F = D * 0.62; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); layer.width = layer.height = Math.round(D * dpr); };
   size(); window.addEventListener('resize', size);
   const globe = Globe.create(Math.min(512, Math.round(Math.min(W, H) * dpr)));
   let seed = 41; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const sin = Math.sin, clamp = x => Math.max(0, Math.min(1, x));
+  const sin = Math.sin, clamp = x => Math.max(0, Math.min(1, x)), mix = (a, b, t) => a + (b - a) * t;
 
-  /* ---- the ground, in map units: jungle in the west, then farmland, a beach, and the sea ---- */
-  const jungleEdge = y => 4.6 + 0.35 * sin(1.3 * y + 0.4) + 0.15 * sin(3.1 * y);
-  const coast = y => 7.6 + 0.3 * sin(0.9 * y + 1.2) + 0.12 * sin(2.7 * y + 0.5);
-  const riverY = x => 0.5 * sin(0.9 * x + 0.3) + 0.18 * sin(2.3 * x + 1) - 0.04 * x + 0.25;
-  const riverW = x => 0.08 + 0.022 * (x + 3);
-  const CELL = 0.5, trees = new Map(), TREE = ['#1f7a3a', '#2a8c44', '#37a04f', '#4bb35a', '#5cc064'], LIGHT = ['#2f9149', '#3ba554', '#4dba62', '#63c96f', '#78d67f'];
-  for (let i = 0; i < 9500; i++) {
-    const x = -3.4 + R() * 8.6, y = -5 + R() * 10; if (x > jungleEdge(y) - 0.05 || Math.abs(y - riverY(x)) < riverW(x) * 0.7 + 0.04) continue;
-    const k = Math.floor(x / CELL) + ',' + Math.floor(y / CELL); if (!trees.has(k)) trees.set(k, []); trees.get(k).push([x, y, 0.06 + R() * 0.045, Math.floor(R() * 5)]);
-  }
-  const FIELD = ['#b9e07a', '#7ecb5f', '#a6de7c', '#d3e58a', '#8fd465'], fields = [], clumps = [], waves = [];
-  for (let i = 0; i < 380; i++) { const y = -5 + R() * 10, x = jungleEdge(y) + 0.15 + R() * (coast(y) - jungleEdge(y) - 0.5); if (Math.abs(y - riverY(x)) < riverW(x) * 0.8 + 0.1) continue; fields.push([x, y, 0.16 + R() * 0.16, 0.12 + R() * 0.12, FIELD[Math.floor(R() * 5)]]); }
-  for (let i = 0; i < 220; i++) { const y = -5 + R() * 10, x = jungleEdge(y) + 0.05 + R() * (coast(y) - jungleEdge(y) - 0.3); if (Math.abs(y - riverY(x)) > riverW(x) + 0.03) clumps.push([x, y, 0.03 + R() * 0.035]); }
-  for (let i = 0; i < 300; i++) { const y = -5.5 + R() * 11; waves.push([coast(y) + 0.5 + R() * 9, y, 0.08 + R() * 0.14]); }
-  const streaks = Array.from({ length: 46 }, () => [R() * 2 - 1, R(), 0.5 + R()]);
+  /* ---- the land the camera flies over, as a long map. u runs forward (the way the camera travels), v runs sideways.
+          Going forward: jungle, a river, farmland, desert with a river through it, a green coast, a beach, the open sea. ---- */
+  const PPU = 48, V0 = -8, U0 = -4, TW = 16 * PPU, TL = 64 * PPU;
+  const eJungle = v => 7.5 + 0.5 * sin(0.9 * v + 0.4) + 0.2 * sin(2.3 * v), river1 = v => 9.7 + 0.55 * sin(0.7 * v + 1) + 0.2 * sin(1.9 * v);
+  const eDry = v => 12.6 + 0.6 * sin(0.8 * v + 2), river2 = v => 18.4 + 0.8 * sin(0.6 * v) + 0.25 * sin(1.7 * v + 2);
+  const eCoast = v => 23.4 + 0.45 * sin(1.1 * v), eBeach = v => 25.5 + 0.3 * sin(0.8 * v + 1) + 0.12 * sin(2.6 * v);
+  const ground = document.createElement('canvas'); ground.width = TW; ground.height = TL;
+  (function paintGround() {
+    const c = ground.getContext('2d'), px = v => (v - V0) * PPU, py = u => (u - U0) * PPU;
+    c.fillStyle = '#1d6b34'; c.fillRect(0, 0, TW, TL);
+    const zone = (f, off, color) => { c.beginPath(); for (let v = V0; v <= -V0 + 0.01; v += 0.2) c.lineTo(px(v), py(f(v) + off)); c.lineTo(TW, TL); c.lineTo(0, TL); c.closePath(); c.fillStyle = color; c.fill(); };
+    const across = (f, w, color) => { c.strokeStyle = color; c.lineWidth = w * PPU; c.lineCap = 'butt'; c.beginPath(); for (let v = V0 - 0.5; v <= -V0 + 0.5; v += 0.2) c.lineTo(px(v), py(f(v))); c.stroke(); };
+    zone(eJungle, 0, '#8fcf62');
+    for (let i = 0; i < 520; i++) { const v = V0 + R() * 16, u = eJungle(v) + 0.2 + R() * (eDry(v) - eJungle(v) - 0.3); c.fillStyle = ['#b9e07a', '#7ecb5f', '#a6de7c', '#d3e58a', '#74c257'][Math.floor(R() * 5)]; c.fillRect(px(v) - 5, py(u) - 4, 9 + R() * 8, 7 + R() * 7); }
+    across(river1, 0.62, '#5dc9d6'); across(river1, 0.3, '#3f86c4');
+    zone(eDry, 0, '#c9b574'); zone(eDry, 1.3, '#dcc083');
+    /* dunes: long curved ridges, a light side and a shaded side */
+    for (let i = 0; i < 260; i++) { const v = V0 + R() * 16, u = eDry(v) + 1.4 + R() * (eCoast(v) - eDry(v) - 1.8), len = 0.5 + R() * 1.4, bend = (R() - 0.5) * 0.5; for (const [dy, color, w] of [[0, '#ecd49a', 4], [3.5, '#c4a468', 3]]) { c.strokeStyle = color; c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); c.moveTo(px(v - len / 2), py(u) + dy); c.quadraticCurveTo(px(v), py(u + bend) + dy, px(v + len / 2), py(u) + dy); c.stroke(); } }
+    across(river2, 1.05, '#7fbf5a'); across(river2, 0.4, '#5dc9d6'); across(river2, 0.18, '#3f86c4');
+    zone(eCoast, 0, '#a9cf72'); zone(eCoast, 0.5, '#7dc65b');
+    for (let i = 0; i < 420; i++) { const v = V0 + R() * 16, u = eCoast(v) + 0.3 + R() * (eBeach(v) - eCoast(v) - 0.35); c.fillStyle = R() < 0.5 ? '#3f9a4d' : '#57b05a'; c.beginPath(); c.arc(px(v), py(u), 2 + R() * 4, 0, 6.2832); c.fill(); }
+    zone(eBeach, 0, '#f3e6b4'); zone(eBeach, 0.34, '#f7fbfc'); zone(eBeach, 0.4, '#8ee0e3'); zone(eBeach, 0.9, '#3d9fda'); zone(eBeach, 1.7, '#1565b8'); zone(eBeach, 3.2, '#0f4fa2');
+    c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 1.2; c.lineCap = 'round';
+    for (let i = 0; i < 700; i++) { const v = V0 + R() * 16, u = eBeach(v) + 0.7 + R() * 32, w = 4 + R() * 9; c.beginPath(); c.moveTo(px(v) - w, py(u)); c.quadraticCurveTo(px(v), py(u) - w * 0.35, px(v) + w, py(u)); c.stroke(); }
+    /* the jungle from above: thousands of round crowns */
+    const TREE = ['#1f7a3a', '#2a8c44', '#37a04f', '#4bb35a', '#5cc064'], LIGHT = ['#2f9149', '#3ba554', '#4dba62', '#63c96f', '#78d67f'], crowns = [];
+    for (let i = 0; i < 6200; i++) { const v = V0 + R() * 16, u = U0 + R() * (eJungle(v) - U0 - 0.08); crowns.push([px(v), py(u), (0.09 + R() * 0.07) * PPU, Math.floor(R() * 5)]); }
+    crowns.forEach(t => { c.fillStyle = TREE[t[3]]; c.beginPath(); c.arc(t[0], t[1], t[2], 0, 6.2832); c.fill(); });
+    crowns.forEach(t => { c.fillStyle = LIGHT[t[3]]; c.beginPath(); c.arc(t[0] - t[2] * 0.25, t[1] - t[2] * 0.28, t[2] * 0.5, 0, 6.2832); c.fill(); });
+  })();
+  const baseColor = (u, v) => (u < eJungle(v) ? '#1d6b34' : u < eDry(v) ? '#8fcf62' : u < eCoast(v) ? '#dcc083' : u < eBeach(v) ? '#7dc65b' : u < eBeach(v) + 0.4 ? '#f3e6b4' : u < eBeach(v) + 1.7 ? '#3d9fda' : '#0f4fa2');
+  /* trees that stand up, for the part of the journey spent inside and just above the forest */
+  const trees = [];
+  for (let i = 0; i < 900; i++) { const v = -5 + R() * 10, u = 0.3 + R() * 7; if (Math.abs(v) < 0.3) continue; trees.push({ u, v, h: 0.27 + R() * 0.15, w: 0.014 + R() * 0.013, r: 0.09 + R() * 0.06, k: R() }); }
+  for (let i = 0; i < 380; i++) { const v = -3 + R() * 6, u = 0.3 + R() * 6.6; if (Math.abs(v) < 0.16) continue; trees.push({ u, v, h: 0.03 + R() * 0.04, w: 0, r: 0.05 + R() * 0.05, k: R() }); }   // undergrowth
+  trees.sort((a, b) => b.u - a.u);
 
-  function drawGround(cam, S, th) {
-    const c = lg; c.setTransform(dpr, 0, 0, dpr, 0, 0); c.fillStyle = '#1e6e36'; c.fillRect(0, 0, W, H);
-    c.save(); c.translate(W / 2, H / 2); c.rotate(th); c.scale(S, S); c.translate(-cam.x, -cam.y);
-    const vr = Math.hypot(W, H) / 2 / S + 0.3, x0 = cam.x - vr, x1 = cam.x + vr, y0 = cam.y - vr, y1 = cam.y + vr;
-    const zone = (f, off, color) => { if (f(cam.y) + off - 0.6 > x1) return; c.beginPath(); for (let y = y0; y <= y1 + 0.2; y += 0.2) c.lineTo(f(y) + off, y); c.lineTo(x1 + 1, y1 + 0.2); c.lineTo(x1 + 1, y0); c.closePath(); c.fillStyle = color; c.fill(); };
-    zone(jungleEdge, 0, '#9ad96f');
-    if (x1 > 4) { c.save(); fields.forEach(f => { if (f[0] > x0 && f[0] < x1 && f[1] > y0 && f[1] < y1) { c.fillStyle = f[4]; c.fillRect(f[0] - f[2] / 2, f[1] - f[3] / 2, f[2], f[3]); } }); c.restore();
-      c.fillStyle = '#3f9a4d'; c.beginPath(); clumps.forEach(t => { if (t[0] > x0 && t[0] < x1 && t[1] > y0 && t[1] < y1) { c.moveTo(t[0] + t[2], t[1]); c.arc(t[0], t[1], t[2], 0, 6.2832); } }); c.fill(); }
-    zone(coast, -0.13, '#f2e4b0'); zone(coast, 0, '#7fdbe0'); zone(coast, 0.4, '#3b9bd6'); zone(coast, 0.95, '#0f4fa8');
-    /* the river, wider toward the sea */
-    c.lineCap = 'round';
-    for (const [color, k] of [['#5dc9d6', 1], ['#3f86c4', 0.45]]) { c.strokeStyle = color; for (let x = Math.max(-3.6, x0); x < Math.min(7.9, x1); x += 0.08) { c.lineWidth = riverW(x) * k; c.beginPath(); c.moveTo(x, riverY(x)); c.lineTo(x + 0.08, riverY(x + 0.08)); c.stroke(); } }
-    /* the canopy: one round crown per tree, with a lighter cap when the camera is close */
-    if (x0 < 5.2) {
-      const seen = [[], [], [], [], []];
-      for (let ix = Math.floor(x0 / CELL); ix <= Math.floor(x1 / CELL); ix++) for (let iy = Math.floor(y0 / CELL); iy <= Math.floor(y1 / CELL); iy++) { const b = trees.get(ix + ',' + iy); if (b) for (const t of b) seen[t[3]].push(t); }
-      seen.forEach((list, i) => { c.fillStyle = TREE[i]; c.beginPath(); for (const t of list) { c.moveTo(t[0] + t[2], t[1]); c.arc(t[0], t[1], t[2], 0, 6.2832); } c.fill(); });
-      if (S * 0.08 > 9) seen.forEach((list, i) => { c.fillStyle = LIGHT[i]; c.beginPath(); for (const t of list) { const r = t[2] * 0.5, x = t[0] - t[2] * 0.25, y = t[1] - t[2] * 0.28; c.moveTo(x + r, y); c.arc(x, y, r, 0, 6.2832); } c.fill(); });
+  function drawScene(cam) {
+    const c = lg, cx = D / 2, cy = D / 2, sp = sin(cam.pitch), cp = Math.cos(cam.pitch), STEP = 2;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const yh = cam.pitch > 1.35 ? -1 : cy - F * Math.tan(cam.pitch);
+    if (yh > 0) { const sky = c.createLinearGradient(0, yh - D * 0.7, 0, yh); sky.addColorStop(0, '#3f8fe0'); sky.addColorStop(0.7, '#9fd0f5'); sky.addColorStop(1, '#e3f3fd'); c.fillStyle = sky; c.fillRect(0, 0, D, Math.min(D, yh) + 1); }
+    /* the ground, one thin strip of the map for each row of the picture */
+    for (let y = Math.max(0, Math.floor(yh) + 1); y < D; y += STEP) {
+      const s = (cy - (y + STEP / 2)) / F, dz = -sp + s * cp; if (dz > -0.0005) continue;
+      const t = cam.h / -dz, u = cam.u + t * (cp + s * sp), half = t * (D / 2) / F;
+      c.fillStyle = baseColor(u, cam.v); c.fillRect(0, y, D, STEP);
+      const ty = Math.floor((u - U0) * PPU); if (ty < 0 || ty >= TL) continue;
+      const sx0 = (cam.v - half - V0) * PPU, sx1 = (cam.v + half - V0) * PPU, a = Math.max(0, sx0), b = Math.min(TW, sx1); if (b - a < 0.01) continue;
+      const k = D / (sx1 - sx0); c.drawImage(ground, a, ty, b - a, 1, (a - sx0) * k, y, (b - a) * k, STEP);
     }
-    if (x1 > 8) { c.strokeStyle = 'rgba(255,255,255,.4)'; c.lineWidth = 0.014; c.beginPath(); waves.forEach(w => { if (w[0] > x0 && w[0] < x1 && w[1] > y0 && w[1] < y1) { c.moveTo(w[0] - w[2], w[1]); c.quadraticCurveTo(w[0], w[1] - w[2] * 0.35, w[0] + w[2], w[1]); } }); c.stroke(); }
-    c.restore();
+    if (yh > 0 && yh < D) {
+      const fog = clamp(1 - cam.pitch / 0.9), hz = c.createLinearGradient(0, yh, 0, yh + D * 0.17); hz.addColorStop(0, `rgba(218,238,250,${0.92 * fog})`); hz.addColorStop(1, 'rgba(218,238,250,0)'); c.fillStyle = hz; c.fillRect(0, yh, D, D * 0.17);
+    }
+    /* under the canopy the forest floor is in shade */
+    const shade = clamp((0.36 - cam.h) / 0.2) * clamp((7.4 - cam.u) / 0.6);
+    if (shade > 0 && yh < D) { c.fillStyle = `rgba(12,38,20,${0.72 * shade})`; c.fillRect(0, Math.max(0, yh), D, D); }
+    const standing = clamp(1 - (cam.h - 0.9) / 0.9);
+    if (standing > 0 && cam.u < 8.2) {
+      c.globalAlpha = standing;
+      for (const tr of trees) {
+        const du = tr.u - cam.u; if (du < 0.1 || du > 9) continue;
+        const dep = z => du * cp - (z - cam.h) * sp, depth = dep(0); if (depth < 0.1) continue;
+        const sc = F / depth, x = cx + (tr.v - cam.v) * sc; if (x < -200 || x > D + 200) continue;
+        const yAt = z => cy - F * (du * sp + (z - cam.h) * cp) / dep(z), far = clamp(depth / 7), tone = (r, g2, b) => `rgb(${Math.round(mix(r, 196, far * 0.62))},${Math.round(mix(g2, 226, far * 0.62))},${Math.round(mix(b, 214, far * 0.62))})`;
+        if (tr.w) {   // a trunk that narrows toward the top, lit on one side
+          const y0 = yAt(0), y1 = yAt(tr.h * 0.8), w = Math.max(1, tr.w * sc), w1 = w * 0.62;
+          c.fillStyle = tone(70, 50, 34); c.beginPath(); c.moveTo(x - w / 2, y0); c.lineTo(x + w / 2, y0); c.lineTo(x + w1 / 2, y1); c.lineTo(x - w1 / 2, y1); c.closePath(); c.fill();
+          c.fillStyle = tone(104, 78, 52); c.beginPath(); c.moveTo(x - w / 2, y0); c.lineTo(x - w * 0.18, y0); c.lineTo(x - w1 * 0.18, y1); c.lineTo(x - w1 / 2, y1); c.closePath(); c.fill();
+        }
+        const yc = yAt(tr.h), r = tr.r * sc, dark = tr.w ? [24 + tr.k * 22, 104 + tr.k * 36, 50] : [34, 124 + tr.k * 30, 58];
+        c.fillStyle = tone(dark[0], dark[1], dark[2]); for (const [ox, oy, k] of [[-0.55, 0.25, 0.8], [0.6, 0.2, 0.85], [0, -0.2, 1]]) { c.beginPath(); c.arc(x + r * ox, yc + r * oy, r * k, 0, 6.2832); c.fill(); }
+        c.fillStyle = tone(dark[0] + 26, dark[1] + 34, dark[2] + 24); c.beginPath(); c.arc(x - r * 0.2, yc - r * 0.42, r * 0.55, 0, 6.2832); c.fill();
+      }
+      c.globalAlpha = 1;
+    }
+    /* leaves overhead while the camera is still below the treetops */
+    const roof = clamp((0.3 - cam.h) / 0.14);
+    if (roof > 0) { const top = cy - D * 0.5, rg = c.createLinearGradient(0, top, 0, cy - D * 0.08); rg.addColorStop(0, `rgba(10,44,22,${0.9 * roof})`); rg.addColorStop(1, 'rgba(10,44,22,0)'); c.fillStyle = rg; c.fillRect(0, 0, D, cy); }
   }
   function drawSky(a) {
     g.globalAlpha = a; const bg = g.createLinearGradient(W, 0, 0, H); bg.addColorStop(0, '#012a70'); bg.addColorStop(0.5, '#0f4699'); bg.addColorStop(1, '#2f6db8');
     g.fillStyle = bg; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
   }
+  const show = (yaw, alpha) => { g.save(); g.globalAlpha = alpha; g.translate(W / 2, H / 2); g.rotate(yaw); g.drawImage(layer, -D / 2, -D / 2, D, D); g.restore(); };
 
-  const PAN = 1.6, RISE = 1.25, t0 = performance.now();
-  let phase = 'hover', goAt = 0, rot = 1.2, spin = 7, last = t0, raf = 0, skipped = false, flyStart = 0, target = null, finished = false, autoGo = 0;
+  /* the flight, in seconds from the start: RUN along the ground and up, TURN to look straight down, then pull OUT to space */
+  const RUN = 1.5, TURN = 0.65, OUT = 0.85, t0 = performance.now(), H0 = 0.036, H1 = 3.2, H2 = 10, H3 = 26, U1 = 22.6, TRAVEL = 3.6;
+  let phase = 'walk', goAt = 0, uGo = 0.25, rot = 1.2, spin = 7, last = t0, raf = 0, skipped = false, flyStart = 0, target = null, finished = false, autoGo = 0;
   let resolveLanding; const untilLanding = new Promise(r => { resolveLanding = r; });
-  const Rf = () => Math.min(W, H) * 0.17, cubic = p => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+  const Rf = () => Math.min(W, H) * 0.17, smooth = p => p * p * (3 - 2 * p);
 
   function frame(now) {
     if (finished) return; raf = requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (phase === 'fly') {
-      const q = clamp((now - flyStart) / (skipped ? 200 : 850)), e = q * q * (3 - 2 * q);
+      const q = clamp((now - flyStart) / (skipped ? 200 : 800)), e = smooth(q);
       spin += (2.4 - spin) * Math.min(1, dt * 3); rot += dt * spin;
       g.clearRect(0, 0, W, H); drawSky(1 - e);
       if (target && !skipped) { globe.paint(rot); globe.drawTo(g, W / 2 + (target.x - W / 2) * e, H / 2 + (target.y - H / 2) * e, Rf() + (target.r - Rf()) * e); }
@@ -2674,30 +2807,35 @@ function siteIntro() {
       return;
     }
     if (phase === 'hold') { spin += (3 - spin) * Math.min(1, dt * 2); rot += dt * spin; drawSky(1); globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Rf()); return; }
-    const tp = phase === 'hover' ? 0 : (now - goAt) / 1000, hover = (now - t0) / 1000;
-    if (tp <= PAN) {
-      /* low over the jungle, then the ground races past toward the sea while the camera climbs */
-      const p = tp / PAN, e = cubic(p), speed = phase === 'hover' ? 0 : (p < 0.5 ? 4 * p * p : 4 * (1 - p) * (1 - p));
-      const cam = { x: 1 + Math.min(hover, 1.2) * 0.06 + 10.4 * e, y: 0.4 - 1.0 * e }, th = -0.5 + 0.42 * e, S = M * (0.6 - 0.4 * Math.pow(e, 1.15));
-      drawGround(cam, S, th);
-      g.globalAlpha = 1 - 0.55 * speed; g.drawImage(layer, 0, 0, W, H); g.globalAlpha = 1;
-      if (speed > 0.05) {
-        const dx = Math.cos(th), dy = Math.sin(th), D = Math.hypot(W, H); g.lineCap = 'round'; g.lineWidth = 2;
-        streaks.forEach(s => { const f = (s[1] + (now - goAt) / 300 * s[2]) % 1, along = (0.5 - f) * D * 1.4, across = s[0] * D * 0.6, x = W / 2 + dx * along - dy * across, y = H / 2 + dy * along + dx * across, len = D * 0.22 * speed * s[2]; g.strokeStyle = `rgba(255,255,255,${0.3 * speed})`; g.beginPath(); g.moveTo(x, y); g.lineTo(x + dx * len, y + dy * len); g.stroke(); });
-      }
-    } else {
-      /* high above the sea now: pull straight back until the whole spinning Earth fits in view */
-      const q = clamp((tp - PAN) / RISE), eo = 1 - Math.pow(1 - q, 3), aW = clamp(1 - q / 0.32), Rbig = M * 2.4, Rg = Math.exp(Math.log(Rbig) + (Math.log(Rf()) - Math.log(Rbig)) * eo);
-      spin += (4.2 - spin) * Math.min(1, dt * 1.2); rot += dt * spin;
-      drawSky(1); g.globalAlpha = clamp(q / 0.22); globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Rg); g.globalAlpha = 1;
-      if (aW > 0) { drawGround({ x: 11.4, y: -0.6 }, M * 0.2 * Math.exp(-5 * q), -0.08); g.globalAlpha = aW; g.drawImage(layer, 0, 0, W, H); g.globalAlpha = 1; }
-      if (q >= 1) { phase = 'hold'; resolveLanding(); }
+    if (phase === 'walk') {
+      /* a few feet above the ground, walking forward between the trunks */
+      const tw = (now - t0) / 1000; uGo = 0.25 + 0.3 * tw;
+      drawScene({ u: uGo, v: 0.02 * sin(tw * 4.5), h: H0 + 0.004 * sin(tw * 9), pitch: 0 }); show(0, 1); return;
     }
-    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.hypot(W, H) * 0.65); vg.addColorStop(0, 'rgba(2,11,36,0)'); vg.addColorStop(1, 'rgba(2,11,36,.38)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
+    const t = (now - goAt) / 1000;
+    if (t < RUN) {
+      /* faster and faster: out through the treetops, over the river, the farmland and the desert, to the coast */
+      const p = t / RUN, e = Math.pow(p, 2.3);
+      drawScene({ u: mix(uGo, U1, e), v: 0.5 * sin(p * 2.2), h: H0 * Math.pow(H1 / H0, Math.pow(p, 1.2)), pitch: 0.25 * p * p });
+      show(0, 1 - 0.45 * clamp(p * 1.4));
+    } else if (t < RUN + TURN) {
+      /* over the beach, still moving and climbing, the camera swings round and tips down until it looks straight at the ground */
+      const q = (t - RUN) / TURN, e = smooth(q);
+      drawScene({ u: U1 + TRAVEL * (1 - Math.pow(1 - q, 2.2)), v: 0.5 * sin(2.2), h: H1 * Math.pow(H2 / H1, q), pitch: mix(0.25, Math.PI / 2, e) });
+      show(-1.9 * e, 0.62);
+    } else {
+      /* straight up and away: the ground shrinks, and the whole turning Earth comes into view */
+      const r = clamp((t - RUN - TURN) / OUT), eo = 1 - Math.pow(1 - r, 3), aW = clamp(1 - (r - 0.12) / 0.33), Rbig = M * 2.4, Rg = Math.exp(Math.log(Rbig) + (Math.log(Rf()) - Math.log(Rbig)) * eo);
+      spin += (4.2 - spin) * Math.min(1, dt * 1.2); rot += dt * spin;
+      drawSky(1); g.globalAlpha = clamp((r - 0.08) / 0.3); globe.paint(rot); globe.drawTo(g, W / 2, H / 2, Rg); g.globalAlpha = 1;
+      if (aW > 0) { drawScene({ u: U1 + TRAVEL + 1.5 * r, v: 0.5 * sin(2.2), h: H2 * Math.pow(H3 / H2, clamp(r / 0.45)), pitch: Math.PI / 2 }); show(-1.9 - 1.1 * r, aW * 0.85); }
+      if (r >= 1) { phase = 'hold'; resolveLanding(); }
+    }
+    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.hypot(W, H) * 0.65); vg.addColorStop(0, 'rgba(2,11,36,0)'); vg.addColorStop(1, 'rgba(2,11,36,.32)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
   }
-  function start(withTap) {
-    if (phase !== 'hover') return; clearTimeout(autoGo);
-    phase = 'pan'; goAt = performance.now(); el.classList.remove('waiting'); label.textContent = 'Tap to skip';
+  function start() {
+    if (phase !== 'walk') return; clearTimeout(autoGo);
+    phase = 'run'; goAt = performance.now(); el.classList.remove('waiting'); label.textContent = 'Tap to skip';
     Sound.unlock(); Sound.play('whoosh');
   }
   function end() {
@@ -2707,10 +2845,10 @@ function siteIntro() {
     if (!skipped) { document.body.classList.add('intro-reveal'); setTimeout(() => document.body.classList.remove('intro-reveal'), 2200); Sound.play('land'); }
   }
   const skip = () => { if (skipped || phase === 'fly') return; skipped = true; el.classList.add('skipping'); if (phase !== 'hold') { phase = 'hold'; resolveLanding(); } };
-  /* the first tap starts it with sound (browsers only allow sound after a tap); a tap after that skips */
-  el.addEventListener('click', () => (phase === 'hover' ? start(true) : skip()));
-  window.addEventListener('keydown', () => (phase === 'hover' ? start(true) : skip()), { once: true });
-  autoGo = setTimeout(() => start(false), Sound.ready() ? 350 : 1300);
+  /* the first tap starts the flight with sound (browsers only allow sound after a tap); a tap after that skips */
+  el.addEventListener('click', () => (phase === 'walk' ? start() : skip()));
+  window.addEventListener('keydown', () => (phase === 'walk' ? start() : skip()), { once: true });
+  autoGo = setTimeout(start, Sound.ready() ? 250 : 900);
   raf = requestAnimationFrame(frame);
   return {
     untilLanding,
@@ -2855,7 +2993,7 @@ const NAV = [
   ['explore', 'Explore the Earth', 'globe'], ['results', 'Results', 'trophy'],
   ['team', 'Team', 'people'], ['faq', 'Questions', 'help'], ['contact', 'Contact', 'pin'],
 ];
-const BAR_LINKS = ['about', 'notices', 'countdown', 'explore', 'results', 'contact'];
+const BAR_LINKS = ['home', 'about', 'notices', 'countdown', 'explore', 'results', 'team', 'faq', 'contact'];
 function buildShell() {
   $('#site').innerHTML = `
   <header class="bar">
@@ -2872,10 +3010,8 @@ function buildShell() {
     <a href="#dashboard" data-nav="dashboard">${icon('user')}<span>Dashboard</span></a>
   </nav></div>
   <main id="view" tabindex="-1"></main>
-  <footer class="foot"><div class="wrap foot-grid">
-    <div><img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263"><small>${CLOUD ? 'Bangladesh Geography Olympiad (BGeO)' : 'Preview build with sample data. Sign-ups made here stay in this browser only.'}</small></div>
-    <nav aria-label="Olympiad"><a href="#about">About the olympiad</a><a href="#notices">Notices</a><a href="#countdown">Key dates</a><a href="#results">Results</a></nav>
-    <nav aria-label="Help"><a href="#faq">Questions and answers</a><a href="#team">Team and partners</a><a href="#contact">Contact</a></nav>
+  <footer class="foot"><div class="wrap">
+    <img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263"><small>${CLOUD ? 'Bangladesh Geography Olympiad (BGeO)' : 'Preview build with sample data. Sign-ups made here stay in this browser only.'}</small>
   </div><div class="wrap foot-base"><small>&copy; ${new Date().getFullYear()} Bangladesh Geography Olympiad. All rights reserved.</small><small>Designed and developed by Tawsikul Islam</small></div></footer>`;
   const sb = $('#sound-btn');
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
@@ -2886,6 +3022,7 @@ function openMenu() { $('#menu').hidden = false; const b = $('#menu-btn'); b.set
 function closeMenu() { const m = $('#menu'); if (!m || m.hidden) return; m.hidden = true; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'false'); b.innerHTML = icon('menu'); }
 function syncChrome(name) {
   $$('[data-nav]').forEach(a => { if (a.dataset.nav === name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  const here = $('.bar-links [aria-current]'), strip = $('.bar-links'); if (here && strip && strip.scrollWidth > strip.clientWidth) strip.scrollLeft = here.offsetLeft - (strip.clientWidth - here.offsetWidth) / 2;
   const u = Store.me(), b = $('#acct-btn');
   if (u) { b.textContent = u.role === 'admin' ? 'Admin' : 'Dashboard'; b.href = u.role === 'admin' ? '#admin' : '#dashboard'; }
   else { b.textContent = 'Log in'; b.href = '#login'; }
@@ -3527,7 +3664,6 @@ PAGES.register = () => {
    Flat colours and plain type, like an official document. Each card carries a QR code
    holding the student's registration number, so an admin can scan it at the venue. Every student
    gets the Regional round card; the National round card goes to the finalists. */
-const roundImg = new Image(); roundImg.src = LOGO_ROUND;
 const CARD_W = 1200, CARD_H = 756, CARD_FACE = '"Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const CARD_THEME = {
   regional: { round: 'Regional round', who: 'Participant', paper: '#ffffff', head: '#0b3d8f', headSoft: '#cfe0f7', accent: '#9ad96f', tagInk: '#04214f', ink: '#0a2350', soft: '#4b6088', line: '#dfe8f3', foot: '#f3f7fc', id: '#0b3d8f', qrEdge: '#c8d6e8', frame: '' },
@@ -3560,11 +3696,10 @@ function drawCard(u, kind) {
   g.fillStyle = T.paper; g.fillRect(0, 0, W, H);
   /* header: who issues the card, and for which round */
   g.fillStyle = T.head; g.fillRect(0, 0, W, 150); g.fillStyle = T.accent; g.fillRect(0, 150, W, 6);
-  if (roundImg.complete && roundImg.naturalWidth) g.drawImage(roundImg, X, 23, 104, 104);
   g.font = `700 26px ${disp}`; const tw = g.measureText(T.round).width + 48;
   g.fillStyle = T.accent; g.fillRect(R - tw, 49, tw, 52); g.fillStyle = T.tagInk; g.textAlign = 'center'; g.fillText(T.round, R - tw / 2, 84); g.textAlign = 'left';
-  g.fillStyle = '#ffffff'; fit('Bangladesh Geography Olympiad', R - tw - 40 - (X + 128), 34, 700, disp); g.fillText('Bangladesh Geography Olympiad', X + 128, 71);
-  g.fillStyle = T.headSoft; g.font = `500 23px ${body}`; g.fillText(`Admit card${season ? ', ' + season + ' season' : ''}`, X + 128, 108);
+  g.fillStyle = '#ffffff'; fit('Bangladesh Geography Olympiad', R - tw - 40 - X, 38, 700, disp); g.fillText('Bangladesh Geography Olympiad', X, 72);
+  g.fillStyle = T.headSoft; g.font = `500 24px ${body}`; g.fillText(`Admit card${season ? ', ' + season + ' season' : ''}`, X, 110);
   /* the QR code and the registration number under it */
   const Q = 250, qx = R - Q, qy = 190;
   g.fillStyle = '#ffffff'; g.fillRect(qx - 8, qy - 8, Q + 16, Q + 16);
@@ -3602,7 +3737,6 @@ const isNational = round => /national/i.test(round || '');
 const hasNationalCard = u => (u.selected || []).some(s => isNational(s.round));
 async function cardReady() {
   try { if (document.fonts && document.fonts.load) await Promise.race([Promise.all([500, 600, 700, 800].map(w => document.fonts.load(`${w} 28px "Inter"`))), new Promise(r => setTimeout(r, 2500))]); } catch (e) { /* fall back to the device's own fonts */ }
-  if (!roundImg.complete) await new Promise(r => { roundImg.addEventListener('load', r, { once: true }); roundImg.addEventListener('error', r, { once: true }); setTimeout(r, 2500); });
 }
 const dataBytes = url => { const bin = atob(url.split(',')[1] || ''), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return bytes; };
 /* the finished picture, drawn only once the site's fonts and the logo are ready */
