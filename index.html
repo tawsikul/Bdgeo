@@ -374,7 +374,9 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 
 /* footer, compass, toasts, dialogs */
 /* the footer, from the Figma: deep navy, the committee's details on the left, two columns of links on the right, small print along the bottom */
-.foot{position:relative;padding:10px 8px 8px;background:#f1f5fb;color:#fff}
+/* the footer has no ground of its own: the page's blue runs on behind it, or the pale ground on a pale page, so it joins what is above */
+.foot{position:relative;padding:10px 8px 8px;background:transparent;color:#fff}
+.on-light .foot{background:#f1f5fb}
 /* laid out the way Upwork lays out its footer: one dark rounded panel set in from the page's edges; on a phone the groups of
    links fold into rows that open with a tap; then "Follow us" and the icons; a hairline; the small print */
 .foot-card{max-width:1480px;margin:0 auto;background:#052057;border-radius:18px;padding:30px 20px 22px}
@@ -3721,6 +3723,7 @@ function render() {
   /* a fresh holder for every page, so one page's tap handlers can never fire on the next */
   /* every page but the home page and the countdown is a blue title band over a pale body */
   const holder = document.createElement('div'); holder.className = name === 'countdown' || !(isDashRoute(name) || (PAGES[name] && name !== 'home')) ? 'page' : 'page page-light'; holder.innerHTML = page.html; view.replaceChildren(holder);
+  $('#site').classList.toggle('on-light', holder.classList.contains('page-light'));   // the footer takes the ground of the page above it
   if (page.mount) page.mount(holder);
   arriveOnScroll(holder);
   syncChrome(isDashRoute(name) ? (DASH_ALIAS[name] || name) : PAGES[name] ? name : 'home');
