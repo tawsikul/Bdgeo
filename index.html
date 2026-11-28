@@ -78,6 +78,11 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 /* the admit card button: a square with the download arrow on a phone or tablet, the full label on a computer */
 .bar .bar-admit{padding:0;width:44px;min-height:44px}
 .bar .bar-admit span{display:none}
+.bar .bar-admit span i{font-style:normal}.bar .bar-admit .long{display:none}
+/* a visitor on a phone finds the admit card button at the bottom of the menu; the top bar keeps its one-tap button for a student who has a card */
+@media(max-width:739px){.bar.offers-card .bar-admit{display:none}}
+.menu-admit{display:flex;width:100%;max-width:640px;margin:14px auto 0;min-height:54px;justify-content:center;gap:10px;font-size:1.05rem}
+.menu-admit[hidden]{display:none}
 .iconbtn{width:44px;height:44px;border-radius:12px;border:0;display:grid;place-content:center;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,background .2s}
 .iconbtn:active{transform:scale(.9)}
 .iconbtn.dark{background:var(--foam);color:var(--ink)}
@@ -87,6 +92,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 @media(min-width:740px) and (max-width:859px){.brand img{height:38px}.bar{gap:8px}.bar-tools{gap:6px}.bar-links > a,.dd-btn{font-size:.875rem;padding-inline:5px}.bar .iconbtn{width:38px;height:38px}.bar .btn-sm{padding:0 10px;gap:5px}}
 .bar.bar-tight .bar-links{display:none}
 @media(min-width:740px){.bar .bar-admit{width:40px;min-height:40px}}
+@media(min-width:1320px){.bar .bar-admit .long{display:inline}.bar .bar-admit .short{display:none}}
 @media(min-width:1000px){.bar-links{gap:4px}.bar .bar-admit{width:auto;min-height:38px;padding:0 14px}.bar .bar-admit span{display:inline}#menu-btn{display:none}.bar.bar-tight #menu-btn{display:grid}}
 @media(max-width:420px){.bar.has-card #acct-btn{width:44px;padding:0}.bar.has-card #acct-btn span{display:none}}
 
@@ -175,7 +181,8 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .stage.landed::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(154,217,111,.7);pointer-events:none;animation:ringOut .7s var(--ease) both}
 @keyframes ringOut{from{transform:scale(1);opacity:.9}to{transform:scale(1.22);opacity:0}}
 @keyframes settle{from{transform:scale(.96);opacity:.4}to{transform:none;opacity:1}}
-.learn{display:inline-flex;align-items:center;gap:7px;min-height:46px;padding:0 6px;color:var(--lime);font-weight:600;text-decoration:none}
+.learn{display:inline-flex;align-items:center;gap:7px;min-height:46px;padding:0 6px;color:var(--lime);font-weight:700;text-decoration:none}
+.hero .btn{font-weight:700}   /* the two buttons under the headline are a step bolder than the rest; every other button stays semi-bold */
 .learn .ic,.door-go .ic,.nu-go .ic,.btn .ic{transition:transform var(--m-in) var(--ease)}
 .lede{font-size:1.16rem;color:#e2edfc;max-width:46ch}
 .lede strong{color:#fff;font-weight:600}
@@ -2558,18 +2565,24 @@ const Store = (() => {
     reset() { db = seed(); session = null; save(); write(SKEY, null); },
 
     /* accounts */
-    signIn(email, pw) {
+    /* `who` is an email or a registration number. A registration number is turned into its email by the database, which
+       hands the email over only when the password is right (see login_email in database-setup.sql). */
+    signIn(who, pw) {
+      const id = String(who).trim(), byEmail = id.includes('@'), reg = id.replace(/\s+/g, '');
+      const noMatch = byEmail ? 'That email and password do not match. Check both and try again.' : 'That registration number and password do not match. Check both and try again. After several wrong tries, wait 15 minutes.';
       if (CLOUD) return (async () => {
         try {
-          const r = await sb.auth.signInWithPassword({ email: String(email).trim(), password: pw });
-          if (r.error) return { error: friendly(r.error) };
+          let email = id;
+          if (!byEmail) { const f = await sb.rpc('login_email', { reg, pass: pw }); if (f.error) return { error: friendly(f.error) }; if (!f.data) return { error: noMatch }; email = f.data; }
+          const r = await sb.auth.signInWithPassword({ email, password: pw });
+          if (r.error) return { error: byEmail ? friendly(r.error) : noMatch };
           await refresh(); const u = me();
           if (!u) { await sb.auth.signOut(); return { error: 'This account has no olympiad profile. Please contact the organisers.' }; }
           return { user: u };
         } catch (e) { return { error: friendly(e) }; }
       })();
-      const u = db.users.find(x => x.email.toLowerCase() === String(email).trim().toLowerCase());
-      if (!u || u.pass !== hashPw(pw)) return { error: 'That email and password do not match. Check both and try again.' };
+      const u = db.users.find(x => (byEmail ? x.email.toLowerCase() === id.toLowerCase() : x.regNo && x.regNo === reg));
+      if (!u || u.pass !== hashPw(pw)) return { error: noMatch };
       session = u.id; write(SKEY, session); return { user: u };
     },
     signUp(d) {
@@ -3605,7 +3618,7 @@ function buildShell() {
       ${BAR_MENU.map((m, i) => (m.items ? `<div class="dd"><button type="button" class="dd-btn" aria-expanded="false" data-dd="${i}">${m.label} ${icon('down', 14)}</button><div class="dd-menu" hidden>${m.items.map(x => `<a href="#${x[0]}" data-nav="${x[0]}">${x[1]}</a>`).join('')}</div></div>` : `<a href="#${m.to}" data-nav="${m.to}">${m.label}</a>`)).join('')}
     </nav>
     <div class="bar-tools">
-      <button type="button" class="btn btn-lime btn-sm bar-admit" id="bar-admit" aria-label="Download admit card" title="Download admit card" hidden><span>Admit card</span>${icon('download', 16)}</button>
+      <button type="button" class="btn btn-lime btn-sm bar-admit" id="bar-admit" data-admit aria-label="Download admit card" title="Download admit card" hidden><span><i class="long">Download admit card</i><i class="short">Admit card</i></span>${icon('download', 16)}</button>
       <a class="btn btn-ghost btn-sm" id="acct-btn" href="#login">Login</a>
       <button type="button" class="iconbtn" id="sound-btn" aria-label="Sound effects"></button>
       <button type="button" class="iconbtn" id="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Menu">${icon('menu')}</button>
@@ -3615,7 +3628,7 @@ function buildShell() {
     ${NAV.map(n => `<a href="#${n[0]}" data-nav="${n[0]}">${icon(n[2])}<span>${n[1]}</span></a>`).join('')}
     <a href="#register" data-nav="register">${icon('edit')}<span>Registration</span></a>
     <a href="#dashboard" data-nav="dashboard">${icon('user')}<span>Dashboard</span></a>
-  </nav></div>
+  </nav><button type="button" class="btn btn-lime menu-admit" data-admit hidden>${icon('download', 18)}<span>Download admit card</span></button></div>
   <main id="view" tabindex="-1"></main>
   <footer class="foot"><div class="foot-card">
     <div class="foot-top">
@@ -3642,7 +3655,7 @@ function buildShell() {
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
   paintSound(); sb.addEventListener('click', () => { Sound.toggle(); paintSound(); });
   $('#menu-btn').addEventListener('click', () => ($('#menu').hidden ? openMenu() : closeMenu()));
-  $('#bar-admit').addEventListener('click', e => downloadMyCard(e.currentTarget));
+  $$('[data-admit]').forEach(b => b.addEventListener('click', e => { closeMenu(); admitTap(e.currentTarget); }));
   /* drop-downs open on a tap and close on a second tap, a tap elsewhere, or Escape */
   document.addEventListener('click', e => {
     const b = e.target.closest('.dd-btn'), open = b && b.getAttribute('aria-expanded') === 'true';
@@ -3691,8 +3704,9 @@ function syncChrome(name) {
   const u = Store.me(), b = $('#acct-btn');
   const what = u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login';
   b.innerHTML = `${icon('account', 18)}<span>${what}</span>`; b.setAttribute('aria-label', what); b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
-  const hasCard = cardOpenFor(u);
-  $$('.bar-admit').forEach(a => { a.hidden = !hasCard; }); $('.bar').classList.toggle('has-card', hasCard);
+  /* the admit card buttons show to a student who has a card, and to any visitor while cards are open (a visitor logs in first) */
+  const hasCard = cardOpenFor(u), offer = hasCard || (!u && !!Store.db.settings.cardsOpen);
+  $$('[data-admit]').forEach(a => { a.hidden = !offer; }); $('.bar').classList.toggle('has-card', hasCard); $('.bar').classList.toggle('offers-card', offer && !hasCard);
   $$('[data-nav="register"]').forEach(a => { a.hidden = !!u; });
   $$('.menu [data-nav="dashboard"]').forEach(a => { a.hidden = !!(u && u.role === 'admin'); });
   fitBar();
@@ -3781,7 +3795,7 @@ PAGES.home = () => {
   const me = Store.me(), ev = Store.nextEvent(), ex = Store.eRegional(), notices = Store.notices().slice(0, 3), news = Store.news();
   const gallery = (Store.db.settings.media || []).map(mediaItemHtml).filter(Boolean);
   const cta = me ? `<a class="btn btn-lime" href="#${me.role === 'admin' ? 'admin' : 'dashboard'}">${me.role === 'admin' ? 'Open the admin portal' : 'Open my dashboard'}</a>`
-    : Store.db.settings.regOpen ? '<a class="btn btn-lime" href="#register">Register now!</a>' : '<span class="chip chip-sea">Registration is closed</span>';
+    : Store.db.settings.regOpen ? '<a class="btn btn-lime" href="#register">Register Now!</a>' : '<span class="chip chip-sea">Registration is closed</span>';
   const year = REG_PREFIX.slice(0, 4), bn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
   return {
     html: `<div class="home">
@@ -3791,7 +3805,7 @@ PAGES.home = () => {
         <div class="hero-copy">
           <h1 class="hero-title" lang="bn"><span class="sr-only">১ম বাংলাদেশ জিওগ্রাফি অলিম্পিয়াড ${bn(year)}</span>${heroMark()}</h1>
           <p class="lede">The <strong>1st Bangladesh Geography Olympiad ${year}</strong>, open to all young geographers and bright minds.</p>
-          <div class="btnrow">${cta}<a class="learn" href="#about">Learn more ${icon('goto', 20)}</a></div>
+          <div class="btnrow">${cta}<a class="learn" href="#about">Learn More ${icon('goto', 20)}</a></div>
         </div>
         <div class="stage" id="stage" tabindex="0" role="img" aria-label="The Earth, turning. Drag it, or press the left and right arrow keys, to spin it."><canvas aria-hidden="true"></canvas><span class="stage-hint" aria-hidden="true">Drag to spin</span></div>
       </div>
@@ -3872,7 +3886,7 @@ PAGES.about = () => ({
     <p class="muted" style="margin-top:10px">These groups are placeholders until the organisers confirm them.</p>
   </section>
   <section class="sheet"><h2>Rules</h2><p style="margin-top:8px">The full rules will be posted in Notices before the first round.</p>
-    <div class="btnrow" style="margin-top:14px"><a class="btn btn-ocean" href="#register">Register now</a><a class="btn btn-quiet" href="#faq">Questions and answers</a></div>
+    <div class="btnrow" style="margin-top:14px"><a class="btn btn-ocean" href="#register">Register Now</a><a class="btn btn-quiet" href="#faq">Questions and answers</a></div>
   </section>
   </div>`,
 });
@@ -4239,6 +4253,22 @@ const logoImg = new Image(); logoImg.src = LOGO_FULL;
 const simplePage = (title, text, href, label) => ({ html: `<div class="wrap narrow">${pageHead(title)}<section class="sheet stack"><p>${esc(text)}</p><div><a class="btn btn-ocean" href="${href}">${esc(label)}</a></div></section></div>` });
 let loginNext = '';
 const afterLogin = role => { const n = loginNext; loginNext = ''; return role === 'admin' ? 'admin' : (n || 'dashboard'); };
+/* Where a fresh login lands. A visitor who came through "Download admit card" lands in the dashboard and the card starts
+   downloading at once; if there is no card for them yet, they are told why. */
+function landAfterLogin(u) {
+  const next = afterLogin(u.role);
+  if (next !== 'card') return go(next);
+  go('dashboard');
+  if (cardOpenFor(u)) { toast('Your admit card is downloading. If it does not start, tap Download admit card.', 'good'); downloadMyCard(null); }
+  else toast(!Store.db.settings.cardsOpen ? 'Admit cards are not open yet. Watch Notices.' : `Admit cards are open for ${cardDistrictWords()} only for now.`, 'info');
+}
+/* the "Download admit card" buttons: one tap downloads for a student who has a card; a visitor is sent to log in first */
+function admitTap(btn) {
+  const u = Store.me();
+  if (cardOpenFor(u)) return downloadMyCard(btn);
+  if (u) return go(u.role === 'admin' ? 'admin' : 'dashboard');
+  loginNext = 'card'; go('login');
+}
 const needLogin = text => ({ html: `<div class="wrap narrow">${pageHead('Please log in')}<section class="sheet stack"><p>${esc(text)}</p><div class="btnrow"><a class="btn btn-ocean" href="#login">Log in</a><a class="btn btn-quiet" href="#register">Register</a></div></section></div>` });
 const previewNote = CLOUD ? '' : '<p class="note">Preview: accounts made here are saved in this browser only. Real sign-up starts when the online database is connected.</p>';
 function forgotDialog() {
@@ -4253,12 +4283,13 @@ function recoveryDialog() {
 
 PAGES.login = () => {
   if (Store.me()) return Store.me().role === 'admin' ? simplePage('You are logged in', 'This is an admin account.', '#admin', 'Open the admin portal') : simplePage('You are logged in', 'Your exam, resources and admit card are in your dashboard.', '#dashboard', 'Open my dashboard');
-  const fields = [{ key: 'email', label: 'Email', type: 'email', required: true, auto: 'email' }, { key: 'password', label: 'Password', type: 'password', required: true, auto: 'current-password' }];
+  const fields = [{ key: 'email', label: 'Registration number or email', type: 'text', required: true, auto: 'username', help: 'Your registration number is on your registration card. It looks like 2027010001.' }, { key: 'password', label: 'Password', type: 'password', required: true, auto: 'current-password' }];
+  const forCard = loginNext === 'card';
   return {
-    html: `<div class="wrap narrow">${pageHead('Log in', 'Open your account to see your admit card, the E-Regional exam and your notices.')}
+    html: `<div class="wrap narrow">${forCard ? pageHead('Download admit card', 'Log in with your registration number and password. Your admit card will start downloading straight away.') : pageHead('Log in', 'Open your account to see your admit card, the E-Regional exam and your notices.')}
       <section class="sheet"><form class="form" id="login-form" novalidate>${fields.map(f => fieldHtml(f, '', 'li')).join('')}
         <p class="err" role="alert" hidden></p>
-        <div class="btnrow"><button class="btn btn-ocean" type="submit">Log in</button><button type="button" class="btn btn-quiet btn-sm" id="forgot">Forgot password</button></div>
+        <div class="btnrow"><button class="btn btn-ocean" type="submit">${forCard ? `Log in and download ${icon('download', 16)}` : 'Log in'}</button><button type="button" class="btn btn-quiet btn-sm" id="forgot">Forgot password</button></div>
         <p>New here? <a class="textlink" href="#register">Register for the olympiad</a></p></form></section>
       ${CLOUD ? '' : `<section class="sheet stack"><h2>Try the preview</h2><p class="muted">Two sample accounts are ready, so you can look around without signing up.</p>
         <div class="btnrow"><button type="button" class="btn btn-quiet btn-sm" data-sample="student">Fill in the sample student</button><button type="button" class="btn btn-quiet btn-sm" data-sample="admin">Fill in the sample admin</button></div></section>`}</div>`,
@@ -4268,7 +4299,7 @@ PAGES.login = () => {
         e.preventDefault(); const vals = readForm(form, fields), btn = $('button[type=submit]', form);
         btn.disabled = true; const r = await Store.signIn(vals.email, form.elements.password.value); if (btn.isConnected) btn.disabled = false;
         if (r.error) { err.textContent = r.error; err.hidden = false; Sound.play('bad'); return; }
-        toast(`Welcome back, ${r.user.name.split(' ')[0]}`, 'good'); go(afterLogin(r.user.role));
+        toast(`Welcome back, ${r.user.name.split(' ')[0]}`, 'good'); landAfterLogin(r.user);
       });
       v.addEventListener('click', e => { const b = e.target.closest('[data-sample]'); if (!b) return; const [em, pw] = SAMPLE_LOGIN[b.dataset.sample]; form.elements.email.value = em; form.elements.password.value = pw; Sound.play('pick'); form.elements.password.focus(); });
       $('#forgot', v).onclick = forgotDialog;
@@ -4366,7 +4397,7 @@ PAGES.register = () => {
         if (btn.isConnected) { btn.disabled = false; btn.textContent = label; }
         if (r.error) { err.textContent = r.error; err.hidden = false; Sound.play('bad'); err.scrollIntoView({ block: 'center' }); return; }
         if (r.confirm) { Sound.play('good'); v.innerHTML = `<div class="wrap narrow">${pageHead('Check your email')}<section class="sheet stack"><p>We sent a confirmation link to <b>${esc(r.email)}</b>. Open it, then log in here.</p><div><a class="btn btn-ocean" href="#login">Go to log in</a></div></section></div>`; return window.scrollTo(0, 0); }
-        Sound.play('win'); toast('You are registered. Welcome to BGeO.', 'good'); go(afterLogin('participant'));
+        Sound.play('win'); toast('You are registered. Welcome to BGeO.', 'good'); landAfterLogin(Store.me() || { role: 'participant' });
       });
     },
   };
