@@ -184,7 +184,6 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 }
 @keyframes floatShade{0%,100%{transform:scale(1)}30%{transform:scale(.86)}72%{transform:scale(1.07)}}
 @media(prefers-reduced-motion:reduce){.stage.floating canvas,.stage.floating::before{animation:none}}
-.stage-hint{display:none}
 /* the headline is the olympiad's own lettering, drawn as a picture: three lines, each rising once out of its own mask */
 .hero-title{margin:0;width:clamp(176px,56vw,330px)}
 .hero-mark{display:block;width:100%;height:auto;overflow:visible}
@@ -205,8 +204,7 @@ body.is-admin{background:var(--foam);color:var(--ink)}
 .lede{font-size:1.16rem;color:#e2edfc;max-width:46ch}
 .lede strong{color:#fff;font-weight:600}
 @media(min-width:740px){.hero-title{width:min(46vw,460px)}}
-@media(min-width:900px){.hero{grid-template-columns:1.25fr 1fr;padding:40px 0;column-gap:20px}.hero-copy{display:grid;gap:18px}.hero-copy > .hero-title{grid-row:auto;width:min(100%,590px)}.stage{grid-row:auto;width:100%;max-width:420px;justify-self:center}
-  .stage-hint{display:block;position:absolute;left:0;right:0;top:calc(100% + 12px);text-align:center;font-size:.875rem;color:#bcd3f3;pointer-events:none;transition:opacity .3s}.stage.used .stage-hint{opacity:0}}
+@media(min-width:900px){.hero{grid-template-columns:1.25fr 1fr;padding:40px 0;column-gap:20px}.hero-copy{display:grid;gap:18px}.hero-copy > .hero-title{grid-row:auto;width:min(100%,590px)}.stage{grid-row:auto;width:100%;max-width:420px;justify-self:center}}
 /* the next date: one quiet line along the bottom of the first screen */
 .nextup{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;padding:16px 0 22px;border-top:1px solid rgba(255,255,255,.2);text-decoration:none;color:#d6e5fb}
 .nextup strong{color:#fff;font-weight:600;margin-left:6px}
@@ -865,6 +863,56 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-mark .
 .paysum b{font-size:1.35rem;color:var(--ink)}
 .paysum span{color:var(--ink-soft);font-size:.86rem}
 .payrow .grow{flex:1 1 260px;min-width:0}
+
+/* waiting for data: grey shapes that breathe, no words */
+.quiet-wait{display:grid;gap:14px;padding:clamp(30px,6vw,60px) 0}
+.quiet-wait i{display:block;height:18px;border-radius:9px;background:rgba(255,255,255,.14);animation:quietWait 1.3s ease-in-out infinite alternate}
+.quiet-wait i:nth-child(2){width:46%;height:38px;border-radius:12px}.quiet-wait i:nth-child(3){width:64%}.quiet-wait i:nth-child(4){width:38%}
+.page-light .quiet-wait i,.sheet .quiet-wait i{background:#dfe8f4}
+.sheet .quiet-wait{padding:6px 0}
+@keyframes quietWait{from{opacity:.45}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.quiet-wait i{animation:none}}
+
+/* the strip across the top for a student whose admit card is waiting on a payment */
+.due{color:#fff;background:#b42318;border-bottom:1px solid rgba(0,0,0,.18);font-size:.98rem;line-height:1.35}
+.due-amber{background:#8a5a00}
+.due-in{width:min(100% - 32px,1080px);margin-inline:auto;padding:10px 0;display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap}
+.due-ic{flex:none;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center}
+.due p{flex:1 1 220px;margin:0;min-width:0}
+.due p b{font-weight:700}
+.due-go{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:999px;background:#fff;color:#8f1d12;font-weight:700;text-decoration:none;box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.due-amber .due-go{color:#6b4500}
+.due-go:hover{background:#fff4f2}.due-go:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.ex-main h2{font-size:1.4rem}
+
+/* the drawn globe: a faint ring of air round it, and a small corner button that opens the real Earth */
+.stage canvas{border-radius:50%;box-shadow:0 0 34px rgba(120,190,255,.26),0 0 2px rgba(170,215,255,.5)}
+body.intro-globe .stage canvas{box-shadow:none}
+.stage-open{position:absolute;right:6%;bottom:6%;z-index:2;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(4,24,66,.62);color:#fff;display:grid;place-items:center;cursor:pointer;opacity:.85;transition:opacity .2s,background .2s,transform .2s;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.stage-open:hover{opacity:1;background:rgba(4,24,66,.9);transform:scale(1.06)}
+.stage-open:focus-visible{outline:3px solid #9ad96f;outline-offset:3px;opacity:1}
+body.intro-globe .stage-open{opacity:0;pointer-events:none}
+/* on a phone the globe rises from the bottom of the screen, wider than the screen: the button sits just above it, at the right edge of the screen */
+@media(max-width:739px){.stage-open{bottom:auto;top:-50px;right:calc((100% - 100vw) / 2 + 16px)}}
+/* the real Earth, over the whole screen */
+html.ev-open{overflow:hidden}
+.earthview{position:fixed;inset:0;z-index:200;background:radial-gradient(1200px 800px at 50% 40%,#061433 0%,#01030a 70%);color:#fff;animation:evIn .35s ease both}
+.earthview .ev-map,.earthview .ev-map.maplibregl-map{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .6s}
+.earthview.ev-ready .ev-map{opacity:1}
+.ev-close{position:absolute;z-index:3;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(4,18,50,.78);color:#fff;display:grid;place-items:center;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .2s,transform .2s}
+.ev-close:hover{background:#b42318;transform:scale(1.05)}
+.ev-close:focus-visible{outline:3px solid #9ad96f;outline-offset:3px}
+.ev-tip{position:absolute;z-index:2;left:50%;top:max(24px,calc(env(safe-area-inset-top) + 10px));transform:translateX(-50%);margin:0;padding:8px 16px;border-radius:999px;background:rgba(4,18,50,.7);font-size:.92rem;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s}
+.ev-ready .ev-tip{opacity:1}.ev-used .ev-tip{opacity:0}
+@media(max-width:520px){.ev-tip{left:14px;transform:none;top:max(24px,calc(env(safe-area-inset-top) + 10px));font-size:.82rem;padding:8px 12px}}
+.ev-wait{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.ev-wait i{width:min(46vmin,360px);aspect-ratio:1;border-radius:50%;border:2px solid rgba(150,205,255,.25);border-top-color:rgba(150,205,255,.9);animation:evSpin 1.1s linear infinite}
+.ev-wait.ev-said{pointer-events:auto}.ev-wait p{max-width:30ch;margin:0;padding:18px 22px;border-radius:16px;background:rgba(4,18,50,.85);text-align:center;font-size:1.05rem}
+.earthview .maplibregl-ctrl-bottom-right{bottom:max(8px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right))}
+.earthview .maplibregl-ctrl-group button{width:40px;height:40px}
+@keyframes evIn{from{opacity:0}to{opacity:1}}
+@keyframes evSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.earthview{animation:none}.ev-wait i{animation:none}}
 
 </style>
 </head>
@@ -2235,6 +2283,8 @@ const IC = {
   edit: '<path d="M4 20h4l10-10-4-4L4 16v4z"/><path d="M13 7l4 4"/>',
   search: '<circle cx="11" cy="11" r="6.500"/><path d="M16 16l4.500 4.500"/>',
   mail: '<rect x="3.500" y="5.500" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/>',
+  alert: '<path d="M12 4.500l8.500 14.500h-17z"/><path d="M12 10v4.500"/><path d="M12 17.200v.300"/>',
+  expand: '<path d="M9 4.500H4.500V9"/><path d="M15 4.500h4.500V9"/><path d="M9 19.500H4.500V15"/><path d="M15 19.500h4.500V15"/>',
   wallet: '<path d="M4 7.500A2.500 2.500 0 016.500 5H18v3"/><rect x="4" y="8" width="16" height="11" rx="2.500"/><path d="M15.500 13.500h1"/>',
   lock: '<rect x="5" y="10.500" width="14" height="9.500" rx="2"/><path d="M8 10.500V8a4 4 0 018 0v2.500"/>',
   calendar: '<rect x="4" y="5.500" width="16" height="14.500" rx="2"/><path d="M4 10h16M8 3.500v4M16 3.500v4"/>',
@@ -2393,6 +2443,9 @@ const SHIRTS = ['S', 'M', 'L', 'XL', 'XXL'];
 const VERSIONS = [['Bangla version', 'Bangla Version'], ['English version', 'English Version']];
 const versionName = m => { const v = VERSIONS.find(x => x[0] === m); return v ? v[1] : (m || ''); };
 
+/* a Bangladeshi mobile number: 01XXXXXXXXX, with or without +88 in front; spaces and dashes are ignored */
+const phoneProblem = v => (/^(\+?88)?01[3-9]\d{8}$/.test(String(v || '').replace(/[\s-]/g, '')) ? '' : 'Check the contact number. It should look like 018XXXXXXXX (11 digits).');
+
 /* ---------- the data layer ----------
    Every page reads and writes through Store. In this preview the data lives in the
    browser. For the real site the same functions will talk to the online database,
@@ -2481,7 +2534,7 @@ function seed() {
   return {
     v: 7,
     settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', seq: users.length - 1 },
-    payments: [],
+    payments: [], cardRules: [],
     users,
     notices: [
       { id: uid('n'), title: 'Registration is open', body: 'Create your account on this website to take part. After you register, your registration card appears in your account.\n\nThis is a sample notice. Replace it from the admin portal.', date: dAt(-1, 9), tag: 'Registration', pinned: true, sample: true },
@@ -2574,7 +2627,7 @@ const Store = (() => {
   const mapMail = m => ({ id: m.id, to: m.to_email, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at, sentAt: m.sent_at, error: m.error, cardUrl: m.card_url || '' });
   const mapPay = p => ({ id: p.id, userId: p.user_id, round: p.round, amount: p.amount, method: p.method, sender: p.sender || '', trx: p.trx_id, info: p.info || {}, status: p.status, note: p.note || '', at: p.at, checkedAt: p.checked_at });
   /* fees: false when this database does not have the payments table yet */
-  let payReady = true;
+  let payReady = true, rulesReady = true;
   const uuid4 = () => (crypto.randomUUID ? crypto.randomUUID() : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
   const natSel = u => (u.selected || []).some(x => /national/i.test(x.round || ''));
   const mapAtt = a => ({ id: a.id, userId: a.user_id, session: a.session, at: a.marked_at, by: a.marked_by });
@@ -2594,13 +2647,14 @@ const Store = (() => {
     const sess = ok(await sb.auth.getSession()).session, authed = !!sess;
     const [settings, content, exams] = await Promise.all([sb.from('settings').select('data').eq('id', 1).maybeSingle().then(ok), fetchAll('content', ['kind', 'id']), fetchAll('exams', ['id'])]);
     const fresh = { v: 7, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
-      users: [], notices: [], news: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [], payments: [] };
+      users: [], notices: [], news: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [], payments: [], cardRules: [] };
     content.forEach(r => { if (KINDS.includes(r.kind)) fresh[r.kind].push({ ...r.data, id: r.id }); });
     let qs = [], keys = []; cardMail = null;
     if (authed) {
       const [users, attempts, messages, emails, q, k, att] = await Promise.all([fetchAll('profiles', ['id']), fetchAll('attempts', ['id']), fetchAll('messages', ['id']), fetchAll('emails', ['id']), fetchAll('exam_questions', ['exam_id']), fetchAll('exam_keys', ['exam_id']), fetchAll('attendance', ['id'])]);
       fresh.attendance = att.map(mapAtt);
       try { fresh.payments = (await fetchAll('payments', ['at'])).map(mapPay); payReady = true; } catch (e) { payReady = false; }
+      try { fresh.cardRules = (await fetchAll('card_rules', ['user_id'])).map(r => ({ userId: r.user_id, rule: r.rule, note: r.note || '', at: r.at })); rulesReady = true; } catch (e) { rulesReady = false; }
       try { const cm = await sb.from('card_mails').select('tries,sent_at').eq('user_id', sess.user.id).maybeSingle(); cardMail = cm.error ? false : (cm.data || { tries: 0, sent_at: null }); } catch (e) { cardMail = false; }
       fresh.users = users.map(mapUser); fresh.attempts = attempts.map(mapAttempt); fresh.messages = messages.map(mapMsg); fresh.emails = emails.map(mapMail); qs = q; keys = k;
     }
@@ -2610,7 +2664,16 @@ const Store = (() => {
       return { ...e.data, id: e.id, questions };
     });
     db = fresh; session = authed && fresh.users.some(u => u.id === sess.user.id) ? sess.user.id : null;
+    /* what every visitor may see is kept in this browser, so the next visit can draw the page at once while fresh data loads behind it */
+    const pub = pubOf(fresh), was = lastPub; lastPub = JSON.stringify(pub);
+    if (!authed) write(PUBKEY, pub);
+    return was !== null && was !== lastPub;
   }
+  const PUBKEY = 'bgeo-pub', PUB = ['settings', 'notices', 'news', 'resources', 'events', 'results', 'team', 'faq'];
+  let lastPub = null;
+  const pubOf = d => { const o = {}; PUB.forEach(k => { o[k] = d[k]; }); o.exams = d.exams.map(e => ({ ...e, questions: e.questions.map(() => null) })); return o; };
+  /* true when this browser holds a login for the online database */
+  const hasLogin = () => { try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^sb-.*-auth-token/.test(k) && localStorage.getItem(k)) return true; } } catch (e) { /* storage is off */ } return false; };
   async function saveExam(ex) {
     const { id, questions, ...meta } = ex; const qs = (questions || []).filter(Boolean);
     delete meta.sample; meta.n = qs.length;
@@ -2627,11 +2690,23 @@ const Store = (() => {
 
   const api = {
     recovery: false, onRecovery: null,
+    /* A visitor who has been here before sees the page at once, drawn from what the browser kept; the fresh data arrives
+       behind it and onFresh(changed) says when. Someone who is logged in waits for their own data, as before. */
+    onFresh: null,
     init() {
-      if (CLOUD) return refresh();
+      if (CLOUD) {
+        const kept = hasLogin() ? null : read(PUBKEY);
+        if (kept && kept.settings && Array.isArray(kept.exams)) {
+          db = { v: 7, users: [], attempts: [], messages: [], emails: [], attendance: [], payments: [], cardRules: [], ...kept }; PUB.forEach(k => { if (k !== 'settings' && !Array.isArray(db[k])) db[k] = []; });
+          session = null; lastPub = JSON.stringify(pubOf(db));
+          refresh().then(changed => { if (this.onFresh) this.onFresh(changed); }, () => {});
+          return Promise.resolve();
+        }
+        return refresh();
+      }
       db = read(KEY);
       if (!db || db.v !== 7) { db = seed(); save(); }
-      db.attendance = db.attendance || []; db.news = db.news || []; db.payments = db.payments || [];
+      db.attendance = db.attendance || []; db.news = db.news || []; db.payments = db.payments || []; db.cardRules = db.cardRules || [];
       session = read(SKEY);
       if (session && !db.users.some(u => u.id === session)) session = null;
       return Promise.resolve();
@@ -2902,6 +2977,49 @@ const Store = (() => {
       db.payments.push(row); save();
     },
     async loadPayments() { if (CLOUD && payReady) db.payments = (await fetchAll('payments', ['at'])).map(mapPay); },
+    /* ----- an admin makes a participant's account by hand -----
+       On the live site the account is made by a small server function (add-participant), because only the server may create
+       a login for somebody else. The new student logs in with the email (or registration number) and the password given here. */
+    async addParticipant(d) {
+      const email = String(d.email || '').trim().toLowerCase(), data = { email, password: String(d.password || ''), name: String(d.name || '').trim(), phone: String(d.phone || '').trim(), institution: String(d.institution || '').trim(), klass: +d.klass, region: d.region || '', district: d.district || '', dob: d.dob || '', medium: d.medium || '' };
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error('That email address does not look right.');
+      if (data.password.length < 8) throw new Error('Choose a password with at least 8 characters.');
+      if (CLOUD) {
+        let r; try { r = await sb.functions.invoke('add-participant', { body: data }); } catch (e) { r = { error: e }; }
+        if (r.error) throw new Error('The account could not be made. ' + (r.error.message || ''));
+        if (!r.data || r.data.error || !r.data.id) throw new Error((r.data && r.data.error) || 'The account could not be made.');
+        await refresh();
+        const u = db.users.find(x => x.id === r.data.id); if (!u) throw new Error('The account was made, but it did not load. Reload the page.');
+        return u;
+      }
+      if (db.users.some(x => x.email.toLowerCase() === email)) throw new Error('An account with this email already exists.');
+      db.settings.seq += 1;
+      const u = { id: uid('u'), role: 'participant', name: data.name, email, phone: data.phone, institution: data.institution, klass: data.klass, category: categoryFor(data.klass), region: data.region, district: data.district, dob: data.dob, gender: '', medium: data.medium, guardianName: '', guardianPhone: '', address: '',
+        regNo: REG_PREFIX + String(db.settings.seq).padStart(4, '0'), createdAt: new Date().toISOString(), pass: hashPw(data.password), selected: [] };
+      db.users.push(u); db.messages.push({ id: uid('m'), userId: u.id, title: 'Welcome to BGeO', body: 'Your registration is complete. Watch the Notices page for dates and venues.', at: new Date().toISOString(), kind: 'info' });
+      save(); return u;
+    },
+    /* ----- an admin's own decision about one student's admit card -----
+       'release': the student can download the card now, whatever the payment, the district list or the switches say.
+       'hold': the student cannot get the card. No rule: the card follows the usual rules. */
+    cardRule(u) { const r = u && db.cardRules.find(x => x.userId === u.id); return r ? r.rule : ''; },
+    cardRuleNote(u) { const r = u && db.cardRules.find(x => x.userId === u.id); return r ? r.note : ''; },
+    get cardRulesReady() { return rulesReady; },
+    async setCardRule(userId, rule, note) {
+      const u = db.users.find(x => x.id === userId), at = new Date().toISOString(), why = String(note || '').trim(); if (!u) return;
+      if (CLOUD) {
+        if (rule) ok(await sb.from('card_rules').upsert({ user_id: userId, rule, note: why, at, by: session }));
+        else ok(await sb.from('card_rules').delete().eq('user_id', userId));
+      }
+      db.cardRules = db.cardRules.filter(x => x.userId !== userId); if (rule) db.cardRules.push({ userId, rule, note: why, at });
+      if (rule) {
+        const m = { id: uid('m'), userId, at, kind: rule === 'release' ? 'selected' : 'info', title: rule === 'release' ? 'Your admit card is ready' : 'Your admit card is on hold',
+          body: rule === 'release' ? 'The organisers have released your admit card. You can download it from your dashboard.' : `The organisers have put your admit card on hold.${why ? ' ' + why : ''} Write to the organisers if you have a question.` };
+        if (CLOUD) { try { ok(await sb.from('messages').insert({ id: m.id, user_id: m.userId, title: m.title, body: m.body, kind: m.kind, at: m.at })); } catch (e) { /* the rule itself is saved */ } }
+        db.messages.push(m);
+      }
+      save();
+    },
     /* admit cards by email */
     async uploadCard(blob, u, kind) {
       if (!CLOUD) return 'preview';
@@ -2913,7 +3031,7 @@ const Store = (() => {
     /* the districts whose students can have the Regional admit card: Dhaka until an admin says otherwise; an empty list means every district */
     cardDistricts() { const l = db.settings.cardDistricts; return Array.isArray(l) ? l : ['Dhaka']; },
     districtOpen(u) { const l = this.cardDistricts(); return !l.length || (!!u && l.includes(u.district)); },
-    cardMailDue() { const u = me(); return !!(CLOUD && u && u.role === 'participant' && db.settings.cardsOpen && this.districtOpen(u) && !this.feeLocked(u, 'regional') && cardMail && !cardMail.sent_at && (cardMail.tries || 0) < 3); },
+    cardMailDue() { const u = me(); return !!(CLOUD && u && u.role === 'participant' && this.cardRule(u) !== 'hold' && (this.cardRule(u) === 'release' || (db.settings.cardsOpen && this.districtOpen(u) && !this.feeLocked(u, 'regional'))) && cardMail && !cardMail.sent_at && (cardMail.tries || 0) < 3); },
     async sendMyCard(pngBase64) {
       if (!CLOUD) return 'off';
       let r; try { r = await sb.functions.invoke('send-emails', { body: { action: 'card', png: pngBase64 } }); } catch (e) { r = { error: e }; }
@@ -2973,7 +3091,7 @@ const Store = (() => {
     },
     async removeUser(id) {
       if (CLOUD) ok(await sb.from('profiles').delete().eq('id', id));
-      db.users = db.users.filter(u => u.id !== id); db.payments = db.payments.filter(x => x.userId !== id); db.attempts = db.attempts.filter(a => a.userId !== id); db.messages = db.messages.filter(m => m.userId !== id); save();
+      db.users = db.users.filter(u => u.id !== id); db.payments = db.payments.filter(x => x.userId !== id); db.cardRules = db.cardRules.filter(x => x.userId !== id); db.attempts = db.attempts.filter(a => a.userId !== id); db.messages = db.messages.filter(m => m.userId !== id); save();
     },
   };
   if (CLOUD) sb.auth.onAuthStateChange(ev => { if (ev === 'PASSWORD_RECOVERY') { api.recovery = true; if (api.onRecovery) setTimeout(api.onRecovery, 0); } });
@@ -2984,8 +3102,29 @@ const Store = (() => {
    The real continents in the logo's own greens and blues: a flat map is wrapped onto a
    sphere pixel by pixel as it turns, lit by a sun from the upper left. */
 const Globe = (() => {
-  const MW = 2048, MH = 1024;
-  let tex = null;
+  const MW = 2048, MH = 1024, CW = 1024, CH = 512;
+  let tex = null, clouds = null;
+  /* a thin layer of cloud, made once: soft patches that wrap round the globe without a seam, thicker near the equator
+     and in the two storm belts, thinner over the dry bands in between */
+  function paintClouds() {
+    let seed = 91; const R = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296), sm = t => t * t * (3 - 2 * t);
+    const lay = []; for (let o = 0; o < 5; o++) { const nx = 6 << o, ny = Math.max(2, nx >> 1); lay.push({ nx, ny, amp: 1 / (1 << o), v: Float32Array.from({ length: nx * (ny + 1) }, () => R()) }); }
+    clouds = new Uint8Array(CW * CH);
+    for (let y = 0; y < CH; y++) {
+      const lat = 90 - (y + 0.5) / CH * 180, a = Math.abs(lat);
+      const belt = 0.5 * Math.exp(-(a * a) / 90) + 0.62 * Math.exp(-((a - 52) * (a - 52)) / 260) - 0.28 * Math.exp(-((a - 24) * (a - 24)) / 110);
+      for (let x = 0; x < CW; x++) {
+        let f = 0, w = 0;
+        for (const l of lay) {
+          const fx = x / CW * l.nx, fy = y / CH * l.ny, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = sm(fx - x0), ty = sm(fy - y0), x1 = (x0 + 1) % l.nx, xa = x0 % l.nx;
+          const p = l.v[y0 * l.nx + xa] * (1 - tx) + l.v[y0 * l.nx + x1] * tx, q = l.v[(y0 + 1) * l.nx + xa] * (1 - tx) + l.v[(y0 + 1) * l.nx + x1] * tx;
+          f += (p * (1 - ty) + q * ty) * l.amp; w += l.amp;
+        }
+        const t = Math.max(0, Math.min(1, (f / w + belt * 0.16 - 0.5) / 0.2));
+        clouds[y * CW + x] = Math.round(175 * sm(t));
+      }
+    }
+  }
   function paintMap() {
     const c = document.createElement('canvas'); c.width = MW; c.height = MH;
     const g = c.getContext('2d', { willReadFrequently: true }); paintEarth(g, MW, MH);
@@ -2995,10 +3134,10 @@ const Globe = (() => {
   function create(size) {
     const S = Math.max(32, size | 0), off = document.createElement('canvas'); off.width = off.height = S;
     const og = off.getContext('2d'), img = og.createImageData(S, S), out = new Uint32Array(img.data.buffer);
-    const n = S * S, row = new Int32Array(n), col = new Int32Array(n), lit = new Uint16Array(n), glint = new Uint8Array(n), r = S / 2;
+    const n = S * S, row = new Int32Array(n), col = new Int32Array(n), lit = new Uint16Array(n), glint = new Uint8Array(n), air = new Uint8Array(n), crow = new Int32Array(n), ccol = new Int32Array(n), r = S / 2;
     const tilt = 0.3, roll = 0.26, ct = Math.cos(tilt), st = Math.sin(tilt), cr = Math.cos(roll), sr = Math.sin(roll);
     /* the sun is up and to the left, a little in front: the lit side is bright, the far side falls into soft shade,
-       and the sea carries one small glint of sunlight. No glow round the edge. */
+       and the sea carries one small glint of sunlight. A thin skin of air shows as a pale blue line round the edge, brightest on the sunny side. */
     const lx = -0.5, ly = -0.56, lz = 0.66, hl = Math.hypot(lx, ly, lz + 1), hx = lx / hl, hy = ly / hl, hz = (lz + 1) / hl;
     for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
       const i = y * S + x, nx = (x + 0.5 - r) / r, ny = (y + 0.5 - r) / r, d2 = nx * nx + ny * ny;
@@ -3007,20 +3146,28 @@ const Globe = (() => {
       const lat = Math.asin(Math.max(-1, Math.min(1, -y2))), lon = Math.atan2(x1, z2);
       const ry = Math.min(MH - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * MH)));
       row[i] = ry * MW; col[i] = Math.floor((lon / 6.283185307 + 0.5) * MW) & (MW - 1);
-      const diffuse = Math.max(0, nx * lx + ny * ly + nz * lz);
-      lit[i] = Math.round(256 * (0.66 + 0.4 * Math.pow(diffuse, 0.85)) * (0.9 + 0.1 * Math.pow(nz, 0.5)));
-      glint[i] = Math.round(120 * Math.pow(Math.max(0, nx * hx + ny * hy + nz * hz), 64));
+      const raw = nx * lx + ny * ly + nz * lz, diffuse = Math.max(0, raw);
+      lit[i] = Math.round(256 * (0.54 + 0.54 * Math.pow(diffuse, 0.8)) * (0.86 + 0.14 * Math.pow(nz, 0.5)));
+      glint[i] = Math.round(150 * Math.pow(Math.max(0, nx * hx + ny * hy + nz * hz), 48));
+      air[i] = Math.round(215 * Math.pow(1 - nz, 2.6) * (0.3 + 0.7 * Math.max(0, Math.min(1, raw * 0.9 + 0.55))));
+      crow[i] = Math.min(CH - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * CH))) * CW; ccol[i] = Math.floor((lon / 6.283185307 + 0.5) * CW) & (CW - 1);
     }
     /* At rot = 0 the globe faces Bangladesh (90° E). As rot grows the Earth turns the way the real one does, west to east. */
     function paint(rot) {
       if (!tex) paintMap();
+      if (!clouds) paintClouds();
       const sh = Math.floor((0.25 - rot / 6.283185307) * MW) & (MW - 1);
+      /* the clouds ride with the Earth and creep slowly eastward over it, so the globe is alive even when it hangs still */
+      const csh = Math.floor((0.25 - rot / 6.283185307 - performance.now() / 1000 * 0.0016) * CW) & (CW - 1);
       for (let i = 0; i < n; i++) {
         const ro = row[i]; if (ro < 0) { out[i] = 0; continue; }
         const p = tex[ro + ((col[i] + sh) & (MW - 1))], k = lit[i]; let cr2 = p & 255, cg = (p >> 8) & 255, cb = (p >> 16) & 255;
         const s = cb > cg && cb > cr2 + 24 ? glint[i] : 0;   // only water shines
         cr2 = (cr2 * k) >> 8; cg = (cg * k) >> 8; cb = (cb * k) >> 8;
         if (s) { cr2 += ((255 - cr2) * s) >> 8; cg += ((255 - cg) * s) >> 8; cb += ((255 - cb) * s) >> 8; }
+        const c = clouds[crow[i] + ((ccol[i] + csh) & (CW - 1))];
+        if (c) { const w = (c * k) >> 8, cw = k > 255 ? 255 : k; cr2 += ((cw - cr2) * w) >> 8; cg += ((cw - cg) * w) >> 8; cb += (((cw + 6 > 255 ? 255 : cw + 6) - cb) * w) >> 8; }
+        const a = air[i]; if (a) { cr2 += ((150 - cr2) * a) >> 8; cg += ((205 - cg) * a) >> 8; cb += ((255 - cb) * a) >> 8; }
         out[i] = 0xff000000 | ((cb > 255 ? 255 : cb) << 16) | ((cg > 255 ? 255 : cg) << 8) | (cr2 > 255 ? 255 : cr2);
       }
       og.putImageData(img, 0, 0);
@@ -3109,7 +3256,19 @@ function mountHeroStage(stage) {
     speed = performance.now() - drag.t > 120 ? 0 : Math.max(-7, Math.min(7, drag.v));   // held still before letting go: no throw
     drag = null; stage.classList.remove('grabbing'); if (still) draw();
   };
-  const key = e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); stage.classList.add('used'); if (still) { rot += e.key === 'ArrowRight' ? 0.35 : -0.35; draw(); } else speed = e.key === 'ArrowRight' ? 2.6 : -2.6; } };
+  const key = e => { if (e.key === 'Enter' && e.target === stage) { e.preventDefault(); return openEarth(); } if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); stage.classList.add('used'); if (still) { rot += e.key === 'ArrowRight' ? 0.35 : -0.35; draw(); } else speed = e.key === 'ArrowRight' ? 2.6 : -2.6; } };
+  /* a double click, a double tap, Enter, or the small corner button opens the real Earth, facing the same side of the planet */
+  const facing = () => 90 - (rot + (still ? 0 : 0.2 * Math.sin(clock * 0.5))) * 57.29578;
+  const openEarth = () => { if (HeroSync.live) return; stage.classList.add('used'); EarthView.open(facing()); };
+  let tapT = 0, tapX = 0, tapY = 0;
+  stage.addEventListener('dblclick', e => { e.preventDefault(); openEarth(); });
+  stage.addEventListener('pointerup', e => {
+    if (e.pointerType === 'mouse' || e.target.closest('.stage-open')) return;   // a mouse sends its own double click
+    const now = performance.now(), near = Math.hypot(e.clientX - tapX, e.clientY - tapY) < 30;
+    if (now - tapT < 380 && near) { tapT = 0; openEarth(); } else { tapT = now; tapX = e.clientX; tapY = e.clientY; }
+  });
+  const opener = $('.stage-open', stage);
+  if (opener) { opener.addEventListener('pointerdown', e => e.stopPropagation()); opener.addEventListener('click', e => { e.stopPropagation(); openEarth(); }); opener.addEventListener('dblclick', e => e.stopPropagation()); }
   stage.addEventListener('pointerdown', down); stage.addEventListener('pointermove', move);
   stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up); stage.addEventListener('keydown', key);
   let stop = () => {};
@@ -3659,6 +3818,108 @@ function adminIntro() {
   el.addEventListener('click', () => { timers.forEach(clearTimeout); close(); });
 }
 
+/* ---------- the real Earth ----------
+   Double-click the hero's globe and it opens into a real one: satellite pictures of the whole planet that can be turned
+   and zoomed, with country borders and place names on top. Nothing here is drawn by this site:
+   the pictures are Sentinel-2 cloudless by EOX (made from Copernicus Sentinel satellite data), the borders and names are
+   OpenStreetMap data served by OpenFreeMap, and the map itself is drawn by MapLibre GL JS, which is fetched only when
+   someone opens this view. A cross at the top closes it. */
+const EarthView = (() => {
+  const BASE = 'media/earth/';
+  const SAT = 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/{z}/{y}/{x}.jpg';
+  const SAT_CREDIT = '<a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by <a href="https://eox.at" target="_blank" rel="noopener">EOX IT Services GmbH</a> (Contains modified Copernicus Sentinel data 2016 &amp; 2017)';
+  const NAMES_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+  let lib = null, el = null, map = null, back = null;
+
+  const loadLib = () => lib || (lib = new Promise((done, fail) => {
+    if (window.maplibregl) return done(window.maplibregl);
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = BASE + 'maplibre-gl.css'; document.head.appendChild(css);
+    const js = document.createElement('script'); js.src = BASE + 'maplibre-gl.js';
+    js.onload = () => (window.maplibregl ? done(window.maplibregl) : fail(new Error('no map library')));
+    js.onerror = () => { lib = null; js.remove(); fail(new Error('the map library did not load')); };
+    document.head.appendChild(js);
+  }));
+  /* where the names and borders come from: read from OpenFreeMap's own style, so this keeps working if they move their files.
+     If it does not answer in a few seconds the Earth opens without names. */
+  const loadNames = () => new Promise(done => {
+    const t = setTimeout(() => done(null), 4000);
+    fetch(NAMES_STYLE).then(r => (r.ok ? r.json() : null)).then(j => {
+      clearTimeout(t); const src = j && j.sources && (j.sources.openmaptiles || Object.values(j.sources).find(x => x.type === 'vector'));
+      done(src && j.glyphs ? { glyphs: j.glyphs, source: src } : null);
+    }, () => { clearTimeout(t); done(null); });
+  });
+  function styleFor(names) {
+    const name = ['coalesce', ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']], cls = c => ['==', ['get', 'class'], c];
+    const halo = { 'text-color': '#ffffff', 'text-halo-color': 'rgba(0,10,30,.8)', 'text-halo-width': 1.4 };
+    const text = (id, filter, font, size, more = {}) => ({ id, type: 'symbol', source: 'names', 'source-layer': more.layer || 'place', filter, ...(more.minzoom != null ? { minzoom: more.minzoom } : {}), ...(more.maxzoom != null ? { maxzoom: more.maxzoom } : {}),
+      layout: { 'text-field': name, 'text-font': [font], 'text-size': size, 'text-max-width': 7, 'symbol-sort-key': ['coalesce', ['get', 'rank'], 20], ...(more.layout || {}) }, paint: { ...halo, ...(more.paint || {}) } });
+    const s = {
+      version: 8, projection: { type: 'globe' },
+      sources: { sat: { type: 'raster', tiles: [SAT], tileSize: 256, maxzoom: 13, attribution: SAT_CREDIT } },
+      layers: [{ id: 'space', type: 'background', paint: { 'background-color': '#01030a' } }, { id: 'sat', type: 'raster', source: 'sat', paint: { 'raster-fade-duration': 200 } }],
+      sky: { 'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 7, 0] },
+    };
+    if (names) {
+      s.glyphs = names.glyphs; s.sources.names = names.source;
+      s.layers.push(
+        { id: 'border-state', type: 'line', source: 'names', 'source-layer': 'boundary', minzoom: 4, filter: ['all', ['==', ['get', 'admin_level'], 4], ['!=', ['get', 'maritime'], 1]], paint: { 'line-color': 'rgba(255,255,255,.4)', 'line-width': 0.8, 'line-dasharray': [3, 2] } },
+        { id: 'border-country', type: 'line', source: 'names', 'source-layer': 'boundary', filter: ['all', ['==', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]], paint: { 'line-color': 'rgba(255,255,255,.8)', 'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.6, 6, 1.5] } },
+        text('name-ocean', cls('ocean'), 'Noto Sans Regular', ['interpolate', ['linear'], ['zoom'], 1, 11, 5, 17], { layer: 'water_name', maxzoom: 7, layout: { 'text-letter-spacing': 0.2 }, paint: { 'text-color': '#cfe6ff', 'text-halo-color': 'rgba(0,25,70,.6)', 'text-halo-width': 1 } }),
+        text('name-village', ['in', ['get', 'class'], ['literal', ['town', 'village']]], 'Noto Sans Regular', ['interpolate', ['linear'], ['zoom'], 7, 11, 12, 14], { minzoom: 7 }),
+        text('name-city', cls('city'), 'Noto Sans Regular', ['interpolate', ['linear'], ['zoom'], 3, 10, 8, 15, 12, 18], { minzoom: 3 }),
+        text('name-state', cls('state'), 'Noto Sans Regular', ['interpolate', ['linear'], ['zoom'], 4, 10, 8, 14], { minzoom: 4.5, maxzoom: 9, layout: { 'text-transform': 'uppercase', 'text-letter-spacing': 0.1 }, paint: { 'text-color': '#e7f0ff' } }),
+        text('name-country', cls('country'), 'Noto Sans Bold', ['interpolate', ['linear'], ['zoom'], 1, 10, 4, 15, 7, 20], { maxzoom: 9 }));
+    }
+    return s;
+  }
+  const say = (msg) => { if (!el) return; const w = $('.ev-wait', el); w.innerHTML = `<p>${esc(msg)}</p>`; w.hidden = false; w.classList.add('ev-said'); };
+  function close() {
+    if (!el) return;
+    document.removeEventListener('keydown', onKey, true);
+    if (map) { try { map.remove(); } catch (e) { /* already gone */ } map = null; }
+    el.remove(); el = null; document.documentElement.classList.remove('ev-open');
+    if (back && back.isConnected && back.focus) back.focus({ preventScroll: true }); back = null;
+  }
+  const onKey = e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } };
+  /* lon: the meridian the drawn globe is facing, so the real one opens on the same side of the planet */
+  async function open(lon) {
+    if (el) return;
+    back = document.activeElement;
+    el = document.createElement('div'); el.className = 'earthview'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'The real Earth');
+    el.innerHTML = `<div class="ev-map" id="ev-map"></div><div class="ev-wait" role="status"><span class="sr-only">Opening the Earth</span><i></i></div>
+      <button type="button" class="ev-close" aria-label="Close the Earth view" title="Close">${icon('close', 26)}</button>
+      <p class="ev-tip" aria-hidden="true">Drag to turn. Scroll or pinch to zoom.</p>`;
+    document.body.appendChild(el); document.documentElement.classList.add('ev-open');
+    $('.ev-close', el).onclick = close; $('.ev-close', el).focus({ preventScroll: true });
+    document.addEventListener('keydown', onKey, true);
+    Sound.play('open');
+    let gl, names, fit = 1.4;
+    try { [gl, names] = await Promise.all([loadLib(), loadNames()]); }
+    catch (e) { return say('The Earth view could not open. Check your internet connection and try again.'); }
+    if (!el) return;   // closed while it was loading
+    const start = Number.isFinite(lon) ? ((lon + 540) % 360) - 180 : 90.4;
+    try {
+      /* the zoom at which the whole planet fits on this screen */
+      const box = el.getBoundingClientRect(); fit = Math.max(0.6, Math.min(2.4, Math.log2(Math.min(box.width, box.height) * 0.86 * Math.PI / 512)));
+      map = new gl.Map({ container: $('#ev-map', el), style: styleFor(names), center: [start, 18], zoom: fit - 0.45, minZoom: 0.4, maxZoom: 15, attributionControl: { compact: true }, dragRotate: false, pitchWithRotate: false, touchPitch: false, maxPitch: 0 });
+    } catch (e) { return say('This browser cannot draw the 3D Earth.'); }
+    map.touchZoomRotate.disableRotation();
+    map.addControl(new gl.NavigationControl({ showCompass: false }), 'bottom-right');
+    const m = map;
+    m.once('load', () => {
+      if (m !== map || !el) return;
+      $('.ev-wait', el).hidden = true; el.classList.add('ev-ready');
+      /* it opens on the side the drawn globe was showing, then turns to Bangladesh, where the olympiad is, with the whole planet in view */
+      if (!reducedMotion()) m.flyTo({ center: [90.4, 23.7], zoom: fit, duration: 2600, essential: false });
+      else m.jumpTo({ center: [90.4, 23.7], zoom: fit });
+    });
+    const hideTip = () => { if (el) el.classList.add('ev-used'); };
+    m.on('dragstart', hideTip); m.on('zoomstart', e => { if (e.originalEvent) hideTip(); });
+    m.on('error', () => { /* a missing tile or the names not loading must never break the view */ });
+  }
+  return { open, close, get isOpen() { return !!el; } };
+})();
+
 /* ---------- toasts, dialogs, forms, saving files ---------- */
 function toast(msg, kind = '') {
   const t = document.createElement('div'); t.className = 'toast ' + kind; t.textContent = msg; $('#toasts').appendChild(t);
@@ -3705,7 +3966,8 @@ function readForm(form, fields) {
 }
 function missing(fields, vals) { return fields.find(f => f.required && (vals[f.key] === '' || vals[f.key] == null || (f.type === 'checkbox' && vals[f.key] !== true))); }
 /* a dialog with a form; resolves with the values, or null if closed */
-function formDialog({ title, fields, values = {}, submit = 'Save', intro, mount }) {
+/* check(vals, form), if given, runs before the dialog closes; it returns (or resolves to) a sentence to show when something is wrong */
+function formDialog({ title, fields, values = {}, submit = 'Save', intro, mount, check }) {
   return new Promise(res => {
     let result = null; const px = uid('d');
     const d = openDialog({ title, html: `<form class="form" novalidate>${intro ? `<p class="muted">${esc(intro)}</p>` : ''}${fields.map(f => fieldHtml(f, values[f.key], px)).join('')}<p class="err" role="alert" hidden></p><div class="dlg-actions"><button type="button" class="btn btn-quiet btn-sm" data-close>Cancel</button><button type="submit" class="btn btn-ocean btn-sm">${esc(submit)}</button></div></form>` });
@@ -3713,7 +3975,13 @@ function formDialog({ title, fields, values = {}, submit = 'Save', intro, mount 
     form.addEventListener('submit', e => {
       e.preventDefault(); const vals = readForm(form, fields), miss = missing(fields, vals), err = $('.err', form);
       if (miss) { err.textContent = `Please fill in "${miss.label}".`; err.hidden = false; Sound.play('bad'); return; }
-      result = vals; d.close();
+      if (!check) { result = vals; d.close(); return; }
+      const btn = $('button[type=submit]', form); btn.disabled = true; err.hidden = true;
+      Promise.resolve().then(() => check(vals, form)).then(problem => problem, x => x.message || String(x)).then(problem => {
+        btn.disabled = false;
+        if (problem) { err.textContent = problem; err.hidden = false; Sound.play('bad'); err.scrollIntoView({ block: 'nearest' }); return; }
+        result = vals; d.close();
+      });
     });
     d.addEventListener('close', () => res(result));
   });
@@ -3885,7 +4153,7 @@ function render() {
   const page = isDashRoute(name) ? PAGES.dashgate() : (PAGES[name] || PAGES.home)();
   /* a fresh holder for every page, so one page's tap handlers can never fire on the next */
   /* every page but the home page and the countdown is a blue title band over a pale body */
-  const holder = document.createElement('div'); holder.className = name === 'countdown' || !(isDashRoute(name) || (PAGES[name] && name !== 'home')) ? 'page' : 'page page-light'; holder.innerHTML = page.html; view.replaceChildren(holder);
+  const holder = document.createElement('div'); holder.className = name === 'countdown' || !(isDashRoute(name) || (PAGES[name] && name !== 'home')) ? 'page' : 'page page-light'; holder.innerHTML = dueStrip() + page.html; view.replaceChildren(holder);
   $('#site').classList.toggle('on-light', holder.classList.contains('page-light'));   // the footer takes the ground of the page above it
   if (page.mount) page.mount(holder);
   arriveOnScroll(holder);
@@ -3895,6 +4163,8 @@ function render() {
   window.scrollTo(0, 0);
   setTimeout(mailMyCard, 600);
 }
+/* shown for the moment a page waits for its data: soft grey shapes, no words (screen readers are told the page is loading) */
+const QUIET_WAIT = '<div class="wrap quiet-wait" role="status" aria-busy="true"><span class="sr-only">Loading</span><i></i><i></i><i></i></div>';
 const pageHead = (title, lead) => `<header class="pagehead"><h1>${esc(title)}</h1>${lead ? `<p>${esc(lead)}</p>` : ''}</header>`;
 const sampleChip = r => (r && r.sample ? '<span class="chip chip-sample">Sample</span>' : '');
 
@@ -3956,7 +4226,7 @@ PAGES.home = () => {
           <p class="lede">The <strong>1st Bangladesh Geography Olympiad ${year}</strong>, open to all young geographers and bright minds.</p>
           <div class="btnrow">${cta}<a class="learn" href="#about">Learn More ${icon('goto', 20)}</a></div>
         </div>
-        <div class="stage" id="stage" tabindex="0" role="img" aria-label="The Earth, turning. Drag it, or press the left and right arrow keys, to spin it."><canvas aria-hidden="true"></canvas><span class="stage-hint" aria-hidden="true">Drag to spin</span></div>
+        <div class="stage" id="stage" tabindex="0" role="img" aria-label="The Earth. Drag it, or press the left and right arrow keys, to spin it. Double-click it, or press Enter, to open the real Earth."><canvas aria-hidden="true"></canvas><button type="button" class="stage-open" id="earth-open" aria-label="Open the real Earth" title="Open the real Earth">${icon('expand', 18)}</button></div>
       </div>
       ${ev ? `<a class="nextup" href="#countdown"><span class="nu-what">Next up <strong>${esc(ev.label)}</strong></span><b id="mini" data-mini>${shortSpan(new Date(ev.at) - Date.now())}</b><span class="nu-go">Schedule ${icon('next', 16)}</span></a>` : ''}
     </div></section>
@@ -4376,6 +4646,7 @@ PAGES.privacy = () => smallPrint('Privacy Policy', 'What this website keeps abou
   ['Who can see it', ['The organisers of the Bangladesh Geography Olympiad, through their admin accounts.', 'Result lists published on this website show the details the organisers choose to publish, such as a name and school.']],
   ['Where it is kept', ['In an online database run for us by Supabase. Emails are sent through Brevo.']],
   ['Visitor statistics', ['This website loads Google Tag Manager and Google Analytics, tools from Google that the organisers use to count visits and see which pages are opened. Google may set cookies in your browser and receives technical details such as your browser, your device and the pages you open.', 'This website does not send your registration details to it. This website has no adverts.']],
+  ['The real Earth view', ['When you open the real Earth from the globe on the home page, your browser fetches satellite pictures from EOX and place names from OpenFreeMap. As with any website, those services see your internet address while they send the pictures.']],
   ['Your choices', [`To see, correct or delete your details, write to <a href="mailto:${ORG.email}">${ORG.email}</a> from the email you registered with.`, 'If you are under 18, ask a parent or guardian before you register.']],
 ]);
 PAGES.terms = () => smallPrint('Terms of Use', 'The rules for using this website.', [
@@ -4410,7 +4681,7 @@ function admitTap(btn) {
   if (cardOpenFor(u)) return downloadMyCard(btn);
   go('admit-card');
 }
-const noCardWhy = u => (!Store.db.settings.cardsOpen ? 'Admit cards are not open yet. Watch Notices.' : `Admit cards are open for ${cardDistrictWords()} only for now.`);
+const noCardWhy = u => (cardHeld(u) ? 'Your admit card is on hold. Write to the organisers.' : trackOf(u) === 'online' && !hasNationalCard(u) ? 'You take the E-Regional round online, so you have no Regional admit card.' : !Store.db.settings.cardsOpen ? 'Admit cards are not open yet. Watch Notices.' : `Admit cards are open for ${cardDistrictWords()} only for now.`);
 function forgotDialog() {
   if (!CLOUD) return openDialog({ title: 'Forgot password', html: '<p>On the live website you will type your email here and get a link to set a new password.</p><p class="note">That email is sent by the online service, so it starts working once the database is connected.</p><div class="dlg-actions"><button type="button" class="btn btn-ocean btn-sm" data-close>OK</button></div>' });
   formDialog({ title: 'Forgot password', submit: 'Send the link', intro: 'Type the email you registered with. We will send a link to set a new password.', fields: [{ key: 'email', label: 'Email', type: 'email', required: true }] })
@@ -4430,7 +4701,8 @@ PAGES['admit-card'] = () => {
   if (u && u.role === 'admin') return simplePage('Download admit card', 'This is an admin account. Admit cards belong to students.', '#admin', 'Open the admin portal');
   return {
     html: `<div class="wrap narrow">${head}<section class="sheet stack">${u
-      ? (ready && cardLocked(u) ? `<p>You are logged in as <b>${esc(u.name)}</b>, registration number ${esc(u.regNo)}.</p><p class="note">${Store.payState(u, cardKind(u)) === 'pending' ? 'Your payment is being checked. Your admit card unlocks when the organisers approve it.' : `Your admit card unlocks after the ${roundName(cardKind(u))} fee of ${taka(Store.feeFor(u, cardKind(u)))} is paid.`}</p><div><a class="btn btn-ocean" href="#dashboard-pay">${icon('wallet', 18)} Open Payment</a></div>`
+      ? (cardHeld(u) ? `<p>You are logged in as <b>${esc(u.name)}</b>, registration number ${esc(u.regNo)}.</p><p class="note note-bad"><b>Your admit card is on hold.</b> Write to the organisers to sort this out.</p><div><a class="btn btn-quiet" href="#contact">Contact the organisers</a></div>`
+        : ready && cardLocked(u) ? `<p>You are logged in as <b>${esc(u.name)}</b>, registration number ${esc(u.regNo)}.</p><p class="note">${Store.payState(u, cardKind(u)) === 'pending' ? 'Your payment is being checked. Your admit card unlocks when the organisers approve it.' : `Your admit card unlocks after the ${roundName(cardKind(u))} fee of ${taka(Store.feeFor(u, cardKind(u)))} is paid.`}</p><div><a class="btn btn-ocean" href="#dashboard-pay">${icon('wallet', 18)} Open Payment</a></div>`
         : ready ? `<p>You are logged in as <b>${esc(u.name)}</b>, registration number ${esc(u.regNo)}.</p><div class="btnrow"><button type="button" class="btn btn-lime" id="ac-get">${icon('download', 18)} Download admit card</button><a class="textlink" href="#dashboard">Open my dashboard</a></div>`
         : `<p>You are logged in as <b>${esc(u.name)}</b>.</p><p class="note">${esc(noCardWhy(u))}</p><div><a class="btn btn-ocean" href="#dashboard">Open my dashboard</a></div>`)
       : `<form class="form" id="ac-form" novalidate>${fields.map(f => fieldHtml(f, '', 'ac')).join('')}
@@ -4532,7 +4804,7 @@ PAGES.register = () => {
   if (Store.me()) return Store.me().role === 'admin' ? simplePage('You are logged in', 'This is an admin account.', '#admin', 'Open the admin portal') : simplePage('You are logged in', 'Your exams, resources and admit card are in your dashboard.', '#dashboard', 'Open my dashboard');
   if (!Store.db.settings.regOpen) return simplePage('Registration is closed', 'Registration is not open right now. Watch the Notices page for the next dates.', '#notices', 'See notices');
   /* The organisers' list, in rows of two so the boxes sit level. Required: name, date of birth, institution, class, version,
-     division, district, email, password (typed twice). Optional: a contact number.
+     division, district, email, password (typed twice). a contact number.
      (Class is not on their list, but the site needs it: it decides the student's category.) */
   const year = new Date().getFullYear();
   const rows = [
@@ -4541,7 +4813,7 @@ PAGES.register = () => {
     [{ key: 'institution', label: 'Institution', required: true },
       { key: 'klass', label: 'Class', type: 'select', required: true, options: [['', 'Choose your class'], ...CLASSES.map(c => [c, 'Class ' + c])] }],
     [{ key: 'medium', label: 'Version', type: 'select', required: true, options: [['', 'Choose your version'], ...VERSIONS] },
-      { key: 'phone', label: 'Contact Number', type: 'tel', auto: 'tel', placeholder: 'Optional' }],
+      { key: 'phone', label: 'Contact Number', type: 'tel', required: true, auto: 'tel', placeholder: '018XXXXXXXX' }],
     [{ key: 'region', label: 'Division', type: 'select', required: true, options: [['', 'Choose your division'], ...DIVISIONS] },
       { key: 'district', label: 'District', type: 'select', required: true, options: [['', 'Choose your division first']] }],
     [{ key: 'email', label: 'Email', type: 'email', required: true, auto: 'email', placeholder: 'Notices and selection emails go here' }],
@@ -4576,6 +4848,7 @@ PAGES.register = () => {
         const flag = key => { const el = form.elements[key], box = el && el.closest('.field, .check'); if (box) { box.classList.add('bad'); el.focus({ preventScroll: true }); box.scrollIntoView({ block: 'center' }); } };
         if (miss) { r = { error: `Please fill in "${miss.label}".` }; flag(miss.key); }
         else if (dobProblem(vals.dob)) { r = { error: dobProblem(vals.dob) }; flag('dob'); }
+        else if (phoneProblem(vals.phone)) { r = { error: phoneProblem(vals.phone) }; flag('phone'); }
         else if (vals.password.length < 8) { r = { error: 'Choose a password with at least 8 characters.' }; flag('password'); }
         else if (vals.password !== vals.password2) { r = { error: 'The two passwords are not the same. Type the password again in both boxes.' }; flag('password2'); }
         else {
@@ -4696,11 +4969,28 @@ function linkDistrict(form) {
 }
 /* Who has an admit card to open or download. The National card belongs to every student an admin has selected.
    The Regional card is for the districts the cards are open for (Store.cardDistricts). */
-const regionalOpen = u => !!(u && u.role === 'participant' && Store.db.settings.cardsOpen && Store.districtOpen(u));
-const cardOpenFor = u => !!(u && u.role === 'participant' && Store.db.settings.cardsOpen && (hasNationalCard(u) || Store.districtOpen(u)));
+/* An admin can decide one student's card by hand: 'release' gives the card whatever the other rules say, 'hold' takes it away. */
+const cardHeld = u => Store.cardRule(u) === 'hold', cardFreed = u => Store.cardRule(u) === 'release';
+const regionalOpen = u => !!(u && u.role === 'participant' && !cardHeld(u) && (cardFreed(u) ? !hasNationalCard(u) || Store.districtOpen(u) : Store.db.settings.cardsOpen && Store.districtOpen(u)));
+const cardOpenFor = u => !!(u && u.role === 'participant' && !cardHeld(u) && (cardFreed(u) || (Store.db.settings.cardsOpen && (hasNationalCard(u) || Store.districtOpen(u)))));
+/* Two kinds of student, once the organisers have named the districts that sit the Regional round in person:
+   'venue' students sit it at the venue with an admit card and do not take the online exam;
+   'online' students take the E-Regional exam and have no Regional admit card. Before that, or with no district chosen, a student sees both. */
+const trackOf = u => { const l = Store.cardDistricts(); if (!u || u.role !== 'participant' || !l.length || !u.district) return 'both'; return l.includes(u.district) ? (Store.db.settings.examSplit ? 'venue' : 'both') : 'online'; };
+/* the strip across the top of every page for a student whose admit card is waiting on something */
+function dueStrip() {
+  const u = Store.me(); if (!u || u.role !== 'participant') return '';
+  const strip = (tone, title, text, href, label) => `<aside class="due due-${tone}" role="${tone === 'red' ? 'alert' : 'status'}"><div class="due-in"><span class="due-ic" aria-hidden="true">${icon(tone === 'red' ? 'alert' : 'clock', 20)}</span><p><b>${esc(title)}</b> <span>${esc(text)}</span></p>${href ? `<a class="due-go" href="${href}">${esc(label)} ${icon('next', 16)}</a>` : ''}</div></aside>`;
+  if (cardHeld(u)) return strip('red', 'Your admit card is on hold.', 'Write to the organisers to sort this out.', '#contact', 'Contact us');
+  const kind = ['national', 'regional'].find(k => cardLocked(u, k)); if (!kind) return '';
+  const st = Store.payState(u, kind), name = roundName(kind), fee = taka(Store.feeFor(u, kind));
+  if (st === 'pending') return strip('amber', 'We are checking your payment.', `Your ${name} admit card unlocks when the organisers approve it.`, '#dashboard-pay', 'See my payment');
+  if (st === 'rejected') return strip('red', 'Your payment was not accepted.', `Send your ${name} payment details again to get your admit card.`, '#dashboard-pay', 'Fix it now');
+  return strip('red', `${name} fee not paid.`, `Pay ${fee} to get your admit card.`, '#dashboard-pay', 'Pay now');
+}
 /* which card a one-tap button gives, and whether a fee still stands between the student and that card */
 const cardKind = u => (hasNationalCard(u) ? 'national' : 'regional');
-const cardLocked = (u, kind) => Store.feeLocked(u, kind || cardKind(u));
+const cardLocked = (u, kind) => Store.cardRule(u) !== 'release' && Store.feeLocked(u, kind || cardKind(u));
 const roundName = r => (r === 'national' ? 'National round' : 'Regional round');
 const payFirst = (u, kind) => { toast(`Pay the ${roundName(kind || cardKind(u))} fee first. Your admit card unlocks after that.`); go('dashboard-pay'); };
 const cardDistrictWords = () => { const l = Store.cardDistricts(); return l.length === 1 ? `${l[0]} district` : l.length === 2 ? `${l[0]} and ${l[1]} districts` : `${l.slice(0, -1).join(', ')} and ${l[l.length - 1]} districts`; };
@@ -4757,6 +5047,13 @@ DASH.dashboard = () => {
   const msgs = Store.messagesFor(u.id), s = Store.db.settings, national = hasNationalCard(u), regional = regionalOpen(u), ev = Store.nextEvent();
   const done = Store.all('attempts').filter(a => a.userId === u.id && a.submittedAt).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
   const ex = Store.eRegional(), exState = ex ? Store.examState(ex) : '', exDone = ex ? done.find(a => a.examId === ex.id) : null;
+  const track = trackOf(u), held = cardHeld(u), freed = cardFreed(u), showCards = !held && (freed || s.cardsOpen);
+  /* the online exam, for the students who take it */
+  const exText = !ex ? 'The online round has not been scheduled yet. Watch Notices for the date.' : exDone ? `You handed in the exam on ${fmtDateTime(exDone.submittedAt)}. Your score is ${exDone.score} of ${ex.questions.length}.` : exState === 'live' ? `The exam is open until ${fmtDateTime(ex.closesAt)}. You get ${plural(ex.minutes, 'minute')} once you press Start.` : exState === 'soon' ? `The exam opens on ${fmtDateTime(ex.opensAt)}, Bangladesh time.` : 'The exam is closed.';
+  const exPanel = big => `<section class="sheet${big ? ' ex-main' : ''}"><h2>E-Regional round</h2>${big ? `<p style="margin-top:8px">You are registered from <b>${esc(u.district)}</b>, so your Regional round is the <b>E-Regional exam</b>. You take it online, in the exam portal, from home.</p>` : ''}
+            <p class="muted" style="margin-top:8px">${exText}</p>
+            <div style="margin-top:12px"><a class="btn ${exState === 'live' && !exDone ? 'btn-ocean' : big ? 'btn-ocean' : 'btn-quiet'}${big ? '' : ' btn-sm'}" href="#eregional">Open the exam portal ${icon('next', 16)}</a></div></section>`;
+  const venuePanel = `<section class="sheet"><h2>Regional round</h2><p class="muted" style="margin-top:8px">Students of ${esc(cardDistrictWords())} sit the Regional round in person, at the venue. Bring your admit card. You do not take the online E-Regional exam.</p><div style="margin-top:12px"><a class="btn btn-quiet btn-sm" href="#countdown">See the schedule ${icon('next', 16)}</a></div></section>`;
   const cardBox = (kind, title, note) => { const id = kind === 'national' ? 'card-nat' : 'card';
     if (cardLocked(u, kind)) { const st = Store.payState(u, kind); return `<div class="cardbox paylock"><div><h3>${title} ${st === 'pending' ? '<span class="chip chip-soon">Payment being checked</span>' : '<span class="chip chip-due">Fee not paid</span>'}</h3>
       <p class="muted">${st === 'pending' ? 'The organisers are checking your payment. This card unlocks when they approve it.' : st === 'rejected' ? 'Your payment was not accepted. Send the details again to unlock this card.' : `Pay the ${roundName(kind)} fee of ${taka(Store.feeFor(u, kind))} to unlock this card.`}</p></div>
@@ -4772,24 +5069,24 @@ DASH.dashboard = () => {
       </header>
       <div class="dash-facts">
         <a href="#countdown"><small>Next date</small><b>${ev ? esc(ev.label) : 'To be announced'}</b><span>${ev ? fmtDateTime(ev.at) : 'Watch Notices'}</span></a>
-        <a href="#eregional"><small>E-Regional round</small><b>${!ex ? 'Not scheduled yet' : exDone ? 'Handed in' : exState === 'live' ? 'Open now' : exState === 'soon' ? 'Opens ' + fmtDate(ex.opensAt) : 'Closed'}</b><span>${exDone ? `Your score: ${exDone.score} of ${ex.questions.length}` : 'The online exam, in its own portal'}</span></a>
+        ${track === 'venue' ? `<a href="#dashboard"><small>Regional round</small><b>In person</b><span>At the venue, with your admit card</span></a>`
+          : `<a href="#eregional"><small>E-Regional round</small><b>${!ex ? 'Not scheduled yet' : exDone ? 'Handed in' : exState === 'live' ? 'Open now' : exState === 'soon' ? 'Opens ' + fmtDate(ex.opensAt) : 'Closed'}</b><span>${exDone ? `Your score: ${exDone.score} of ${ex.questions.length}` : 'The online exam, in its own portal'}</span></a>`}
         <a href="#dashboard-resources"><small>Resources</small><b>${plural(Store.all('resources').length, 'item')}</b><span>Notes, papers and reading</span></a>
       </div></div>
       <div class="acct-grid">
         <div class="acct-main">
-          <section class="sheet"><h2>${national ? 'Admit cards' : 'Admit card'}</h2>
+          ${track === 'online' && !national && !regional && !held ? exPanel(true) : `<section class="sheet"><h2>${national && regional ? 'Admit cards' : 'Admit card'}</h2>
             ${!u.district ? `<form class="note" id="pick-district" style="margin-top:12px"><p><b>Choose your district.</b> Your admit card depends on it, and it can only be set once.</p>
                 <div class="btnrow" style="margin-top:10px"><select name="district" aria-label="District" required><option value="">Choose your district</option>${ALL_DISTRICTS.map(x => `<option>${esc(x)}</option>`).join('')}</select><button type="submit" class="btn btn-ocean btn-sm">Save my district</button></div></form>` : ''}
-            ${!s.cardsOpen ? '<p class="note" style="margin-top:12px">Cards are not released yet. You will get a notice when yours is ready.</p>'
+            ${held ? `<div class="cardbox paylock" style="margin-top:14px"><div><h3>Admit card <span class="chip chip-due">On hold</span></h3><p class="muted">The organisers have put your admit card on hold.${Store.cardRuleNote(u) ? ' ' + esc(Store.cardRuleNote(u)) : ''} Write to them to sort this out.</p></div><div><a class="btn btn-quiet" href="#contact">Contact the organisers</a></div></div>`
+              : !showCards ? (cardLocked(u) && (national || Store.districtOpen(u)) ? `<div class="stack-lg" style="margin-top:14px">${cardBox(cardKind(u), roundName(cardKind(u)), '')}</div>` : '<p class="note" style="margin-top:12px">Cards are not released yet. You will get a notice when yours is ready.</p>')
               : (national || regional) ? `<div class="stack-lg" style="margin-top:14px">${national ? cardBox('national', 'National round', 'For the final. Bring this card to the national venue.') : ''}${regional ? cardBox('regional', 'Regional round', 'Bring this card to your Regional round. The organisers scan the QR code.') : ''}</div>`
               : u.district ? `<p class="note" style="margin-top:12px">Admit cards are open for ${esc(cardDistrictWords())} only right now. You are registered from ${esc(u.district)}. Your card will appear here when your district opens.</p>`
-              : `<p class="note" style="margin-top:12px">Admit cards are open for ${esc(cardDistrictWords())} only right now.</p>`}</section>
+              : `<p class="note" style="margin-top:12px">Admit cards are open for ${esc(cardDistrictWords())} only right now.</p>`}</section>`}
         </div>
         <aside class="acct-side">
           <section class="sheet"><h2>My notices</h2><div class="stack" style="margin-top:12px">${msgs.map(m => `<div class="msg ${m.kind === 'selected' ? 'sel' : ''}"><h3>${esc(m.title)}</h3><p>${esc(m.body)}</p><small class="muted">${fmtDateTime(m.at)}</small></div>`).join('') || '<p class="muted">No personal notices yet.</p>'}</div></section>
-          <section class="sheet"><h2>E-Regional round</h2>
-            <p class="muted" style="margin-top:8px">${!ex ? 'The online round has not been scheduled yet. Watch Notices for the date.' : exDone ? `You handed in the exam on ${fmtDateTime(exDone.submittedAt)}. Your score is ${exDone.score} of ${ex.questions.length}.` : exState === 'live' ? `The exam is open until ${fmtDateTime(ex.closesAt)}. You get ${plural(ex.minutes, 'minute')} once you press Start.` : exState === 'soon' ? `The exam opens on ${fmtDateTime(ex.opensAt)}, Bangladesh time.` : 'The exam is closed.'}</p>
-            <div style="margin-top:12px"><a class="btn ${exState === 'live' && !exDone ? 'btn-ocean' : 'btn-quiet'} btn-sm" href="#eregional">Open the exam portal ${icon('next', 16)}</a></div></section>
+          ${track === 'venue' ? venuePanel : track === 'online' && !national && !regional && !held ? '' : exPanel(false)}
         </aside>
       </div>
     </div>`,
@@ -4868,20 +5165,21 @@ DASH['dashboard-me'] = () => {
   const u = Store.me();
   return {
     html: `<div class="wrap narrow">${pageHead('My details', 'These details are printed on your admit card.')}
-      ${!u.dob || !u.medium ? '<div class="note" style="margin-bottom:14px"><b>Some details are missing.</b> Tap Edit details and add your date of birth and your version.</div>' : ''}
+      ${!u.dob || !u.medium || !u.phone ? '<div class="note" style="margin-bottom:14px"><b>Some details are missing.</b> Tap Edit details and add your date of birth, your version and a contact number.</div>' : ''}
       <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Registration number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Contact number</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>Institution</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Version</dt><dd>${esc(versionName(u.medium) || 'Not given')}</dd><dt>Division</dt><dd>${esc(u.region || 'Not given')}</dd><dt>District</dt><dd>${esc(u.district || 'Not chosen yet')}</dd><dt>Date of birth</dt><dd>${esc(fmtDay(u.dob) || 'Not given')}</dd>${u.guardianPhone ? `<dt>Parent's contact</dt><dd>${esc(u.guardianPhone)}</dd>` : ''}<dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
         <div style="margin-top:16px"><button type="button" class="btn btn-ocean" id="edit-me">${icon('edit', 18)} Edit details</button></div></section>
       <section class="sheet"><h2>Payment</h2>${Store.fees().on ? `<p class="muted" style="margin-top:8px">Fees and your payments are on the Payment page.</p><div style="margin-top:12px"><a class="btn btn-quiet btn-sm" href="#dashboard-pay">${icon('wallet', 16)} Open Payment</a></div>` : '<p class="muted" style="margin-top:8px">There is nothing to pay right now. The organisers will announce any fee in Notices.</p>'}</section>
     </div>`,
     mount(v) {
       $('#edit-me', v).onclick = async () => {
-        const fields = [{ key: 'name', label: 'Full Name', required: true }, { key: 'phone', label: 'Contact Number', type: 'tel', placeholder: 'Optional' }, { key: 'institution', label: 'Institution', required: true },
+        const fields = [{ key: 'name', label: 'Full Name', required: true }, { key: 'phone', label: 'Contact Number', type: 'tel', required: true, placeholder: '018XXXXXXXX' }, { key: 'institution', label: 'Institution', required: true },
           { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) },
           { key: 'medium', label: 'Version', type: 'select', required: true, options: [['', 'Choose your version'], ...VERSIONS] },
           { key: 'dob', label: 'Date of Birth', type: 'date', required: true }]
           /* the district is chosen once: after that it and its division are fixed, and only the organisers can change them */
           .concat(u.district ? [] : [{ key: 'region', label: 'Division', type: 'select', required: true, options: [['', 'Choose your division'], ...DIVISIONS] }, { key: 'district', label: 'District', type: 'select', required: true, options: districtOptions(u.region), help: 'This can only be set once.' }]);
         const vals = await formDialog({ title: 'Edit my details', fields, values: u, submit: 'Save changes', mount: linkDistrict, intro: u.district ? `Your district is ${u.district}. To change it, write to the organisers.` : '' });
+        if (vals && phoneProblem(vals.phone)) return toast(phoneProblem(vals.phone), 'bad');
         if (vals) { vals.klass = +vals.klass; if (u.district) vals.region = u.region; try { await Store.updateMe(vals); toast('Changes saved', 'good'); render(); } catch (e) { toast(e.message, 'bad'); } }
       };
     },
@@ -4896,7 +5194,7 @@ const isDashRoute = name => { const n = DASH_ALIAS[name] || name; return n === '
 function renderDash(name) {
   const root = $('#dash'), u = Store.me();
   const DASH_TABS = dashTabs(), tab = DASH_TABS.some(t => t[0] === name) ? name : 'dashboard';
-  root.innerHTML = `<header class="dash-top"><a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, public site"><img src="${LOGO_FULL}" alt="" width="560" height="263"></a><b>${u.role === 'admin' ? 'Dashboard preview' : 'Dashboard'}</b>
+  root.innerHTML = `${dueStrip()}<header class="dash-top"><a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, public site"><img src="${LOGO_FULL}" alt="" width="560" height="263"></a><b>${u.role === 'admin' ? 'Dashboard preview' : 'Dashboard'}</b>
       <div class="sp">${cardOpenFor(u) ? `<button type="button" class="btn btn-lime btn-sm" id="dash-card">Admit card ${icon('download', 16)}</button>` : ''}<a class="btn btn-ghost btn-sm" href="#home" aria-label="Public site">${icon('globe', 18)}<span>Public site</span></a><button type="button" class="iconbtn" id="logout" aria-label="Log out" title="Log out">${icon('out')}</button></div></header>
     <nav class="dash-tabs" aria-label="Dashboard sections">${DASH_TABS.map(t => `<a href="#${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${icon(t[2], 18)} ${t[1]}</a>`).join('')}</nav>
     <main id="dash-view"></main>`;
@@ -4921,7 +5219,7 @@ const clock = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Mat
 /* ---------- the exam portal: a screen of its own, only for the E-Regional round ---------- */
 const isExamRoute = name => name === 'eregional' || name.startsWith('exam-');
 /* students who sit the Regional round in person do not take the online one, when the organisers have switched that rule on */
-const offlineOnly = u => !!(Store.db.settings.examSplit && u && u.role === 'participant' && Store.cardDistricts().length && Store.districtOpen(u));
+const offlineOnly = u => trackOf(u) === 'venue';
 const examFacts = ex => `<dl class="xfacts"><div><dt>Opens</dt><dd>${fmtDateTime(ex.opensAt)}</dd></div><div><dt>Closes</dt><dd>${fmtDateTime(ex.closesAt)}</dd></div><div><dt>Time allowed</dt><dd>${plural(ex.minutes, 'minute')}</dd></div><div><dt>Questions</dt><dd>${ex.questions.length || 'To be announced'}</dd></div></dl>`;
 const examShell = (ex, body, lead) => `<div class="wrap narrow xwrap">${pageHead(ex ? ex.title : 'E-Regional round', lead || (ex && ex.description) || 'The online round of the olympiad.')}${ex ? examFacts(ex) : ''}${body}</div>`;
 function renderPortal(name) {
@@ -4950,7 +5248,7 @@ function pageExam(id) {
   const ex = Store.get('exams', id), me = Store.me();
   /* online: fetch this exam's questions and my attempts first, then draw the page */
   if (CLOUD && Date.now() - (examFresh[id] || 0) > 4000) return {
-    html: examShell(ex, '<section class="sheet"><p class="empty">Loading the exam…</p></section>'),
+    html: examShell(ex, `<section class="sheet">${QUIET_WAIT}</section>`),
     mount() { Store.loadExam(id).then(() => { examFresh[id] = Date.now(); if (isExamRoute(routeName())) render(); }, e => toast(e.message, 'bad')); },
   };
   let at = Store.attempt(ex.id, me.id);
@@ -5135,6 +5433,7 @@ function personDialog(p, after) {
       <dt>Class</dt><dd>Class ${esc(p.klass)} (${esc(p.category)})</dd><dt>Division</dt><dd>${esc(p.region || 'Not given')}</dd><dt>District</dt><dd>${esc(p.district || 'Not chosen yet')}</dd><dt>Date of birth</dt><dd>${esc(fmtDay(p.dob) || 'Not given')}</dd><dt>Registered</dt><dd>${fmtDateTime(p.createdAt)}</dd>
       <dt>Selected for</dt><dd>${(p.selected || []).map(s => esc(s.round)).join(', ') || 'Nothing yet'}</dd>
       <dt>Fees</dt><dd id="pd-fee"></dd>
+      <dt>Admit card</dt><dd id="pd-rule"></dd>
       <dt>Attendance</dt><dd id="pd-att"></dd>
       <dt>E-Regional exam</dt><dd>${tries.map(a => { const ex = Store.get('exams', a.examId); return ex ? `${esc(ex.title)}: ${a.score}/${ex.questions.length}` : ''; }).filter(Boolean).join('<br>') || 'None finished'}</dd></dl>
     <div class="cardprev" id="pd-card"></div>
@@ -5157,6 +5456,23 @@ function personDialog(p, after) {
     const v = await formDialog({ title: `Mark the ${roundName(r)} fee as paid`, submit: 'Mark as paid', intro: `Use this when ${p.name} paid in cash, or when the organisers waive the fee. The admit card unlocks at once.`, fields: [{ key: 'note', label: 'Note', placeholder: 'For example: paid in cash at the school' }] });
     if (v) busy(null, async () => { await Store.markPaid(p.id, r, v.note); toast('Marked as paid', 'good'); drawFee(); after(); });
   });
+  /* the admit card: it follows the usual rules unless an admin releases it or puts it on hold for this one student */
+  const cardBoxEl = $('#pd-rule', d), drawCardRule = () => {
+    const rule = Store.cardRule(p), auto = cardOpenFor(p) ? (cardLocked(p) ? 'locked until the fee is paid' : 'can be downloaded') : trackOf(p) === 'online' && !hasNationalCard(p) ? 'none, this student takes the E-Regional exam online' : !Store.db.settings.cardsOpen ? 'not released yet' : 'not open for this district';
+    cardBoxEl.innerHTML = `<b>${rule === 'release' ? 'Released by an admin' : rule === 'hold' ? 'On hold' : 'Automatic'}</b>${rule ? (Store.cardRuleNote(p) ? `: ${esc(Store.cardRuleNote(p))}` : '') : ` (${auto})`}
+      <span class="btnrow" style="margin-top:8px">${rule !== 'release' ? '<button type="button" class="btn btn-lime btn-sm" data-rule="release">Release admit card</button>' : ''}${rule !== 'hold' ? '<button type="button" class="btn btn-quiet btn-sm" data-rule="hold">Seize admit card</button>' : ''}${rule ? '<button type="button" class="btn btn-quiet btn-sm" data-rule="">Back to automatic</button>' : ''}</span>${Store.cardRulesReady ? '' : '<small class="muted" style="display:block;margin-top:6px">This database is missing the newest update, so this cannot be saved yet.</small>'}`;
+  };
+  drawCardRule();
+  cardBoxEl.addEventListener('click', async e => {
+    const b = e.target.closest('[data-rule]'); if (!b) return; const rule = b.dataset.rule; let note = '';
+    if (rule) {
+      const v = await formDialog({ title: rule === 'release' ? `Release the admit card of ${p.name}` : `Seize the admit card of ${p.name}`, submit: rule === 'release' ? 'Release' : 'Seize',
+        intro: rule === 'release' ? 'The student can download the admit card at once, even without a payment and even if cards are not released for everyone. Use it when the fee was paid to you by hand.' : 'The student can no longer see or download the admit card, and is told it is on hold.',
+        fields: [{ key: 'note', label: rule === 'release' ? 'Note for the organisers' : 'Reason the student will read', placeholder: rule === 'release' ? 'For example: paid in cash' : 'For example: your school has to confirm your class' }] });
+      if (!v) return; note = v.note;
+    }
+    busy(null, async () => { try { await Store.setCardRule(p.id, rule, note); toast(rule === 'release' ? 'Admit card released' : rule === 'hold' ? 'Admit card seized' : 'Back to automatic', 'good'); } catch (x) { toast(x.message, 'bad'); } drawCardRule(); drawFee(); after(); });
+  });
   $('[data-sel]', d).onclick = () => { d.close(); selectDialog([p.id], after); };
   $('[data-ed]', d).onclick = async () => {
     const v = await formDialog({ title: 'Edit ' + p.name, submit: 'Save changes', values: p, mount: linkDistrict, fields: [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
@@ -5168,9 +5484,38 @@ function personDialog(p, after) {
   $('[data-rm]', d).onclick = async () => { if (await confirmDialog(`Remove ${p.name} and all of their exam attempts? This cannot be undone.`, 'Remove', true)) busy(null, async () => { await Store.removeUser(p.id); d.close(); toast('Participant removed'); after(); }); };
 }
 const feeWord = (p, r) => { const st = Store.payState(p, r); return st === 'paid' ? 'Paid' : st === 'pending' ? 'Waiting' : Store.feeFor(p, r) > 0 ? 'Not paid' : ''; };
+/* an admin makes a participant by hand and sets, in the same step, what is already settled for that student */
+async function addParticipantDialog(after) {
+  let made = null;
+  const fields = [{ key: 'name', label: 'Full Name', required: true }, { key: 'email', label: 'Email', type: 'email', required: true, help: 'The student logs in with this email, or with the registration number they get.' },
+    { key: 'password', label: 'Password', required: true, placeholder: 'At least 8 characters', help: 'Give this password to the student. They can change it later with "Forgot password".' },
+    { key: 'phone', label: 'Contact Number', type: 'tel', required: true, placeholder: '018XXXXXXXX' }, { key: 'institution', label: 'Institution', required: true },
+    { key: 'klass', label: 'Class', type: 'select', required: true, options: [['', 'Choose the class'], ...CLASSES.map(c => [c, 'Class ' + c])] }, { key: 'medium', label: 'Version', type: 'select', required: true, options: [['', 'Choose the version'], ...VERSIONS] },
+    { key: 'dob', label: 'Date of Birth', type: 'date', required: true },
+    { key: 'region', label: 'Division', type: 'select', required: true, options: [['', 'Choose the division'], ...DIVISIONS] }, { key: 'district', label: 'District', type: 'select', required: true, options: [['', 'Choose the division first']] },
+    { key: 'regPaid', label: 'Regional round fee is paid', type: 'checkbox' }, { key: 'national', label: 'Selected for the National round', type: 'checkbox' }, { key: 'natPaid', label: 'National round fee is paid', type: 'checkbox' },
+    { key: 'card', label: 'Admit card', type: 'select', options: [['', 'Automatic (follows payment and the switches)'], ['release', 'Released (can download now)'], ['hold', 'On hold (cannot download)']] }];
+  const v = await formDialog({ title: 'Add a participant', submit: 'Create the account', fields, mount: linkDistrict,
+    intro: 'This makes a real account. Tick what is already settled, and the student sees exactly that when they log in.',
+    check: async vals => {
+      if (phoneProblem(vals.phone)) return phoneProblem(vals.phone);
+      if (dobProblem(vals.dob)) return dobProblem(vals.dob);
+      if (vals.natPaid && !vals.national) return 'The National round fee can only be marked paid for a student who is selected for the National round.';
+      /* the account first; then each thing that was ticked. If a later step fails the account still exists, and the message says what to finish by hand. */
+      if (!made) { try { made = await Store.addParticipant(vals); } catch (x) { return x.message; } }
+      try {
+        if (vals.national) await Store.select([made.id], 'National round');
+        if (vals.regPaid) await Store.markPaid(made.id, 'regional', 'Marked paid when the account was made');
+        if (vals.natPaid) await Store.markPaid(made.id, 'national', 'Marked paid when the account was made');
+        if (vals.card) await Store.setCardRule(made.id, vals.card, 'Set when the account was made');
+      } catch (x) { return `The account was made (registration number ${made.regNo}), but one of the ticks could not be saved: ${x.message} Close this window and set it from the participant's own window.`; }
+      return '';
+    } });
+  if (made) { after(); openDialog({ title: 'Participant added', html: `<p><b>${esc(made.name)}</b> now has an account.</p><dl class="kv"><dt>Registration number</dt><dd>${esc(made.regNo)}</dd><dt>Email</dt><dd>${esc(made.email)}</dd>${v ? `<dt>Password</dt><dd>${esc(v.password)}</dd>` : ''}</dl><p class="note">Give these to the student. They log in with the email or the registration number, and the password.</p><div class="dlg-actions"><button type="button" class="btn btn-ocean btn-sm" data-close>Done</button></div>` }); }
+}
 ADMIN['admin-people'] = main => {
   const picked = new Set(); const f = { q: '', cat: '', region: '', district: '', sel: '' };
-  main.innerHTML = `<section class="panel"><div class="panel-head"><h2>Participants</h2><button type="button" class="btn btn-quiet btn-sm" id="p-csv">${icon('download', 18)} Export list</button></div>
+  main.innerHTML = `<section class="panel"><div class="panel-head"><h2>Participants</h2><span class="btnrow"><button type="button" class="btn btn-ocean btn-sm" id="p-add">${icon('plus', 18)} Add a participant</button><button type="button" class="btn btn-quiet btn-sm" id="p-csv">${icon('download', 18)} Export list</button></span></div>
       <div class="filters">
         <div class="field"><label for="p-q">Search</label><input id="p-q" type="search" placeholder="Name, email, school or registration no."></div>
         <div class="field"><label for="p-cat">Category</label><select id="p-cat"><option value="">All</option>${['Junior', 'Secondary', 'Higher secondary'].map(c => `<option>${c}</option>`).join('')}</select></div>
@@ -5205,10 +5550,11 @@ ADMIN['admin-people'] = main => {
   main.addEventListener('click', e => { const o = e.target.closest('[data-open]'); if (o) personDialog(Store.get('users', o.dataset.open), draw); });
   $('#p-none', main).onclick = () => { picked.clear(); draw(); };
   $('#p-mark', main).onclick = () => selectDialog([...picked], () => { picked.clear(); draw(); });
+  $('#p-add', main).onclick = () => addParticipantDialog(draw);
   $('#p-csv', main).onclick = () => {
     const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
-    const lines = [['Registration no', 'Name', 'Email', 'Contact number', 'Institution', 'Class', 'Version', 'Category', 'Region', 'District', 'Date of birth', 'Parent contact', 'Registered', 'Selected for', 'Regional fee', 'National fee'].map(q).join(',')]
-      .concat(shown().map(p => [p.regNo, p.name, p.email, p.phone, p.institution, p.klass, versionName(p.medium), p.category, p.region, p.district || '', p.dob || '', p.guardianPhone || '', fmtDateTime(p.createdAt), (p.selected || []).map(s => s.round).join('; '), feeWord(p, 'regional'), feeWord(p, 'national')].map(q).join(',')));
+    const lines = [['Registration no', 'Name', 'Email', 'Contact number', 'Institution', 'Class', 'Version', 'Category', 'Region', 'District', 'Date of birth', 'Parent contact', 'Registered', 'Selected for', 'Regional fee', 'National fee', 'Admit card'].map(q).join(',')]
+      .concat(shown().map(p => [p.regNo, p.name, p.email, p.phone, p.institution, p.klass, versionName(p.medium), p.category, p.region, p.district || '', p.dob || '', p.guardianPhone || '', fmtDateTime(p.createdAt), (p.selected || []).map(s => s.round).join('; '), feeWord(p, 'regional'), feeWord(p, 'national'), Store.cardRule(p) === 'release' ? 'Released' : Store.cardRule(p) === 'hold' ? 'On hold' : 'Automatic'].map(q).join(',')));
     saveAndTell('bgeo-participants.csv', new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv' }));
   };
   draw();
@@ -5311,8 +5657,8 @@ async function scanDialog(session, after) {
   const mark = async u => {
     if (!u) { show('bad', 'Not a BGeO card', 'This code or number does not match any registered student.'); Sound.play('bad'); return; }
     try {
-      const r = await Store.markPresent(u.id, session), owes = Store.feeLocked(u, isNational(session) ? 'national' : 'regional');
-      show(r === 'new' && !owes ? 'good' : 'warn', u.name, (r === 'new' ? `${u.regNo}, ${u.institution}. Marked present.` : `${u.regNo}. Already marked present.`) + (owes ? ' FEE NOT PAID.' : ''));
+      const r = await Store.markPresent(u.id, session), held = Store.cardRule(u) === 'hold', owes = held || (Store.cardRule(u) !== 'release' && Store.feeLocked(u, isNational(session) ? 'national' : 'regional'));
+      show(r === 'new' && !owes ? 'good' : 'warn', u.name, (r === 'new' ? `${u.regNo}, ${u.institution}. Marked present.` : `${u.regNo}. Already marked present.`) + (held ? ' ADMIT CARD ON HOLD.' : owes ? ' FEE NOT PAID.' : ''));
       Sound.play(owes ? 'bad' : r === 'new' ? 'good' : 'pick'); after();
     } catch (e) { show('bad', 'Could not save', e.message); Sound.play('bad'); }
   };
@@ -5762,7 +6108,14 @@ async function boot() {
   buildShell();
   const intro = siteIntro();
   if (WANT_CLOUD && !CLOUD) { if (intro) intro.cancel(); $('#view').innerHTML = '<div class="wrap narrow"><header class="pagehead"><h1>The site could not start</h1><p>A file it needs did not load. Check your internet connection and reload the page.</p></header></div>'; return; }
-  $('#view').innerHTML = '<div class="wrap"><header class="pagehead"><p>Loading…</p></header></div>';
+  /* nothing is written on the screen while the data arrives: a returning visitor gets the page at once from what the browser kept,
+     and anyone else sees quiet grey shapes for the moment it takes */
+  $('#view').innerHTML = QUIET_WAIT;
+  /* fresh data that arrives behind a page already on screen: the page is drawn again only if something changed and nobody has started using it */
+  Store.onFresh = changed => {
+    const a = document.activeElement, busyHere = !!$('dialog[open]') || (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) || $$('#view input, #view textarea').some(el => el.value && !/^(checkbox|radio|hidden|submit|button)$/.test(el.type));
+    if (changed && !busyHere && !document.body.classList.contains('intro-on')) { const y = window.scrollY; render(); window.scrollTo(0, y); } else syncChrome(routeName());
+  };
   try { await Store.init(); }
   catch (e) { if (intro) intro.cancel(); $('#view').innerHTML = `<div class="wrap narrow"><header class="pagehead"><h1>Could not load the olympiad data</h1><p>${esc(e.message)}</p></header><p><a class="btn btn-lime" href="">Try again</a></p></div>`; return; }
   Store.onRecovery = recoveryDialog;
