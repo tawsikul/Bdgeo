@@ -374,26 +374,47 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 
 /* footer, compass, toasts, dialogs */
 /* the footer, from the Figma: deep navy, the committee's details on the left, two columns of links on the right, small print along the bottom */
-.foot{position:relative;background:#052057;padding:48px 0 30px;color:#fff}
-.foot-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px 20px}
-.foot-main{grid-column:1 / -1}
-.foot-main > img{height:86px;width:auto;margin-left:-4px}
-.foot h2{font:700 1.3rem/1.25 var(--body);color:#fff;margin:22px 0 12px}
-.foot-main p{margin:0 0 7px;max-width:36ch;font-size:1.06rem;line-height:1.45;color:#e6effc}
+.foot{position:relative;padding:10px 8px 8px;background:#f1f5fb;color:#fff}
+/* laid out the way Upwork lays out its footer: one dark rounded panel set in from the page's edges; on a phone the groups of
+   links fold into rows that open with a tap; then "Follow us" and the icons; a hairline; the small print */
+.foot-card{max-width:1480px;margin:0 auto;background:#052057;border-radius:18px;padding:30px 20px 22px}
+.foot-main > img{height:74px;width:auto;margin-left:-4px;display:block}
+.foot h2{font:700 1.22rem/1.25 var(--body);color:#fff;margin:18px 0 10px}
+.foot-main p{margin:0 0 7px;max-width:36ch;font-size:1.03rem;line-height:1.45;color:#e6effc}
 .foot-main p strong{color:#fff;font-weight:700}
 .foot a{color:inherit;text-decoration:none}
-.foot-social{display:flex;flex-wrap:wrap;gap:16px;margin:22px 0 0 -5px !important;max-width:none !important}
-.foot-social[hidden]{display:none}
-.foot-social a{display:grid;place-items:center;width:44px;height:44px;border-radius:12px}
-.foot-social img{width:34px;height:34px;display:block}
-.foot-links h2{margin:0 0 10px;font-size:1.16rem}
-.foot-links a{display:block;padding:9px 0;font-size:1.08rem;color:#e6effc}
-.foot small{color:#dbe6f8;display:block;font-size:.9rem}
-.foot-base{display:flex;flex-wrap:wrap;gap:14px 24px;justify-content:space-between;align-items:center;margin-top:34px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14)}
-.foot-legal{display:flex;flex-wrap:wrap;gap:6px 0}
-.foot-legal a{padding:6px 13px;font-size:.92rem;color:#e6effc;border-left:1px solid rgba(255,255,255,.45);line-height:1.1}
-.foot-legal a:first-child{padding-left:0;border-left:0}
-@media(min-width:740px){.foot{padding:60px 0 34px}.foot-grid{grid-template-columns:minmax(0,1fr) auto auto;gap:40px 84px}.foot-main{grid-column:auto}.foot-links{padding-top:74px}.foot-base{border-top:0;padding-top:0}}
+.foot-cols{margin-top:24px;border-bottom:1px solid rgba(255,255,255,.16)}
+.foot-acc{border-top:1px solid rgba(255,255,255,.16)}
+.foot-acc summary{display:flex;align-items:center;justify-content:space-between;min-height:54px;font:600 1.08rem/1.2 var(--body);color:#fff;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent}
+.foot-acc summary::-webkit-details-marker{display:none}
+.foot-acc summary .ic{transition:transform var(--m-std) var(--ease);opacity:.9}
+.foot-acc[open] summary .ic{transform:rotate(180deg)}
+.foot-links{padding:0 0 12px}
+.foot-links a{display:block;padding:8px 0;font-size:1.03rem;color:#dfe9f9}
+.foot-follow{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:20px 0 4px}
+.foot-follow[hidden]{display:none}
+.foot-follow > span{font-size:1.03rem;font-weight:600;color:#fff}
+.foot-social{display:flex;flex-wrap:wrap;gap:10px;margin:0}
+.foot-social a{display:grid;place-items:center;width:44px;height:44px;border-radius:50%}
+.foot-social img{width:30px;height:30px;display:block}
+.foot small{color:#dbe6f8;display:block;font-size:.88rem}
+.foot-base{display:flex;flex-direction:column;gap:12px;margin-top:16px;padding-top:18px;border-top:1px solid rgba(255,255,255,.16)}
+.foot-legal{display:flex;flex-wrap:wrap;gap:4px 15px}
+.foot-legal a{padding:5px 0;font-size:.88rem;color:#dfe9f9}
+@media(min-width:740px){
+  .foot{padding:16px 16px 16px}
+  .foot-card{border-radius:22px;padding:52px clamp(28px,5vw,72px) 26px}
+  .foot-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px 72px}
+  .foot-main > img{height:86px}
+  .foot-cols{display:flex;gap:72px;margin-top:70px;border-bottom:0}
+  .foot-acc{border-top:0}
+  .foot-acc summary{min-height:0;padding:0 0 12px;pointer-events:none;font-size:1.14rem}
+  .foot-acc summary .ic{display:none}
+  .foot-links{min-width:150px}
+  .foot-follow{padding:34px 0 6px}
+  .foot-base{flex-direction:row;justify-content:space-between;align-items:center;margin-top:22px}
+  .foot-legal{gap:4px 24px}
+}
 /* small print pages and the site map */
 .prose h2{margin:22px 0 8px;font-size:1.2rem}.prose h2:first-child{margin-top:0}.prose p{margin:0 0 9px;max-width:68ch}
 .sitemap{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px 28px}
@@ -691,29 +712,13 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-mark .
 /* =====================================================================================================
    One site, three ways to hold it.
    PHONE (under 740px): a tall screen and a thumb. The globe rises big behind the first screen, rows of cards swipe
-   sideways, the next date rides in a thin strip under the top bar, a bar of four links sits at the bottom, and
+   sideways, the next date rides in a thin strip under the top bar, and
    sections arrive as you scroll.
    TABLET (740px and up, touch): the computer's layout, sized for fingers. No pointer effects.
    COMPUTER (a mouse): everything answers the pointer.
    ===================================================================================================== */
-.tabbar,.nextstrip{display:none}
+.nextstrip{display:none}
 @media(max-width:739px){
-  body:not(.is-admin):not(.is-dash){--tab-h:calc(60px + env(safe-area-inset-bottom,0px))}
-  /* the bottom bar */
-  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:38;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tab-h);padding-bottom:env(safe-area-inset-bottom,0px);background:#052057;border-top:1px solid rgba(255,255,255,.14)}
-  .tabbar a{display:grid;justify-items:center;align-content:center;gap:3px;text-decoration:none;color:#b9cdee;font-size:.75rem;font-weight:600;-webkit-tap-highlight-color:transparent;transition:color var(--m-in) var(--ease),transform var(--m-press) var(--ease)}
-  .tabbar a:active{transform:scale(.94)}
-  .tabbar a[aria-current="page"]{color:var(--lime)}
-  .tabbar a .ic{width:22px;height:22px}
-  #site #acct-btn{display:none}
-  .foot{padding:38px 0 calc(30px + var(--tab-h))}
-  .foot-grid{gap:26px 20px}
-  .foot-main > img{height:74px}
-  .foot h2{margin:18px 0 10px}
-  .foot-links a{padding:7px 0}
-  .foot-base{flex-direction:column;align-items:flex-start;gap:10px;margin-top:26px;padding-top:16px}
-  .foot-legal{flex-wrap:nowrap;width:100%}
-  .foot-legal a{padding:6px 10px;font-size:.84rem;white-space:nowrap}
   .menu{inset:var(--bar-h) 0 var(--tab-h) 0}
   /* the next date, in a thin strip that stays under the top bar */
   .nextstrip{position:sticky;top:var(--bar-h);z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:38px;padding:0 16px;background:#031c4e;border-bottom:1px solid rgba(255,255,255,.12);color:#d6e5fb;font-size:.9rem;text-decoration:none;white-space:nowrap}
@@ -3610,25 +3615,27 @@ function buildShell() {
     <a href="#dashboard" data-nav="dashboard">${icon('user')}<span>Dashboard</span></a>
   </nav></div>
   <main id="view" tabindex="-1"></main>
-  <nav class="tabbar" aria-label="Quick links">
-    <a href="#home" data-nav="home">${icon('compass')}<span>Home</span></a>
-    <a href="#notices" data-nav="notices">${icon('mail')}<span>Notice</span></a>
-    <a href="#countdown" data-nav="countdown">${icon('clock')}<span>Schedule</span></a>
-    <a href="#login" id="tab-acct">${icon('account')}<span>Login</span></a>
-  </nav>
-  <footer class="foot"><div class="wrap foot-grid">
-    <div class="foot-main">
-      <img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263" draggable="false">
-      <h2>${ORG.name}</h2>
-      <p><strong>Address:</strong> <span id="foot-address"></span></p>
-      <p><strong>Email:</strong> <a id="foot-email"></a></p>
-      <p><strong>Phone:</strong> <a id="foot-phone"></a></p>
-      <p class="foot-social" id="foot-social" hidden></p>
+  <footer class="foot"><div class="foot-card">
+    <div class="foot-top">
+      <div class="foot-main">
+        <img src="${LOGO_FULL}" alt="Bangladesh Geography Olympiad" width="560" height="263" draggable="false">
+        <h2>${ORG.name}</h2>
+        <p><strong>Address:</strong> <span id="foot-address"></span></p>
+        <p><strong>Email:</strong> <a id="foot-email"></a></p>
+        <p><strong>Phone:</strong> <a id="foot-phone"></a></p>
+      </div>
+      <div class="foot-cols">
+        <details class="foot-acc"><summary>Organization${icon('down', 20)}</summary><nav class="foot-links" aria-label="Organization"><a href="#about">About Us</a><a href="#about">Goals</a><a href="#team">Peoples</a><a href="#contact">Join Us</a><a href="#faq">FAQs</a></nav></details>
+        <details class="foot-acc"><summary>General${icon('down', 20)}</summary><nav class="foot-links" aria-label="General"><a href="#register">Registration</a><a href="#syllabus">Syllabus &amp; Topic</a><a href="#notices">Notice</a><a href="#countdown">Schedule</a><a href="#results">Results</a></nav></details>
+      </div>
     </div>
-    <nav class="foot-links" aria-label="Organization"><h2>Organization</h2><a href="#about">About Us</a><a href="#about">Goals</a><a href="#team">Peoples</a><a href="#contact">Join Us</a><a href="#faq">FAQs</a></nav>
-    <nav class="foot-links" aria-label="General"><h2>General</h2><a href="#register">Registration</a><a href="#syllabus">Syllabus &amp; Topic</a><a href="#notices">Notice</a><a href="#countdown">Schedule</a><a href="#results">Results</a></nav>
-  </div><div class="wrap foot-base"><small>Copyright &copy; ${new Date().getFullYear()} BdGeO. All rights reserved.${CLOUD ? '' : ' Preview build with sample data. Sign-ups made here stay in this browser only.'}</small>
-    <nav class="foot-legal" aria-label="Legal"><a href="#privacy">Privacy Policy</a><a href="#terms">Terms of Use</a><a href="#legal">Legal</a><a href="#sitemap">Site Map</a></nav></div></footer>`;
+    <div class="foot-follow" id="foot-follow" hidden><span>Follow us</span><p class="foot-social" id="foot-social"></p></div>
+    <div class="foot-base"><small>&copy; ${new Date().getFullYear()} BdGeO. All rights reserved.${CLOUD ? '' : ' Preview build with sample data. Sign-ups made here stay in this browser only.'}</small>
+      <nav class="foot-legal" aria-label="Legal"><a href="#privacy">Privacy Policy</a><a href="#terms">Terms of Use</a><a href="#legal">Legal</a><a href="#sitemap">Site Map</a></nav></div>
+  </div></footer>`;
+  /* in the footer the two groups of links are folded on a phone (tap a heading to open it) and always open on wider screens */
+  const wideFoot = window.matchMedia('(min-width: 740px)'), setFoot = () => $$('.foot-acc').forEach(d => { d.open = wideFoot.matches; });
+  setFoot(); if (wideFoot.addEventListener) wideFoot.addEventListener('change', setFoot);
   const sb = $('#sound-btn');
   const paintSound = () => { sb.innerHTML = icon(Sound.on ? 'sound' : 'mute'); sb.setAttribute('aria-pressed', Sound.on ? 'true' : 'false'); sb.title = Sound.on ? 'Sound is on' : 'Sound is off'; };
   paintSound(); sb.addEventListener('click', () => { Sound.toggle(); paintSound(); });
@@ -3663,7 +3670,7 @@ function openMenu() { $('#menu').hidden = false; const b = $('#menu-btn'); b.set
 function closeMenu() { closeDrops(); const m = $('#menu'); if (!m || m.hidden) return; m.hidden = true; const b = $('#menu-btn'); b.setAttribute('aria-expanded', 'false'); b.innerHTML = icon('menu'); }
 /* the organisers' details. An admin can change the email, phone, address and social links under Admin, Site. */
 const ORG = { name: 'Bangladesh Geography Olympiad Committee', address: 'Prothom Alo Bhaban, 1st Floor, 19 Karwan Bazar, Dhaka, Bangladesh, 1215', email: 'support@geographyolympiad.org', phone: '+880 9638-713534',
-  socials: { facebook: 'https://www.facebook.com/BdGeOC', instagram: 'https://www.instagram.com/bdgeographyolympiad', x: 'https://www.x.com/BdGeOC', linkedin: 'https://www.linkedin.com/company/BdGeOC' } };
+  socials: { facebook: 'https://www.facebook.com/BdGeOC', instagram: 'https://www.instagram.com/bdgeographyolympiad', x: 'https://www.x.com/BdGeOC', linkedin: 'https://www.linkedin.com/company/bdgeographyolympiad' } };
 const SOCIALS = [['facebook', 'Facebook'], ['instagram', 'Instagram'], ['x', 'X'], ['linkedin', 'LinkedIn']];
 function contactOf() {
   const s = (Store.db && Store.db.settings) || {};
@@ -3673,7 +3680,7 @@ function fillFoot() {
   const c = contactOf(), em = $('#foot-email'), ph = $('#foot-phone'), so = $('#foot-social'); if (!em) return;
   $('#foot-address').textContent = c.address;
   em.textContent = c.email; em.href = 'mailto:' + c.email; ph.textContent = c.phone; ph.href = 'tel:' + c.phone.replace(/[^+\d]/g, '');
-  so.hidden = !c.socials.length; so.innerHTML = c.socials.map(([label, url, k]) => `<a href="${esc(url)}" target="_blank" rel="noopener" aria-label="${label}" title="${label}"><img src="${SOCIAL_ICON[k]}" alt="" width="34" height="34" draggable="false"></a>`).join('');
+  $('#foot-follow').hidden = !c.socials.length; so.innerHTML = c.socials.map(([label, url, k]) => `<a href="${esc(url)}" target="_blank" rel="noopener" aria-label="${label}" title="${label}"><img src="${SOCIAL_ICON[k]}" alt="" width="34" height="34" draggable="false"></a>`).join('');
 }
 function syncChrome(name) {
   fillFoot();
@@ -3681,8 +3688,6 @@ function syncChrome(name) {
   $$('.dd').forEach(d => d.classList.toggle('here', !!$('[aria-current]', d)));
   const u = Store.me(), b = $('#acct-btn');
   const what = u ? (u.role === 'admin' ? 'Admin' : 'Dashboard') : 'Login';
-  const ta = $('#tab-acct'); ta.lastElementChild.textContent = what; ta.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
-  if (name === 'login' || name === 'register') ta.setAttribute('aria-current', 'page'); else ta.removeAttribute('aria-current');
   b.innerHTML = `${icon('account', 18)}<span>${what}</span>`; b.setAttribute('aria-label', what); b.href = u ? (u.role === 'admin' ? '#admin' : '#dashboard') : '#login';
   const hasCard = cardOpenFor(u);
   $$('.bar-admit').forEach(a => { a.hidden = !hasCard; }); $('.bar').classList.toggle('has-card', hasCard);
