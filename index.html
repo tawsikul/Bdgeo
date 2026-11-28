@@ -2211,12 +2211,18 @@ const Sound = (() => {
     src.start(t0, Math.random() * 1.5); src.stop(t0 + t + 0.02);
   }
   /* a long sound that follows a path: pts is a list of [seconds, level, pitch]. With `wave` it is a note; without, it is wind. */
-  function path(now, { at = 0, pts, wave, q = 0.7 }) {
+  function path(now, { at = 0, pts, wave, q = 0.7, flutter = 0 }) {
     const t0 = now + at, end = pts[pts.length - 1][0], a = ctx.createGain(), noisy = !wave, lift = noisy ? NOISE_UP : 1;
     const src = noisy ? ctx.createBufferSource() : ctx.createOscillator(), flt = noisy ? ctx.createBiquadFilter() : null, freq = noisy ? flt.frequency : src.frequency;
     if (noisy) { src.buffer = noise(); src.loop = true; flt.type = 'bandpass'; flt.Q.value = q; src.connect(flt); flt.connect(a); } else { src.type = wave; src.connect(a); }
     pts.forEach(([t, g, f], i) => { const lv = Math.max(FLOOR, Math.min(0.8, g * lift)); if (!i) { a.gain.setValueAtTime(lv, t0 + t); freq.setValueAtTime(f, t0 + t); } else { a.gain.exponentialRampToValueAtTime(lv, t0 + t); freq.exponentialRampToValueAtTime(f, t0 + t); } });
     a.connect(out);
+    if (flutter) {   // flutter: slow random noise pushes the level up and down many times a second, as wind does on a microphone
+      const top = Math.max(...pts.map(x => x[1])) * lift, wob = ctx.createBufferSource(), lp = ctx.createBiquadFilter(), depth = ctx.createGain();
+      wob.buffer = noise(); wob.loop = true; lp.type = 'lowpass'; lp.frequency.value = 22; depth.gain.value = Math.min(0.8, top) * flutter * 14;
+      wob.connect(lp); lp.connect(depth); depth.connect(a.gain); wob.onended = () => { wob.disconnect(); lp.disconnect(); depth.disconnect(); };
+      wob.start(t0 + pts[0][0], Math.random() * 1.5); wob.stop(t0 + end + 0.02);
+    }
     if (noisy) { src.onended = () => { src.disconnect(); flt.disconnect(); a.disconnect(); }; src.start(t0 + pts[0][0], Math.random() * 1.5); } else src.start(t0 + pts[0][0]);
     src.stop(t0 + end + 0.02);
   }
@@ -2244,16 +2250,19 @@ const Sound = (() => {
     bad(now) { tone(now, { f: 233, f2: 150, t: 0.24, g: 0.18, type: 'triangle', attack: 0.004 }); tone(now, { f: 466, f2: 300, t: 0.2, g: 0.07, attack: 0.004 }); },
     tick(now) { air(now, { t: 0.03, f: 3200, q: 4, g: 0.16, peak: 0 }); },
     win(now) { [523, 659, 784].forEach((f, i) => tone(now, { f, t: 0.26, g: 0.16, at: i * 0.1, attack: 0.004 })); bell(now, { f: 1047, t: 0.7, g: 0.18, depth: 500, at: 0.3 }); },
-    /* The opening: 4.1 seconds of hard, steady wind, as heard from something moving very fast. No sweeps and no whooshes:
-       the wind is there from the tap, gusts a little, and only thins out as the Earth settles. Layers of noise:
-       a broad roar (the body of the wind), a low rumble (for bigger speakers), a thin high whistle that wavers, and hiss.
-       The recorded wind (media/wind.mp3) plays on top of this when it has loaded. */
+    /* The opening when the recorded wind (media/gale.mp3) has not loaded: the same idea made here. Deep, hard wind as a
+       camera's microphone hears it at speed: a low roar that flutters, and deep knocks where the wind strikes the microphone.
+       No sweeps, no hiss. It is there from the tap and thins out as the Earth settles. */
     opening(now) {
       tone(now, { f: 520, f2: 200, t: 0.09, g: 0.16, attack: 0.003 });   // the tap itself
-      path(now, { q: 0.5, pts: [[0, 0.02, 700], [0.12, 0.2, 800], [0.5, 0.17, 950], [0.9, 0.22, 780], [1.35, 0.18, 1050], [1.8, 0.23, 880], [2.3, 0.2, 1150], [2.8, 0.22, 900], [3.3, 0.15, 800], [3.75, 0.06, 620], [4.15, 0, 420]] });
-      path(now, { q: 0.6, pts: [[0, 0.02, 190], [0.15, 0.22, 210], [0.8, 0.18, 240], [1.6, 0.23, 200], [2.5, 0.2, 250], [3.3, 0.14, 210], [4.1, 0, 150]] });
-      path(now, { q: 7, pts: [[0.05, 0, 1500], [0.3, 0.05, 1650], [0.8, 0.035, 1500], [1.3, 0.06, 1850], [1.9, 0.04, 1600], [2.5, 0.06, 2000], [3.1, 0.035, 1700], [3.8, 0, 1400]] });
-      path(now, { q: 0.8, pts: [[0.05, 0, 3600], [0.3, 0.07, 3900], [1.5, 0.09, 4300], [2.8, 0.07, 3800], [3.7, 0, 3200]] });
+      path(now, { q: 1.1, flutter: 0.6, pts: [[0, 0.03, 380], [0.1, 0.24, 420], [0.9, 0.26, 360], [1.8, 0.27, 460], [2.8, 0.25, 390], [3.4, 0.17, 360], [3.9, 0.06, 300], [4.2, 0, 240]] });
+      path(now, { q: 1, flutter: 0.7, pts: [[0, 0.03, 130], [0.1, 0.27, 140], [1.2, 0.26, 170], [2.4, 0.28, 130], [3.4, 0.18, 150], [4.2, 0, 110]] });
+      path(now, { q: 1, flutter: 0.4, pts: [[0.05, 0, 800], [0.2, 0.03, 850], [1.5, 0.035, 950], [3.0, 0.03, 820], [3.9, 0, 700]] });
+      /* knocks: deep thuds at uneven moments, each with a higher note inside it so a phone's speaker can play it */
+      [0.07, 0.21, 0.38, 0.47, 0.71, 0.86, 1.02, 1.27, 1.4, 1.63, 1.84, 1.95, 2.2, 2.41, 2.6, 2.86, 3.05, 3.31, 3.52].forEach((t, i) => {
+        const g = (0.16 + 0.1 * ((i * 7) % 5) / 4) * (t > 3 ? 0.6 : 1), len = 0.09 + 0.03 * (i % 3);
+        tone(now, { f: 96 - (i % 4) * 8, f2: 52, t: len, g, at: t, attack: 0.006 }); tone(now, { f: 250 - (i % 3) * 20, f2: 130, t: len * 0.8, g: g * 0.5, at: t, attack: 0.006, type: 'triangle' });
+      });
     },
     /* a tsunami: a deep surge that swells, breaks and hisses away */
     wave(now) { air(now, { t: 1.05, f: 180, fm: 1300, f2: 300, q: 0.9, g: 0.2, type: 'lowpass', peak: 0.45 }); air(now, { t: 0.7, f: 2400, f2: 5200, q: 0.9, g: 0.06, at: 0.38, peak: 0.25 }); tone(now, { f: 58, f2: 40, t: 0.9, g: 0.16, peak: 0.3 }); },
@@ -2265,14 +2274,14 @@ const Sound = (() => {
   /* a recorded sound (the wind of the opening). `data` is the file's bytes, fetched ahead of time; it is unpacked and
      started here, skipping however long the unpacking took so it stays in step with the picture. */
   async function clip(data, g = 0.7) {
-    if (!on || !ctx || !data) return; const t0 = performance.now();
+    if (!on || !ctx || !data) return false; const t0 = performance.now();
     try {
       const buf = await new Promise((ok, no) => { const p = ctx.decodeAudioData(data.slice(0), ok, no); if (p && p.catch) p.catch(no); });
-      const late = (performance.now() - t0) / 1000; if (late > buf.duration - 0.3) return;
-      const src = ctx.createBufferSource(), a = ctx.createGain(); src.buffer = buf; a.gain.setValueAtTime(Math.min(0.8, g), ctx.currentTime); src.connect(a); a.connect(out);
+      const late = (performance.now() - t0) / 1000; if (late > buf.duration - 0.3) return false;
+      const src = ctx.createBufferSource(), a = ctx.createGain(); src.buffer = buf; a.gain.setValueAtTime(Math.min(1, g), ctx.currentTime); src.connect(a); a.connect(out);
       src.onended = () => { src.disconnect(); a.disconnect(); if (playing && playing.src === src) playing = null; };
-      src.start(0, late); playing = { src, a };
-    } catch (e) { /* the wind is an extra; the opening works without it */ }
+      src.start(0, late); playing = { src, a }; return true;
+    } catch (e) { return false; }
   }
   /* fade the recorded sound away, for when the opening is skipped */
   function hush() { if (!playing || !ctx) return; try { const now = ctx.currentTime, { src, a } = playing; a.gain.setValueAtTime(a.gain.value, now); a.gain.exponentialRampToValueAtTime(FLOOR, now + 0.25); src.stop(now + 0.27); } catch (e) {} playing = null; }
@@ -3231,9 +3240,10 @@ function siteIntro() {
       g.drawImage(pic, -DS / 2, -DS / 2); g.restore();
     }
   }
-  /* the wind of the flight is a recording (media/wind.mp3), fetched while the title screen waits. Without it the site's own made wind still plays. */
+  /* the wind of the flight is a recording (media/gale.mp3, built by tools/wind_make.py from the organiser's reference sound), fetched
+     while the title screen waits. If it has not arrived or cannot play, the site's own made wind plays instead. */
   let windData = null;
-  try { const conn = navigator.connection; if (location.protocol !== 'file:' && !(conn && conn.saveData)) fetch('media/wind.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { windData = b; }).catch(() => {}); } catch (e) { /* no recording */ }
+  try { const conn = navigator.connection; if (location.protocol !== 'file:' && !(conn && conn.saveData)) fetch('media/gale.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { windData = b; }).catch(() => {}); } catch (e) { /* no recording */ }
   /* ---- the title screen: stars, the Earth with a glow round it, two satellites on their orbits, a pin on Dhaka ---- */
   const stars = []; for (let i = 0; i < 90; i++) stars.push([R(), R(), 0.5 + R() * 1.1, R() * 6.28, 0.6 + R() * 1.4]);
   const ORBITS = [{ rx: 1.46, ry: 0.4, tilt: -0.33, speed: 0.55, at: 0.6, color: '154,217,111' }, { rx: 1.78, ry: 0.56, tilt: 0.42, speed: -0.34, at: 3.4, color: '255,255,255' }];
@@ -3337,7 +3347,8 @@ function siteIntro() {
   const skip = () => { if (skipped || finished || revealed) return; skipped = true; if (landed) quit(); };
   function begin() {
     if (started) return; started = true; el.classList.add('going'); gate.classList.add('gone'); setTimeout(() => gateUi.remove(), 400);
-    Sound.unlock(); Sound.play('opening'); Sound.clip(windData, 0.8);
+    Sound.unlock();
+    if (windData && Sound.on) { Sound.play('tap'); Sound.clip(windData, 1).then(ok => { if (!ok && !finished) Sound.play('opening'); }); } else Sound.play('opening');
   }
   const press = () => (started ? skip() : begin());
   el.addEventListener('click', press);
