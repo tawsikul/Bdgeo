@@ -832,6 +832,27 @@ body.intro-on .hero .lede,body.intro-on .hero .btnrow,body.intro-on .hero-mark .
   *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0s !important;animation-iteration-count:1 !important;transition-property:opacity,color,background-color,border-color !important;scroll-behavior:auto !important}
 }
 
+/* fees and payments */
+.chip-due{background:#ffe3df;color:#8f1d12}
+.note-bad{background:#ffe9e6;color:#7d1a10}
+.pay-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.paylock{padding:16px;border:2px dashed var(--line);border-radius:18px;background:#f7faff}
+.paylock h3{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.paysteps{margin:16px 0 4px;padding:0;list-style:none;counter-reset:pay;display:grid;gap:12px}
+.paysteps li{counter-increment:pay;position:relative;padding:14px 14px 14px 56px;border:1px solid var(--line);border-radius:16px;background:#f7faff;display:grid;gap:6px}
+.paysteps li::before{content:counter(pay);position:absolute;left:14px;top:14px;width:30px;height:30px;border-radius:50%;background:var(--ocean);color:#fff;font-weight:700;display:grid;place-items:center}
+.paysteps small{color:var(--ink-soft);font-size:.9rem}
+.payhow{font-weight:600;font-size:1.05rem;line-height:1.5;word-break:break-word}
+.paysub{margin:18px 0 2px;font-size:1.02rem}
+.payrow .trx{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.02em;user-select:all}
+.payrow{flex-wrap:wrap}
+.paysum{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:6px 0 4px}
+.paysum > div{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#f7faff;display:grid;gap:2px}
+.paysum small{color:var(--ink-soft);font-weight:600;font-size:.82rem}
+.paysum b{font-size:1.35rem;color:var(--ink)}
+.paysum span{color:var(--ink-soft);font-size:.86rem}
+.payrow .grow{flex:1 1 260px;min-width:0}
+
 </style>
 </head>
 <body>
@@ -2201,6 +2222,7 @@ const IC = {
   edit: '<path d="M4 20h4l10-10-4-4L4 16v4z"/><path d="M13 7l4 4"/>',
   search: '<circle cx="11" cy="11" r="6.500"/><path d="M16 16l4.500 4.500"/>',
   mail: '<rect x="3.500" y="5.500" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/>',
+  wallet: '<path d="M4 7.500A2.500 2.500 0 016.500 5H18v3"/><rect x="4" y="8" width="16" height="11" rx="2.500"/><path d="M15.500 13.500h1"/>',
   lock: '<rect x="5" y="10.500" width="14" height="9.500" rx="2"/><path d="M8 10.500V8a4 4 0 018 0v2.500"/>',
   calendar: '<rect x="4" y="5.500" width="16" height="14.500" rx="2"/><path d="M4 10h16M8 3.500v4M16 3.500v4"/>',
   flag: '<path d="M6 21V4M6 5h11l-2 3.500 2 3.500H6"/>',
@@ -2349,6 +2371,11 @@ const Sound = (() => {
   return { play, clip, hush, toggle, unlock: ensure, ready: () => !!ctx && ctx.state === 'running', get on() { return on; } };
 })();
 
+/* fees */
+const PAY_METHODS = ['bKash', 'Nagad', 'Rocket', 'Bank'];
+const taka = n => '৳' + Number(n || 0).toLocaleString('en-IN');
+const SHIRTS = ['S', 'M', 'L', 'XL', 'XXL'];
+
 /* ---------- the data layer ----------
    Every page reads and writes through Store. In this preview the data lives in the
    browser. For the real site the same functions will talk to the online database,
@@ -2437,6 +2464,7 @@ function seed() {
   return {
     v: 7,
     settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', seq: users.length - 1 },
+    payments: [],
     users,
     notices: [
       { id: uid('n'), title: 'Registration is open', body: 'Create your account on this website to take part. After you register, your registration card appears in your account.\n\nThis is a sample notice. Replace it from the admin portal.', date: dAt(-1, 9), tag: 'Registration', pinned: true, sample: true },
@@ -2527,6 +2555,11 @@ const Store = (() => {
   const mapAttempt = a => ({ id: a.id, examId: a.exam_id, userId: a.user_id, startedAt: a.started_at, deadline: a.deadline, submittedAt: a.submitted_at, answers: a.answers || [], score: a.score, secs: a.secs });
   const mapMsg = m => ({ id: m.id, userId: m.user_id, title: m.title, body: m.body, kind: m.kind, at: m.at });
   const mapMail = m => ({ id: m.id, to: m.to_email, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at, sentAt: m.sent_at, error: m.error, cardUrl: m.card_url || '' });
+  const mapPay = p => ({ id: p.id, userId: p.user_id, round: p.round, amount: p.amount, method: p.method, sender: p.sender || '', trx: p.trx_id, info: p.info || {}, status: p.status, note: p.note || '', at: p.at, checkedAt: p.checked_at });
+  /* fees: false when this database does not have the payments table yet */
+  let payReady = true;
+  const uuid4 = () => (crypto.randomUUID ? crypto.randomUUID() : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
+  const natSel = u => (u.selected || []).some(x => /national/i.test(x.round || ''));
   const mapAtt = a => ({ id: a.id, userId: a.user_id, session: a.session, at: a.marked_at, by: a.marked_by });
   const mailRow = m => ({ id: m.id, to_email: m.to, name: m.name, subject: m.subject, body: m.body, status: m.status, at: m.at, ...(m.cardUrl ? { card_url: m.cardUrl } : {}) });
   /* admit card emails: null until we know, false if this database does not have the feature yet */
@@ -2544,12 +2577,13 @@ const Store = (() => {
     const sess = ok(await sb.auth.getSession()).session, authed = !!sess;
     const [settings, content, exams] = await Promise.all([sb.from('settings').select('data').eq('id', 1).maybeSingle().then(ok), fetchAll('content', ['kind', 'id']), fetchAll('exams', ['id'])]);
     const fresh = { v: 7, settings: { regOpen: true, cardsOpen: true, contactEmail: '', contactPhone: '', facebook: '', ...(settings ? settings.data : {}) },
-      users: [], notices: [], news: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [] };
+      users: [], notices: [], news: [], resources: [], events: [], results: [], team: [], faq: [], exams: [], attempts: [], messages: [], emails: [], attendance: [], payments: [] };
     content.forEach(r => { if (KINDS.includes(r.kind)) fresh[r.kind].push({ ...r.data, id: r.id }); });
     let qs = [], keys = []; cardMail = null;
     if (authed) {
       const [users, attempts, messages, emails, q, k, att] = await Promise.all([fetchAll('profiles', ['id']), fetchAll('attempts', ['id']), fetchAll('messages', ['id']), fetchAll('emails', ['id']), fetchAll('exam_questions', ['exam_id']), fetchAll('exam_keys', ['exam_id']), fetchAll('attendance', ['id'])]);
       fresh.attendance = att.map(mapAtt);
+      try { fresh.payments = (await fetchAll('payments', ['at'])).map(mapPay); payReady = true; } catch (e) { payReady = false; }
       try { const cm = await sb.from('card_mails').select('tries,sent_at').eq('user_id', sess.user.id).maybeSingle(); cardMail = cm.error ? false : (cm.data || { tries: 0, sent_at: null }); } catch (e) { cardMail = false; }
       fresh.users = users.map(mapUser); fresh.attempts = attempts.map(mapAttempt); fresh.messages = messages.map(mapMsg); fresh.emails = emails.map(mapMail); qs = q; keys = k;
     }
@@ -2580,7 +2614,7 @@ const Store = (() => {
       if (CLOUD) return refresh();
       db = read(KEY);
       if (!db || db.v !== 7) { db = seed(); save(); }
-      db.attendance = db.attendance || []; db.news = db.news || [];
+      db.attendance = db.attendance || []; db.news = db.news || []; db.payments = db.payments || [];
       session = read(SKEY);
       if (session && !db.users.some(u => u.id === session)) session = null;
       return Promise.resolve();
@@ -2800,6 +2834,57 @@ const Store = (() => {
       db.attendance = db.attendance.filter(a => !(a.userId === userId && a.session === session)); save();
     },
     async loadAttendance() { if (CLOUD) db.attendance = (await fetchAll('attendance', ['id'])).map(mapAtt); },
+    /* ----- fees -----
+       The Regional round in person is for the admit card districts, so those students pay the Regional fee.
+       Every student selected for the National round pays the National fee. Nothing is charged while fees are switched off. */
+    fees() { const s = db.settings, n = k => Math.max(0, Math.round(+s[k] || 0)); return { on: !!s.feesOn && payReady, regional: n('feeRegional'), national: n('feeNational'), how: String(s.payHow || '').trim() }; },
+    feeFor(u, round) {
+      const f = this.fees(); if (!f.on || !u || u.role !== 'participant') return 0;
+      if (round === 'national') return natSel(u) ? f.national : 0;
+      return u.district && this.districtOpen(u) ? f.regional : 0;
+    },
+    paymentsOf(userId) { return db.payments.filter(p => p.userId === userId).sort((a, b) => new Date(b.at) - new Date(a.at)); },
+    /* the payment that counts for a round: a paid one, else one being checked, else the last one turned down */
+    payment(u, round) { const l = this.paymentsOf(u.id).filter(p => p.round === round); return l.find(p => p.status === 'paid') || l.find(p => p.status === 'pending') || l[0] || null; },
+    payState(u, round) { const p = this.payment(u, round); return p ? p.status : 'none'; },
+    feeLocked(u, round) { return this.feeFor(u, round) > 0 && this.payState(u, round) !== 'paid'; },
+    async pay(round, d) {
+      const u = me(), amount = this.feeFor(u, round), trx = String(d.trx || '').replace(/\s+/g, '').toUpperCase(), sender = String(d.sender || '').trim().slice(0, 30);
+      if (!amount) throw new Error('There is no fee for you to pay for this round.');
+      if (!PAY_METHODS.includes(d.method)) throw new Error('Choose how you paid.');
+      if (trx.length < 6 || trx.length > 40 || !/^[A-Z0-9-]+$/.test(trx)) throw new Error('Check the transaction ID. It is the code in the message you got after paying.');
+      if (['paid', 'pending'].includes(this.payState(u, round))) throw new Error('A payment for this round is already with the organisers.');
+      let row;
+      if (CLOUD) row = mapPay(ok(await sb.rpc('submit_payment', { p_round: round, p_method: d.method, p_sender: sender, p_trx: trx, p_info: d.info || {} })));
+      else {
+        if (db.payments.some(p => p.status !== 'rejected' && p.trx === trx)) throw new Error('That transaction ID is already used.');
+        row = { id: uid('p'), userId: u.id, round, amount, method: d.method, sender, trx, info: d.info || {}, status: 'pending', note: '', at: new Date().toISOString(), checkedAt: null };
+      }
+      db.payments.push(row); save(); return row;
+    },
+    /* an admin accepts a payment or turns it down; the student gets a notice in their dashboard either way */
+    async checkPayment(id, status, note) {
+      const p = db.payments.find(x => x.id === id), u = p && db.users.find(x => x.id === p.userId), at = new Date().toISOString(); if (!p) return;
+      const why = String(note || '').trim(), label = p.round === 'national' ? 'National round' : 'Regional round';
+      if (CLOUD) ok(await sb.from('payments').update({ status, note: why, checked_at: at, checked_by: session }).eq('id', id));
+      p.status = status; p.note = why; p.checkedAt = at;
+      if (u) {
+        const m = { id: uid('m'), userId: u.id, at, kind: status === 'paid' ? 'selected' : 'info', title: status === 'paid' ? `Payment received: ${label}` : `Payment not accepted: ${label}`,
+          body: status === 'paid' ? `We have received your ${label} fee of ৳${p.amount}. Your admit card is unlocked.` : `We could not match your ${label} payment (transaction ID ${p.trx}).${why ? ' ' + why : ''} Open Payment in your dashboard and send the details again.` };
+        if (CLOUD) { try { ok(await sb.from('messages').insert({ id: m.id, user_id: m.userId, title: m.title, body: m.body, kind: m.kind, at: m.at })); } catch (e) { /* the payment itself is saved */ } }
+        db.messages.push(m);
+      }
+      save();
+    },
+    /* cash in hand or a fee the organisers waive: an admin marks the round as paid */
+    async markPaid(userId, round, note) {
+      const u = db.users.find(x => x.id === userId), amount = this.feeFor(u, round), at = new Date().toISOString(); if (!u) return;
+      const live = db.payments.find(p => p.userId === userId && p.round === round && p.status === 'pending'); if (live) return this.checkPayment(live.id, 'paid', note);
+      const row = { id: uid('p'), userId, round, amount, method: 'Cash', sender: '', trx: 'CASH-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase(), info: {}, status: 'paid', note: String(note || '').trim(), at, checkedAt: at };
+      if (CLOUD) { row.id = uuid4(); ok(await sb.from('payments').insert({ id: row.id, user_id: userId, round, amount, method: row.method, trx_id: row.trx, status: 'paid', note: row.note, checked_at: at, checked_by: session })); }
+      db.payments.push(row); save();
+    },
+    async loadPayments() { if (CLOUD && payReady) db.payments = (await fetchAll('payments', ['at'])).map(mapPay); },
     /* admit cards by email */
     async uploadCard(blob, u, kind) {
       if (!CLOUD) return 'preview';
@@ -2811,7 +2896,7 @@ const Store = (() => {
     /* the districts whose students can have the Regional admit card: Dhaka until an admin says otherwise; an empty list means every district */
     cardDistricts() { const l = db.settings.cardDistricts; return Array.isArray(l) ? l : ['Dhaka']; },
     districtOpen(u) { const l = this.cardDistricts(); return !l.length || (!!u && l.includes(u.district)); },
-    cardMailDue() { const u = me(); return !!(CLOUD && u && u.role === 'participant' && db.settings.cardsOpen && this.districtOpen(u) && cardMail && !cardMail.sent_at && (cardMail.tries || 0) < 3); },
+    cardMailDue() { const u = me(); return !!(CLOUD && u && u.role === 'participant' && db.settings.cardsOpen && this.districtOpen(u) && !this.feeLocked(u, 'regional') && cardMail && !cardMail.sent_at && (cardMail.tries || 0) < 3); },
     async sendMyCard(pngBase64) {
       if (!CLOUD) return 'off';
       let r; try { r = await sb.functions.invoke('send-emails', { body: { action: 'card', png: pngBase64 } }); } catch (e) { r = { error: e }; }
@@ -2871,7 +2956,7 @@ const Store = (() => {
     },
     async removeUser(id) {
       if (CLOUD) ok(await sb.from('profiles').delete().eq('id', id));
-      db.users = db.users.filter(u => u.id !== id); db.attempts = db.attempts.filter(a => a.userId !== id); db.messages = db.messages.filter(m => m.userId !== id); save();
+      db.users = db.users.filter(u => u.id !== id); db.payments = db.payments.filter(x => x.userId !== id); db.attempts = db.attempts.filter(a => a.userId !== id); db.messages = db.messages.filter(m => m.userId !== id); save();
     },
   };
   if (CLOUD) sb.auth.onAuthStateChange(ev => { if (ev === 'PASSWORD_RECOVERY') { api.recovery = true; if (api.onRecovery) setTimeout(api.onRecovery, 0); } });
@@ -4327,7 +4412,8 @@ PAGES['admit-card'] = () => {
   if (u && u.role === 'admin') return simplePage('Download admit card', 'This is an admin account. Admit cards belong to students.', '#admin', 'Open the admin portal');
   return {
     html: `<div class="wrap narrow">${head}<section class="sheet stack">${u
-      ? (ready ? `<p>You are logged in as <b>${esc(u.name)}</b>, registration number ${esc(u.regNo)}.</p><div class="btnrow"><button type="button" class="btn btn-lime" id="ac-get">${icon('download', 18)} Download admit card</button><a class="textlink" href="#dashboard">Open my dashboard</a></div>`
+      ? (ready && cardLocked(u) ? `<p>You are logged in as <b>${esc(u.name)}</b>, registration number ${esc(u.regNo)}.</p><p class="note">${Store.payState(u, cardKind(u)) === 'pending' ? 'Your payment is being checked. Your admit card unlocks when the organisers approve it.' : `Your admit card unlocks after the ${roundName(cardKind(u))} fee of ${taka(Store.feeFor(u, cardKind(u)))} is paid.`}</p><div><a class="btn btn-ocean" href="#dashboard-pay">${icon('wallet', 18)} Open Payment</a></div>`
+        : ready ? `<p>You are logged in as <b>${esc(u.name)}</b>, registration number ${esc(u.regNo)}.</p><div class="btnrow"><button type="button" class="btn btn-lime" id="ac-get">${icon('download', 18)} Download admit card</button><a class="textlink" href="#dashboard">Open my dashboard</a></div>`
         : `<p>You are logged in as <b>${esc(u.name)}</b>.</p><p class="note">${esc(noCardWhy(u))}</p><div><a class="btn btn-ocean" href="#dashboard">Open my dashboard</a></div>`)
       : `<form class="form" id="ac-form" novalidate>${fields.map(f => fieldHtml(f, '', 'ac')).join('')}
           <p class="err" role="alert" hidden></p><p class="note" id="ac-note" role="status" hidden></p>
@@ -4343,6 +4429,7 @@ PAGES['admit-card'] = () => {
         btn.disabled = true; const r = await Store.signIn(reg, pw); if (btn.isConnected) btn.disabled = false;
         if (r.error) { err.textContent = r.error; err.hidden = false; Sound.play('bad'); return; }
         if (r.user.role === 'admin') return go('admin');
+        if (cardOpenFor(r.user) && cardLocked(r.user)) return payFirst(r.user);
         if (cardOpenFor(r.user)) { toast('Your admit card is downloading.', 'good'); await downloadMyCard(null); }
         render();   // the page now shows who is logged in, with the download button again
       });
@@ -4457,11 +4544,18 @@ PAGES.register = () => {
       <section class="sheet"><form class="form marks" id="reg-form" novalidate>
         <p class="muted formkey"><span class="req">*</span> must be filled in.</p>
         ${groups.map(([title, fs]) => `<fieldset class="fset"><legend>${title}</legend><div class="form-2">${fs.map(f => fieldHtml(f, '', 'rg')).join('')}</div></fieldset>`).join('')}
+        <p class="note" id="fee-hint" role="status" hidden></p>
         <div class="note" id="mail-hint" role="alert" hidden></div>
         <p class="err" role="alert" hidden></p>${previewNote}
         <div class="btnrow"><button class="btn btn-ocean" type="submit">Create my account</button><a class="textlink" href="#login">I already have an account</a></div></form></section></div>`,
     mount(v) {
       const form = $('#reg-form', v), err = $('.err', form); linkDistrict(form);
+      /* a student from a district that sits the Regional round in person is told about the fee before signing up */
+      const feeHint = $('#fee-hint', form), fee = Store.fees(), showFee = () => {
+        const d = form.elements.district.value, due = fee.on && fee.regional > 0 && d && Store.districtOpen({ district: d });
+        feeHint.hidden = !due; if (due) feeHint.textContent = `Students of ${d} district sit the Regional round in person. The fee is ${taka(fee.regional)}. You pay it from your dashboard after you register, and your admit card unlocks then.`;
+      };
+      form.addEventListener('change', showFee);
       form.addEventListener('input', e => { const box = e.target.closest('.bad'); if (box) box.classList.remove('bad'); });
       form.addEventListener('submit', async e => {
         e.preventDefault(); const vals = readForm(form, fields), btn = $('button[type=submit]', form); vals.password = form.elements.password.value;
@@ -4592,11 +4686,17 @@ function linkDistrict(form) {
    The Regional card is for the districts the cards are open for (Store.cardDistricts). */
 const regionalOpen = u => !!(u && u.role === 'participant' && Store.db.settings.cardsOpen && Store.districtOpen(u));
 const cardOpenFor = u => !!(u && u.role === 'participant' && Store.db.settings.cardsOpen && (hasNationalCard(u) || Store.districtOpen(u)));
+/* which card a one-tap button gives, and whether a fee still stands between the student and that card */
+const cardKind = u => (hasNationalCard(u) ? 'national' : 'regional');
+const cardLocked = (u, kind) => Store.feeLocked(u, kind || cardKind(u));
+const roundName = r => (r === 'national' ? 'National round' : 'Regional round');
+const payFirst = (u, kind) => { toast(`Pay the ${roundName(kind || cardKind(u))} fee first. Your admit card unlocks after that.`); go('dashboard-pay'); };
 const cardDistrictWords = () => { const l = Store.cardDistricts(); return l.length === 1 ? `${l[0]} district` : l.length === 2 ? `${l[0]} and ${l[1]} districts` : `${l.slice(0, -1).join(', ')} and ${l[l.length - 1]} districts`; };
 /* the admit card as a PDF, straight from a button: the National card once a student is selected, the Regional one before that */
 function downloadMyCard(btn) {
   const u = Store.me(); if (!cardOpenFor(u)) { go(u ? 'dashboard' : 'login'); return null; }
-  return busy(btn, async () => { const kind = hasNationalCard(u) ? 'national' : 'regional'; await saveAndTell(`BGeO-${kind === 'national' ? 'national-' : ''}admit-card-${u.regNo}.pdf`, await cardPdf(u, kind)); });
+  if (cardLocked(u)) { payFirst(u); return null; }
+  return busy(btn, async () => { const kind = cardKind(u); await saveAndTell(`BGeO-${kind === 'national' ? 'national-' : ''}admit-card-${u.regNo}.pdf`, await cardPdf(u, kind)); });
 }
 async function cardPdf(u, kind) {
   await cardReady();
@@ -4645,7 +4745,11 @@ DASH.dashboard = () => {
   const msgs = Store.messagesFor(u.id), s = Store.db.settings, national = hasNationalCard(u), regional = regionalOpen(u), ev = Store.nextEvent();
   const done = Store.all('attempts').filter(a => a.userId === u.id && a.submittedAt).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
   const ex = Store.eRegional(), exState = ex ? Store.examState(ex) : '', exDone = ex ? done.find(a => a.examId === ex.id) : null;
-  const cardBox = (kind, title, note) => { const id = kind === 'national' ? 'card-nat' : 'card'; return `<div class="cardbox"><div><h3>${title}</h3><p class="muted">${note}</p></div><div class="cardprev" id="${id}"></div>
+  const cardBox = (kind, title, note) => { const id = kind === 'national' ? 'card-nat' : 'card';
+    if (cardLocked(u, kind)) { const st = Store.payState(u, kind); return `<div class="cardbox paylock"><div><h3>${title} ${st === 'pending' ? '<span class="chip chip-soon">Payment being checked</span>' : '<span class="chip chip-due">Fee not paid</span>'}</h3>
+      <p class="muted">${st === 'pending' ? 'The organisers are checking your payment. This card unlocks when they approve it.' : st === 'rejected' ? 'Your payment was not accepted. Send the details again to unlock this card.' : `Pay the ${roundName(kind)} fee of ${taka(Store.feeFor(u, kind))} to unlock this card.`}</p></div>
+      <div><a class="btn ${st === 'pending' ? 'btn-quiet' : 'btn-ocean'}" href="#dashboard-pay">${icon('wallet', 18)} ${st === 'pending' ? 'See my payment' : kind === 'national' ? 'Register for the National round' : 'Pay the fee'}</a></div></div>`; }
+    return `<div class="cardbox"><div><h3>${title}</h3><p class="muted">${note}</p></div><div class="cardprev" id="${id}"></div>
     <div class="btnrow"><button type="button" class="btn btn-ocean" id="${id}-pdf">${icon('download', 18)} Download PDF</button><button type="button" class="btn btn-quiet" id="${id}-dl">${icon('image', 18)} Save as a picture</button></div></div>`; };
   return {
     html: `<div class="wrap">
@@ -4694,6 +4798,59 @@ DASH.dashboard = () => {
     },
   };
 };
+
+/* ---------- Payment: what a student owes, how to pay it, and what the organisers said about it ---------- */
+DASH['dashboard-pay'] = () => {
+  const u = Store.me();
+  if (u.role === 'admin') return simplePage('Payment', 'Students see their fees and send their payment details here. Payments are checked in the admin portal.', '#admin-pay', 'Open Payments in the admin portal');
+  const f = Store.fees(), rounds = ['regional', 'national'].filter(r => Store.feeFor(u, r) > 0 || Store.payment(u, r));
+  const payFields = [{ key: 'method', label: 'How you paid', type: 'select', required: true, options: [['', 'Choose one'], ...PAY_METHODS] },
+    { key: 'sender', label: 'Number you paid from', type: 'tel', required: true, placeholder: '01XXXXXXXXX', help: 'For a bank payment, write the account name.' },
+    { key: 'trx', label: 'Transaction ID', required: true, placeholder: 'For example: BK7A2QX9LM', help: 'The code in the message you got after paying.' }];
+  /* the National round has a short registration of its own, sent together with the payment */
+  const natFields = [{ key: 'certName', label: 'Name for your certificate', required: true, help: 'Exactly as it should be printed.' },
+    { key: 'emergency', label: 'Contact number on the day', type: 'tel', required: true, help: 'A parent or guardian we can call during the National round.' },
+    { key: 'shirt', label: 'T-shirt size', type: 'select', options: [['', 'Choose later'], ...SHIRTS] }];
+  const box = r => {
+    const p = Store.payment(u, r), st = p ? p.status : 'none', fee = Store.feeFor(u, r), name = roundName(r), nat = r === 'national';
+    const head = `<div class="pay-head"><h2>${nat ? 'National round registration' : 'Regional round fee'}</h2>${st === 'paid' ? `<span class="chip chip-live">${icon('check', 14)} Paid</span>` : st === 'pending' ? '<span class="chip chip-soon">Being checked</span>' : '<span class="chip chip-due">Not paid</span>'}</div>`;
+    if (st === 'paid') return `<section class="sheet" data-round="${r}">${head}<p style="margin-top:8px">We have received your ${name} fee of <b>${taka(p.amount)}</b>.</p>
+      <dl class="kv" style="margin-top:12px"><dt>Paid by</dt><dd>${esc(p.method)}</dd>${p.method === 'Cash' ? '' : `<dt>Transaction ID</dt><dd>${esc(p.trx)}</dd>`}<dt>Approved</dt><dd>${fmtDateTime(p.checkedAt || p.at)}</dd></dl>
+      ${cardOpenFor(u) && cardKind(u) === r ? `<div style="margin-top:14px"><button type="button" class="btn btn-lime" data-card>${icon('download', 18)} Download admit card</button></div>` : `<p class="muted" style="margin-top:12px">${Store.db.settings.cardsOpen ? 'Your admit card is on the Overview page.' : 'Your admit card appears on the Overview page when cards are released.'}</p>`}</section>`;
+    if (st === 'pending') return `<section class="sheet" data-round="${r}">${head}<p style="margin-top:8px">You sent the details of your <b>${taka(p.amount)}</b> payment on ${fmtDateTime(p.at)}. The organisers are checking it. This usually takes up to a day.</p>
+      <dl class="kv" style="margin-top:12px"><dt>Paid by</dt><dd>${esc(p.method)}</dd><dt>From</dt><dd>${esc(p.sender)}</dd><dt>Transaction ID</dt><dd>${esc(p.trx)}</dd></dl>
+      <p class="note" style="margin-top:12px">Your ${name} admit card unlocks as soon as the payment is approved. You get a notice here when that happens.</p></section>`;
+    const fields = (nat ? natFields : []).concat(payFields), vals = { certName: u.name, emergency: u.guardianPhone || '', ...(p && p.info ? p.info : {}) };
+    return `<section class="sheet" data-round="${r}">${head}
+      ${st === 'rejected' ? `<div class="note note-bad" style="margin-top:10px"><b>Your last payment was not accepted.</b> ${esc(p.note || 'The organisers could not find it.')} Check the transaction ID and send the details again.</div>` : ''}
+      <p style="margin-top:8px">${nat ? `You are selected for the National round. To take your place, fill in this form and pay the fee of <b>${taka(fee)}</b>.` : `Students of ${esc(cardDistrictWords())} sit the Regional round in person. The fee is <b>${taka(fee)}</b>. Your admit card unlocks after it is paid.`}</p>
+      ${f.how ? `<ol class="paysteps"><li><b>Send ${taka(fee)}</b><div class="payhow">${esc(f.how).replace(/\n/g, '<br>')}</div><small>Write your registration number <b>${esc(u.regNo)}</b> as the reference if the app asks for one.</small></li><li><b>Tell us about it</b><small>Fill in the boxes below and send them. The organisers match them with the payment.</small></li></ol>
+        <form class="form marks" novalidate data-pay="${r}">${nat ? '<h3 class="paysub">Your National round details</h3>' : ''}${(nat ? natFields : []).map(x => fieldHtml(x, vals[x.key] || '', 'py-' + r)).join('')}${nat ? '<h3 class="paysub">Your payment</h3>' : ''}${payFields.map(x => fieldHtml(x, '', 'py-' + r)).join('')}
+          <p class="err" role="alert" hidden></p><div><button class="btn btn-ocean" type="submit">${icon('check', 18)} ${nat ? 'Send my registration and payment' : 'Send my payment details'}</button></div></form>`
+        : '<p class="note" style="margin-top:12px">The organisers have not published where to send the payment yet. Watch Notices, then come back to this page.</p>'}</section>`;
+  };
+  const why = !f.on ? 'There is nothing to pay right now. The organisers will announce any fee in Notices.'
+    : `You have nothing to pay right now.${f.regional ? ` The Regional round fee of ${taka(f.regional)} is for students of ${cardDistrictWords()}, who sit that round in person.` : ''}${f.national ? ` The National round fee of ${taka(f.national)} is for students selected for the National round.` : ''}`;
+  return {
+    html: `<div class="wrap narrow">${pageHead('Payment', 'Your fees, and the payments you have sent.')}${rounds.map(box).join('') || `<section class="sheet"><p>${esc(why)}</p></section>`}</div>`,
+    mount(v) {
+      $$('[data-card]', v).forEach(b => { b.onclick = () => downloadMyCard(b); });
+      $$('form[data-pay]', v).forEach(form => {
+        const r = form.dataset.pay, nat = r === 'national', fields = (nat ? natFields : []).concat(payFields), err = $('.err', form);
+        form.addEventListener('input', e => { const b = e.target.closest('.bad'); if (b) b.classList.remove('bad'); });
+        form.addEventListener('submit', e => {
+          e.preventDefault(); const d = readForm(form, fields), miss = missing(fields, d); err.hidden = true; $$('.bad', form).forEach(x => x.classList.remove('bad'));
+          const stop = (msg, key) => { err.textContent = msg; err.hidden = false; Sound.play('bad'); const el = form.elements[key], b = el && el.closest('.field'); if (b) { b.classList.add('bad'); el.focus(); } };
+          if (miss) return stop(`Please fill in "${miss.label}".`, miss.key);
+          busy($('button[type=submit]', form), async () => {
+            try { await Store.pay(r, { method: d.method, sender: d.sender, trx: d.trx, info: nat ? { certName: d.certName.trim(), emergency: d.emergency.trim(), shirt: d.shirt || '' } : {} }); toast('Sent. The organisers will check your payment.', 'good'); render(); }
+            catch (x) { stop(x.message, 'trx'); }
+          });
+        });
+      });
+    },
+  };
+};
 DASH['dashboard-resources'] = () => PAGES.resources();
 DASH['dashboard-me'] = () => {
   const u = Store.me();
@@ -4702,7 +4859,7 @@ DASH['dashboard-me'] = () => {
       ${!u.dob || !u.guardianPhone ? '<div class="note" style="margin-bottom:14px"><b>Some details are missing.</b> Tap Edit details and add your date of birth and a parent\'s contact number.</div>' : ''}
       <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Registration number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Own contact</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>Institute</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Division</dt><dd>${esc(u.region || 'Not given')}</dd><dt>District</dt><dd>${esc(u.district || 'Not chosen yet')}</dd><dt>Date of birth</dt><dd>${esc(fmtDay(u.dob) || 'Not given')}</dd><dt>Parent's contact</dt><dd>${esc(u.guardianPhone || 'Not given')}</dd><dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
         <div style="margin-top:16px"><button type="button" class="btn btn-ocean" id="edit-me">${icon('edit', 18)} Edit details</button></div></section>
-      <section class="sheet"><h2>Payment</h2><p class="muted" style="margin-top:8px">Online payment is not open yet. The organisers will announce it in Notices.</p></section>
+      <section class="sheet"><h2>Payment</h2>${Store.fees().on ? `<p class="muted" style="margin-top:8px">Fees and your payments are on the Payment page.</p><div style="margin-top:12px"><a class="btn btn-quiet btn-sm" href="#dashboard-pay">${icon('wallet', 16)} Open Payment</a></div>` : '<p class="muted" style="margin-top:8px">There is nothing to pay right now. The organisers will announce any fee in Notices.</p>'}</section>
     </div>`,
     mount(v) {
       $('#edit-me', v).onclick = async () => {
@@ -4717,13 +4874,15 @@ DASH['dashboard-me'] = () => {
     },
   };
 };
-const DASH_TABS = [['dashboard', 'Overview', 'compass'], ['dashboard-resources', 'Resources', 'book'], ['dashboard-me', 'My details', 'user']];
+const DASH_ALL = [['dashboard', 'Overview', 'compass'], ['dashboard-resources', 'Resources', 'book'], ['dashboard-pay', 'Payment', 'wallet'], ['dashboard-me', 'My details', 'user']];
+/* the Payment tab shows once fees are switched on, or for a student who has paid before */
+const dashTabs = () => { const u = Store.me(), pay = Store.fees().on || (u && Store.paymentsOf(u.id).length > 0); return DASH_ALL.filter(t => t[0] !== 'dashboard-pay' || pay); };
 /* old addresses that now live inside the dashboard */
 const DASH_ALIAS = { account: 'dashboard', resources: 'dashboard-resources' };
 const isDashRoute = name => { const n = DASH_ALIAS[name] || name; return n === 'dashboard' || n.startsWith('dashboard-'); };
 function renderDash(name) {
   const root = $('#dash'), u = Store.me();
-  const tab = DASH_TABS.some(t => t[0] === name) ? name : 'dashboard';
+  const DASH_TABS = dashTabs(), tab = DASH_TABS.some(t => t[0] === name) ? name : 'dashboard';
   root.innerHTML = `<header class="dash-top"><a class="brand" href="#home" aria-label="Bangladesh Geography Olympiad, public site"><img src="${LOGO_FULL}" alt="" width="560" height="263"></a><b>${u.role === 'admin' ? 'Dashboard preview' : 'Dashboard'}</b>
       <div class="sp">${cardOpenFor(u) ? `<button type="button" class="btn btn-lime btn-sm" id="dash-card">Admit card ${icon('download', 16)}</button>` : ''}<a class="btn btn-ghost btn-sm" href="#home" aria-label="Public site">${icon('globe', 18)}<span>Public site</span></a><button type="button" class="iconbtn" id="logout" aria-label="Log out" title="Log out">${icon('out')}</button></div></header>
     <nav class="dash-tabs" aria-label="Dashboard sections">${DASH_TABS.map(t => `<a href="#${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${icon(t[2], 18)} ${t[1]}</a>`).join('')}</nav>
@@ -4872,7 +5031,7 @@ function examResult(ex, at, st) {
 
 /* ---------- admin portal: its own screen, only for admin accounts ---------- */
 const ADMIN_TABS = [
-  ['admin', 'Overview', 'compass'], ['admin-people', 'Participants', 'people'], ['admin-attend', 'Attendance', 'check'], ['admin-notices', 'Notices', 'mail'], ['admin-news', 'News', 'list'], ['admin-resources', 'Resources', 'book'],
+  ['admin', 'Overview', 'compass'], ['admin-people', 'Participants', 'people'], ['admin-attend', 'Attendance', 'check'], ['admin-pay', 'Payments', 'wallet'], ['admin-notices', 'Notices', 'mail'], ['admin-news', 'News', 'list'], ['admin-resources', 'Resources', 'book'],
   ['admin-home', 'Home page', 'image'], ['admin-dates', 'Dates', 'calendar'], ['admin-exams', 'E-Regional exam', 'edit'], ['admin-results', 'Results', 'trophy'], ['admin-emails', 'Emails', 'mail'], ['admin-site', 'Site', 'gear'],
 ];
 const ADMIN = {};
@@ -4962,6 +5121,7 @@ function personDialog(p, after) {
     <dl class="kv"><dt>Registration no.</dt><dd>${esc(p.regNo)}</dd><dt>Email</dt><dd>${esc(p.email)}</dd><dt>Own contact</dt><dd>${esc(p.phone || 'Not given')}</dd><dt>Parent's contact</dt><dd>${esc(p.guardianPhone || 'Not given')}</dd><dt>School</dt><dd>${esc(p.institution)}</dd>
       <dt>Class</dt><dd>Class ${esc(p.klass)} (${esc(p.category)})</dd><dt>Division</dt><dd>${esc(p.region || 'Not given')}</dd><dt>District</dt><dd>${esc(p.district || 'Not chosen yet')}</dd><dt>Date of birth</dt><dd>${esc(fmtDay(p.dob) || 'Not given')}</dd><dt>Registered</dt><dd>${fmtDateTime(p.createdAt)}</dd>
       <dt>Selected for</dt><dd>${(p.selected || []).map(s => esc(s.round)).join(', ') || 'Nothing yet'}</dd>
+      <dt>Fees</dt><dd id="pd-fee"></dd>
       <dt>Attendance</dt><dd id="pd-att"></dd>
       <dt>E-Regional exam</dt><dd>${tries.map(a => { const ex = Store.get('exams', a.examId); return ex ? `${esc(ex.title)}: ${a.score}/${ex.questions.length}` : ''; }).filter(Boolean).join('<br>') || 'None finished'}</dd></dl>
     <div class="cardprev" id="pd-card"></div>
@@ -4974,6 +5134,16 @@ function personDialog(p, after) {
     const v = await formDialog({ title: `Mark ${p.name} present`, submit: 'Mark present', values: { session: attendSession || (Store.nextEvent() || {}).label || ROUNDS[0] }, fields: [{ key: 'session', label: 'For which round or session', required: true, help: 'Use the same name as on the Attendance tab.' }] });
     if (v) busy(null, async () => { const r = await Store.markPresent(p.id, v.session.trim()); toast(r === 'new' ? `${p.name} marked present` : `${p.name} was already marked present`, r === 'new' ? 'good' : ''); drawAtt(); });
   };
+  const feeBox = $('#pd-fee', d), drawFee = () => {
+    const rs = ['regional', 'national'].filter(r => Store.feeFor(p, r) > 0 || Store.payment(p, r));
+    feeBox.innerHTML = rs.map(r => { const st = Store.payState(p, r), pay = Store.payment(p, r); return `${roundName(r)}: ${st === 'paid' ? `paid ${taka(pay.amount)} (${esc(pay.method)})` : st === 'pending' ? 'payment waiting to be checked' : `not paid (${taka(Store.feeFor(p, r))})`}${st !== 'paid' ? ` <button type="button" class="textlink" data-paid="${r}">Mark as paid</button>` : ''}`; }).join('<br>') || (Store.fees().on ? 'Nothing to pay' : 'Fees are switched off');
+  };
+  drawFee();
+  feeBox.addEventListener('click', async e => {
+    const b = e.target.closest('[data-paid]'); if (!b) return; const r = b.dataset.paid;
+    const v = await formDialog({ title: `Mark the ${roundName(r)} fee as paid`, submit: 'Mark as paid', intro: `Use this when ${p.name} paid in cash, or when the organisers waive the fee. The admit card unlocks at once.`, fields: [{ key: 'note', label: 'Note', placeholder: 'For example: paid in cash at the school' }] });
+    if (v) busy(null, async () => { await Store.markPaid(p.id, r, v.note); toast('Marked as paid', 'good'); drawFee(); after(); });
+  });
   $('[data-sel]', d).onclick = () => { d.close(); selectDialog([p.id], after); };
   $('[data-ed]', d).onclick = async () => {
     const v = await formDialog({ title: 'Edit ' + p.name, submit: 'Save changes', values: p, mount: linkDistrict, fields: [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
@@ -4984,6 +5154,7 @@ function personDialog(p, after) {
   const un = $('[data-unsel]', d); if (un) un.onclick = () => busy(un, async () => { for (const s of (p.selected || []).slice()) await Store.unselect([p.id], s.round); d.close(); toast('Selection cleared'); after(); });
   $('[data-rm]', d).onclick = async () => { if (await confirmDialog(`Remove ${p.name} and all of their exam attempts? This cannot be undone.`, 'Remove', true)) busy(null, async () => { await Store.removeUser(p.id); d.close(); toast('Participant removed'); after(); }); };
 }
+const feeWord = (p, r) => { const st = Store.payState(p, r); return st === 'paid' ? 'Paid' : st === 'pending' ? 'Waiting' : Store.feeFor(p, r) > 0 ? 'Not paid' : ''; };
 ADMIN['admin-people'] = main => {
   const picked = new Set(); const f = { q: '', cat: '', region: '', district: '', sel: '' };
   main.innerHTML = `<section class="panel"><div class="panel-head"><h2>Participants</h2><button type="button" class="btn btn-quiet btn-sm" id="p-csv">${icon('download', 18)} Export list</button></div>
@@ -5023,8 +5194,8 @@ ADMIN['admin-people'] = main => {
   $('#p-mark', main).onclick = () => selectDialog([...picked], () => { picked.clear(); draw(); });
   $('#p-csv', main).onclick = () => {
     const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
-    const lines = [['Registration no', 'Name', 'Email', 'Own contact', 'School', 'Class', 'Category', 'Region', 'District', 'Date of birth', 'Parent contact', 'Registered', 'Selected for'].map(q).join(',')]
-      .concat(shown().map(p => [p.regNo, p.name, p.email, p.phone, p.institution, p.klass, p.category, p.region, p.district || '', p.dob || '', p.guardianPhone || '', fmtDateTime(p.createdAt), (p.selected || []).map(s => s.round).join('; ')].map(q).join(',')));
+    const lines = [['Registration no', 'Name', 'Email', 'Own contact', 'School', 'Class', 'Category', 'Region', 'District', 'Date of birth', 'Parent contact', 'Registered', 'Selected for', 'Regional fee', 'National fee'].map(q).join(',')]
+      .concat(shown().map(p => [p.regNo, p.name, p.email, p.phone, p.institution, p.klass, p.category, p.region, p.district || '', p.dob || '', p.guardianPhone || '', fmtDateTime(p.createdAt), (p.selected || []).map(s => s.round).join('; '), feeWord(p, 'regional'), feeWord(p, 'national')].map(q).join(',')));
     saveAndTell('bgeo-participants.csv', new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv' }));
   };
   draw();
@@ -5066,6 +5237,53 @@ async function readQrFromFile(file, read) {
   } finally { URL.revokeObjectURL(url); }
 }
 /* the whole registration number, or just the serial at its end (7 finds 2027010007) */
+/* ---------- Payments: what students say they have paid, checked against the organisers' own bKash or bank record ---------- */
+ADMIN['admin-pay'] = main => {
+  const f = { show: 'pending', round: '', q: '' }, fees = Store.fees();
+  main.innerHTML = `<section class="panel"><div class="panel-head"><h2>Payments</h2><button type="button" class="btn btn-quiet btn-sm" id="pay-csv">${icon('download', 18)} Export list</button></div>
+      ${Store.db.settings.feesOn ? '' : '<p class="note">Fees are switched off, so students are not asked to pay. Switch them on and set the amounts in the Site tab.</p>'}
+      <div class="paysum" id="pay-sum"></div>
+      <p class="muted">Open your bKash, Nagad or bank record, find the transaction ID, check the amount, then approve. Reject a payment you cannot find; the student is asked to send it again.</p>
+      <div class="filters">
+        <div class="field"><label for="pay-q">Search</label><input id="pay-q" type="search" placeholder="Name, registration no. or transaction ID"></div>
+        <div class="field"><label for="pay-show">Show</label><select id="pay-show"><option value="pending">Waiting to be checked</option><option value="paid">Paid</option><option value="rejected">Rejected</option><option value="due">Not paid yet</option><option value="">Every payment</option></select></div>
+        <div class="field"><label for="pay-round">Round</label><select id="pay-round"><option value="">Both</option><option value="regional">Regional</option><option value="national">National</option></select></div>
+      </div>
+      <div id="pay-list"></div></section>`;
+  const list = $('#pay-list', main), who = id => Store.get('users', id);
+  const rows = () => Store.all('payments').filter(p => (!f.show || p.status === f.show) && (!f.round || p.round === f.round) && (() => { const u = who(p.userId); return !f.q || `${u ? u.name + ' ' + u.regNo : ''} ${p.trx} ${p.sender}`.toLowerCase().includes(f.q); })()).sort((a, b) => new Date(b.at) - new Date(a.at));
+  /* students who owe a fee and have nothing paid or waiting */
+  const due = () => Store.participants().flatMap(u => ['regional', 'national'].filter(r => (!f.round || r === f.round) && Store.feeFor(u, r) > 0 && !['paid', 'pending'].includes(Store.payState(u, r))).map(r => ({ u, r }))).filter(x => !f.q || `${x.u.name} ${x.u.regNo}`.toLowerCase().includes(f.q));
+  const extra = p => { const i = p.info || {}, bits = [i.certName ? `Certificate name: ${i.certName}` : '', i.emergency ? `Contact on the day: ${i.emergency}` : '', i.shirt ? `T-shirt: ${i.shirt}` : ''].filter(Boolean); return bits.length ? `<p>${esc(bits.join(', '))}</p>` : ''; };
+  const draw = () => {
+    const all = Store.all('payments'), paid = all.filter(p => p.status === 'paid');
+    $('#pay-sum', main).innerHTML = `<div><small>Waiting to be checked</small><b>${all.filter(p => p.status === 'pending').length}</b><span>Check these first</span></div><div><small>Paid</small><b>${paid.length}</b><span>${taka(paid.reduce((n, p) => n + (p.amount || 0), 0))} in total</span></div><div><small>Fees now</small><b>${fees.regional ? taka(fees.regional) : 'Free'} / ${fees.national ? taka(fees.national) : 'Free'}</b><span>Regional / National</span></div>`;
+    if (f.show === 'due') { const d = due(); list.innerHTML = d.map(({ u, r }) => `<div class="rowi"><div class="grow"><h3>${esc(u.name)}</h3><p>${esc(u.regNo)}, ${esc(placeOf(u))}. ${roundName(r)}: ${taka(Store.feeFor(u, r))} not paid${Store.payState(u, r) === 'rejected' ? ' (last payment rejected)' : ''}.</p></div><button type="button" class="btn btn-quiet btn-sm" data-cash="${u.id}" data-r="${r}">Mark as paid</button></div>`).join('') || '<p class="empty">Nobody owes a fee right now.</p>'; return; }
+    list.innerHTML = rows().map(p => { const u = who(p.userId); return `<div class="rowi payrow"><div class="grow"><h3>${esc(u ? u.name : 'Removed student')} <span class="chip ${p.status === 'paid' ? 'chip-live' : p.status === 'pending' ? 'chip-soon' : 'chip-due'}">${p.status === 'paid' ? 'Paid' : p.status === 'pending' ? 'Waiting' : 'Rejected'}</span></h3>
+        <p>${u ? `${esc(u.regNo)}, ${esc(placeOf(u))}. ` : ''}${roundName(p.round)}, <b>${taka(p.amount)}</b></p>
+        <p>${esc(p.method)}${p.sender ? ` from ${esc(p.sender)}` : ''}${p.method === 'Cash' ? '' : `, transaction ID <b class="trx">${esc(p.trx)}</b>`}, ${fmtDateTime(p.at)}</p>${extra(p)}${p.note ? `<p class="muted">Note: ${esc(p.note)}</p>` : ''}</div>
+        ${p.status === 'pending' ? `<div class="btnrow"><button type="button" class="btn btn-lime btn-sm" data-ok="${p.id}">Approve</button><button type="button" class="btn btn-quiet btn-sm" data-no="${p.id}">Reject</button></div>` : p.status === 'paid' ? `<button type="button" class="btn btn-quiet btn-sm" data-no="${p.id}">Undo</button>` : ''}</div>`; }).join('') || `<p class="empty">${f.show === 'pending' ? 'No payment is waiting to be checked.' : 'No payments match.'}</p>`;
+  };
+  $('#pay-q', main).addEventListener('input', e => { f.q = e.target.value.trim().toLowerCase(); draw(); });
+  $('#pay-show', main).addEventListener('change', e => { f.show = e.target.value; draw(); });
+  $('#pay-round', main).addEventListener('change', e => { f.round = e.target.value; draw(); });
+  list.addEventListener('click', async e => {
+    const okB = e.target.closest('[data-ok]'), noB = e.target.closest('[data-no]'), cash = e.target.closest('[data-cash]');
+    if (okB) return busy(okB, async () => { await Store.checkPayment(okB.dataset.ok, 'paid', ''); toast('Approved. The admit card is unlocked.', 'good'); draw(); });
+    if (noB) { const v = await formDialog({ title: 'Reject this payment', submit: 'Reject', intro: 'The student gets a notice and is asked to send the details again.', fields: [{ key: 'note', label: 'Reason the student will read', placeholder: 'For example: the transaction ID was not found' }] }); if (v) busy(noB, async () => { await Store.checkPayment(noB.dataset.no, 'rejected', v.note); toast('Rejected. The student has been told.'); draw(); }); return; }
+    if (cash) { const u = who(cash.dataset.cash), r = cash.dataset.r; const v = await formDialog({ title: `Mark the ${roundName(r)} fee as paid`, submit: 'Mark as paid', intro: `Use this when ${u.name} paid in cash, or when the organisers waive the fee.`, fields: [{ key: 'note', label: 'Note', placeholder: 'For example: paid in cash' }] }); if (v) busy(cash, async () => { await Store.markPaid(u.id, r, v.note); toast('Marked as paid', 'good'); draw(); }); }
+  });
+  $('#pay-csv', main).onclick = () => {
+    const q = x => `"${String(x ?? '').replace(/"/g, '""')}"`;
+    const lines = [['Registration no', 'Name', 'District', 'Round', 'Amount', 'Status', 'Method', 'Paid from', 'Transaction ID', 'Sent', 'Checked', 'Certificate name', 'Contact on the day', 'T-shirt', 'Note'].map(q).join(',')]
+      .concat((f.show === 'due' ? [] : rows()).map(p => { const u = who(p.userId) || {}, i = p.info || {}; return [u.regNo, u.name, u.district, roundName(p.round), p.amount, p.status, p.method, p.sender, p.trx, fmtDateTime(p.at), p.checkedAt ? fmtDateTime(p.checkedAt) : '', i.certName, i.emergency, i.shirt, p.note].map(q).join(','); }))
+      .concat(f.show === 'due' ? due().map(({ u, r }) => [u.regNo, u.name, u.district, roundName(r), Store.feeFor(u, r), 'not paid', '', '', '', '', '', '', '', '', ''].map(q).join(',')) : []);
+    saveAndTell('bgeo-payments.csv', new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv' }));
+  };
+  draw();
+  if (CLOUD) Store.loadPayments().then(draw, () => {});
+};
+
 const findByNumber = text => { const d = String(text).replace(/\D/g, ''); if (!d) return null; const ps = Store.participants(); return ps.find(p => String(p.regNo).replace(/\D/g, '') === d) || (d.length <= 5 ? ps.find(p => regSerial(p.regNo) === +d) : null) || null; };
 async function scanDialog(session, after) {
   const d = openDialog({ title: 'Scan cards', html: `<p class="muted">Attendance for <b>${esc(session)}</b>. Hold the QR code on a card in front of the camera, or upload a picture of the card.</p>
@@ -5080,9 +5298,9 @@ async function scanDialog(session, after) {
   const mark = async u => {
     if (!u) { show('bad', 'Not a BGeO card', 'This code or number does not match any registered student.'); Sound.play('bad'); return; }
     try {
-      const r = await Store.markPresent(u.id, session);
-      show(r === 'new' ? 'good' : 'warn', u.name, r === 'new' ? `${u.regNo}, ${u.institution}. Marked present.` : `${u.regNo}. Already marked present.`);
-      Sound.play(r === 'new' ? 'good' : 'pick'); after();
+      const r = await Store.markPresent(u.id, session), owes = Store.feeLocked(u, isNational(session) ? 'national' : 'regional');
+      show(r === 'new' && !owes ? 'good' : 'warn', u.name, (r === 'new' ? `${u.regNo}, ${u.institution}. Marked present.` : `${u.regNo}. Already marked present.`) + (owes ? ' FEE NOT PAID.' : ''));
+      Sound.play(owes ? 'bad' : r === 'new' ? 'good' : 'pick'); after();
     } catch (e) { show('bad', 'Could not save', e.message); Sound.play('bad'); }
   };
   $('#sc-form', d).addEventListener('submit', e => { e.preventDefault(); const inp = $('#sc-num', d); if (!inp.value.trim()) return; mark(findByNumber(inp.value)); inp.value = ''; });
@@ -5484,6 +5702,8 @@ async function emailNoticeDialog(n) {
 }
 ADMIN['admin-site'] = main => {
   const s = Store.db.settings, cf = [{ key: 'contactEmail', label: 'Contact email', type: 'email', placeholder: ORG.email }, { key: 'contactPhone', label: 'Contact phone', type: 'tel', placeholder: ORG.phone }, { key: 'contactAddress', label: 'Address', placeholder: ORG.address }, { key: 'facebook', label: 'Facebook page link', type: 'url', placeholder: ORG.socials.facebook }, { key: 'instagram', label: 'Instagram link', type: 'url', placeholder: ORG.socials.instagram }, { key: 'x', label: 'X (Twitter) link', type: 'url', placeholder: ORG.socials.x }, { key: 'linkedin', label: 'LinkedIn link', type: 'url', placeholder: ORG.socials.linkedin }];
+  const ffields = [{ key: 'feeRegional', label: 'Regional round fee (taka)', type: 'number', placeholder: '0' }, { key: 'feeNational', label: 'National round fee (taka)', type: 'number', placeholder: '0' },
+    { key: 'payHow', label: 'Where students send the money', type: 'textarea', rows: 4, placeholder: 'For example:\nbKash Send Money to 01XXXXXXXXX (personal)\nNagad Send Money to 01XXXXXXXXX', help: 'Students see this text exactly as you write it. Until it is filled in, they cannot send a payment.' }];
   const top = document.createElement('div'); top.className = 'stack'; top.style.gap = '16px';
   top.innerHTML = `<section class="panel"><h2>Switches</h2>
       <label class="check" for="sw-reg"><input type="checkbox" id="sw-reg"${s.regOpen ? ' checked' : ''}><span>Registration is open</span></label>
@@ -5491,11 +5711,21 @@ ADMIN['admin-site'] = main => {
       <label class="check" for="sw-split"><input type="checkbox" id="sw-split"${s.examSplit ? ' checked' : ''}><span>Students in the admit card districts sit the Regional round in person only (the E-Regional exam is closed to them)</span></label>
       <form class="form" id="cd" novalidate style="margin-top:14px"><div class="field"><label for="cd-list">Admit cards are only for these districts</label><input id="cd-list" name="list" value="${esc(Store.cardDistricts().join(', '))}" placeholder="Every district"><small>Write district names with commas between them, for example: Dhaka, Gazipur. Leave it empty to give the card to every district. A student selected for the National round always gets the National card.</small></div>
         <p class="err" role="alert" hidden></p><div><button class="btn btn-ocean btn-sm" type="submit">Save districts</button></div></form></section>
+    <section class="panel"><h2>Fees</h2><p class="muted">Students of the admit card districts pay the Regional fee before they can download their Regional card. Students selected for the National round fill in a short National registration and pay the National fee. Leave a fee at 0 to charge nothing for that round.</p>
+      <label class="check" for="sw-fee"><input type="checkbox" id="sw-fee"${s.feesOn ? ' checked' : ''}><span>Fees are on</span></label>
+      <form class="form" id="ff" novalidate style="margin-top:14px"><div class="form-2">${ffields.slice(0, 2).map(f => fieldHtml(f, s[f.key] || '', 'ff')).join('')}</div>${fieldHtml(ffields[2], s.payHow || '', 'ff')}
+        <p class="err" role="alert" hidden></p><div><button class="btn btn-ocean btn-sm" type="submit">Save fees</button></div></form></section>
     <section class="panel"><h2>Contact details</h2><p class="muted">These show in the footer and on the Contact page. Leave a box empty to keep the one shown in grey.</p><form class="form" id="cf" novalidate>${cf.map(f => fieldHtml(f, s[f.key], 'cf')).join('')}<div><button class="btn btn-ocean btn-sm" type="submit">Save contact details</button></div></form></section>`;
   main.appendChild(top);
   $('#sw-reg', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('regOpen', on); toast(on ? 'Registration is open' : 'Registration is closed', 'good'); });
   $('#sw-card', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('cardsOpen', on); toast(on ? 'Cards can be downloaded' : 'Cards are hidden', 'good'); });
   $('#sw-split', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('examSplit', on); toast(on ? 'The online exam is closed to the admit card districts' : 'Every student can take the online exam', 'good'); });
+  $('#sw-fee', top).onchange = e => busy(null, async () => { const on = e.target.checked; await Store.setting('feesOn', on); toast(on ? 'Fees are on' : 'Fees are off. Every card is free to download.', 'good'); });
+  $('#ff', top).addEventListener('submit', e => {
+    e.preventDefault(); const f = e.target, err = $('.err', f), reg = Math.round(+f.elements.feeRegional.value || 0), nat = Math.round(+f.elements.feeNational.value || 0), how = f.elements.payHow.value.trim();
+    if (reg < 0 || nat < 0 || reg > 100000 || nat > 100000) { err.textContent = 'A fee is a number of taka from 0 to 100000.'; err.hidden = false; Sound.play('bad'); return; }
+    err.hidden = true; busy($('button', f), async () => { await Store.setting('feeRegional', reg); await Store.setting('feeNational', nat); await Store.setting('payHow', how); toast('Fees saved', 'good'); });
+  });
   $('#cd', top).addEventListener('submit', e => {
     e.preventDefault(); const err = $('.err', e.target), names = e.target.elements.list.value.split(/[,\n]/).map(x => x.trim()).filter(Boolean);
     const list = [], bad = []; names.forEach(n => { const hit = ALL_DISTRICTS.find(d => d.toLowerCase() === n.toLowerCase()); if (!hit) bad.push(n); else if (!list.includes(hit)) list.push(hit); });
