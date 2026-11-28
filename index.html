@@ -2250,19 +2250,22 @@ const Sound = (() => {
     bad(now) { tone(now, { f: 233, f2: 150, t: 0.24, g: 0.18, type: 'triangle', attack: 0.004 }); tone(now, { f: 466, f2: 300, t: 0.2, g: 0.07, attack: 0.004 }); },
     tick(now) { air(now, { t: 0.03, f: 3200, q: 4, g: 0.16, peak: 0 }); },
     win(now) { [523, 659, 784].forEach((f, i) => tone(now, { f, t: 0.26, g: 0.16, at: i * 0.1, attack: 0.004 })); bell(now, { f: 1047, t: 0.7, g: 0.18, depth: 500, at: 0.3 }); },
-    /* The opening when the recorded wind (media/gale.mp3) has not loaded: the same idea made here. Deep, hard wind as a
-       camera's microphone hears it at speed: a low roar that flutters, and deep knocks where the wind strikes the microphone.
-       No sweeps, no hiss. It is there from the tap and thins out as the Earth settles. */
+    /* The opening flight when its recorded sound (media/journey.mp3) has not loaded: the same idea made here, plainer.
+       Deep wind as a camera's microphone hears it: loud and knocking when the camera crosses from place to place at full
+       speed (around 1.35, 2.67, 3.92 and 5.22 s), lower at each place, thinning away in space. Under it, quietly: birds
+       in the forest, a whistle of wind in the mountains, sand hissing in the desert, a hum in the city, a wave at the beach. */
     opening(now) {
       tone(now, { f: 520, f2: 200, t: 0.09, g: 0.16, attack: 0.003 });   // the tap itself
-      path(now, { q: 1.1, flutter: 0.6, pts: [[0, 0.03, 380], [0.1, 0.24, 420], [0.9, 0.26, 360], [1.8, 0.27, 460], [2.8, 0.25, 390], [3.4, 0.17, 360], [3.9, 0.06, 300], [4.2, 0, 240]] });
-      path(now, { q: 1, flutter: 0.7, pts: [[0, 0.03, 130], [0.1, 0.27, 140], [1.2, 0.26, 170], [2.4, 0.28, 130], [3.4, 0.18, 150], [4.2, 0, 110]] });
-      path(now, { q: 1, flutter: 0.4, pts: [[0.05, 0, 800], [0.2, 0.03, 850], [1.5, 0.035, 950], [3.0, 0.03, 820], [3.9, 0, 700]] });
-      /* knocks: deep thuds at uneven moments, each with a higher note inside it so a phone's speaker can play it */
-      [0.07, 0.21, 0.38, 0.47, 0.71, 0.86, 1.02, 1.27, 1.4, 1.63, 1.84, 1.95, 2.2, 2.41, 2.6, 2.86, 3.05, 3.31, 3.52].forEach((t, i) => {
-        const g = (0.16 + 0.1 * ((i * 7) % 5) / 4) * (t > 3 ? 0.6 : 1), len = 0.09 + 0.03 * (i % 3);
-        tone(now, { f: 96 - (i % 4) * 8, f2: 52, t: len, g, at: t, attack: 0.006 }); tone(now, { f: 250 - (i % 3) * 20, f2: 130, t: len * 0.8, g: g * 0.5, at: t, attack: 0.006, type: 'triangle' });
-      });
+      const lv = [[0, 0.1], [0.25, 0.22], [0.9, 0.3], [1.12, 0.5], [1.35, 1], [1.57, 0.75], [1.75, 0.5], [2.3, 0.5], [2.47, 0.6], [2.67, 1], [2.87, 0.7], [3.05, 0.42], [3.6, 0.42], [3.72, 0.55], [3.92, 1], [4.12, 0.65], [4.3, 0.4], [4.9, 0.4], [5.02, 0.5], [5.22, 0.85], [5.42, 0.55], [5.82, 0.5], [6.3, 0.7], [6.62, 0.85], [7.0, 0.6], [7.5, 0.22], [7.9, 0.04], [8.2, 0]];
+      path(now, { q: 1.1, flutter: 0.6, pts: lv.map(([t, k]) => [t, 0.27 * k, 380 + 140 * k]) });       // the roar
+      path(now, { q: 1, flutter: 0.7, pts: lv.map(([t, k]) => [t, 0.28 * k, 130 + 40 * k]) });          // the deep part
+      lv.forEach(([t, k], i) => { if (k < 0.6 || t > 7) return; [0, 0.09, 0.17].forEach((dt, j) => { tone(now, { f: 96 - j * 8, f2: 52, t: 0.1, g: 0.24 * k, at: t - 0.08 + dt, attack: 0.006 }); tone(now, { f: 250 - j * 20, f2: 130, t: 0.08, g: 0.12 * k, at: t - 0.08 + dt, attack: 0.006, type: 'triangle' }); }); });   // knocks on the microphone, at speed
+      bird(now, 0.12, 2500, 3, 0.06); bird(now, 0.5, 4300, 4, 0.04); bird(now, 0.85, 2700, 2, 0.05);                                    // forest
+      path(now, { wave: 'sine', pts: [[1.45, 0, 880], [1.7, 0.03, 940], [2.1, 0.035, 820], [2.5, 0.03, 900], [2.75, 0, 860]] });         // mountains: the wind whistles
+      path(now, { q: 0.8, flutter: 0.8, pts: [[2.75, 0, 4200], [3.0, 0.04, 4600], [3.6, 0.04, 4200], [3.95, 0, 4000]] });                // desert: sand
+      path(now, { wave: 'triangle', pts: [[4.0, 0, 98], [4.25, 0.06, 98], [4.95, 0.06, 104], [5.2, 0, 98]] });                           // city: a hum
+      air(now, { t: 1.2, f: 300, fm: 1800, f2: 500, q: 0.8, g: 0.09, type: 'lowpass', at: 5.3, peak: 0.45 }); air(now, { t: 1.1, f: 300, fm: 1700, f2: 500, q: 0.8, g: 0.08, type: 'lowpass', at: 6.05, peak: 0.45 });   // beach: two waves
+      path(now, { wave: 'sine', pts: [[7.0, 0, 660], [7.25, 0.012, 700], [7.85, 0.04, 960], [8.05, 0, 988]] });                          // toward the landing chime
     },
     /* a tsunami: a deep surge that swells, breaks and hisses away */
     wave(now) { air(now, { t: 1.05, f: 180, fm: 1300, f2: 300, q: 0.9, g: 0.2, type: 'lowpass', peak: 0.45 }); air(now, { t: 0.7, f: 2400, f2: 5200, q: 0.9, g: 0.06, at: 0.38, peak: 0.25 }); tone(now, { f: 58, f2: 40, t: 0.9, g: 0.16, peak: 0.3 }); },
@@ -3065,29 +3068,73 @@ function siteIntro() {
   const sin = Math.sin, clamp = x => Math.max(0, Math.min(1, x)), mix = (a, b, t) => a + (b - a) * t, smooth = p => p * p * (3 - 2 * p);
 
   /* ---- the land the camera flies over, as a long map. u runs forward (the way the camera travels), v runs sideways.
-          Going forward: jungle, a river, farmland, desert with a river through it, a green coast, a beach, the open sea. ---- */
-  const PPU = 48, V0 = -8, U0 = -4, TW = 16 * PPU, TL = 64 * PPU, SEA = '#5589c0';
-  const eJungle = v => 7.5 + 0.5 * sin(0.9 * v + 0.4) + 0.2 * sin(2.3 * v), river1 = v => 9.7 + 0.55 * sin(0.7 * v + 1) + 0.2 * sin(1.9 * v);
-  const eDry = v => 12.6 + 0.6 * sin(0.8 * v + 2), river2 = v => 18.4 + 0.8 * sin(0.6 * v) + 0.25 * sin(1.7 * v + 2);
-  const eCoast = v => 23.4 + 0.45 * sin(1.1 * v), eBeach = v => 25.5 + 0.3 * sin(0.8 * v + 1) + 0.12 * sin(2.6 * v);
+          Going forward: jungle, a meadow with a river, mountains with a pass through them, desert with a river, a city on
+          a street grid, a green shore, a beach, the open sea. ---- */
+  const PPU = 48, V0 = -8, U0 = -4, TW = 16 * PPU, TL = 64 * PPU, SEA = '#5589c0', AVENUE = 0.2, PASS = 0.1;
+  const eJungle = v => 7.5 + 0.5 * sin(0.9 * v + 0.4) + 0.2 * sin(2.3 * v), river1 = v => 8.45 + 0.3 * sin(0.7 * v + 1) + 0.12 * sin(1.9 * v);
+  const eRock = v => 9.3 + 0.35 * sin(0.8 * v + 2), eDry = v => 15.3 + 0.5 * sin(0.8 * v + 2), river2 = v => 18.4 + 0.8 * sin(0.6 * v) + 0.25 * sin(1.7 * v + 2);
+  const eCity = v => 22.1 + 0.25 * sin(0.9 * v + 1), eCoast = v => 27.6 + 0.3 * sin(1.1 * v), eBeach = v => 30.0 + 0.3 * sin(0.8 * v + 1) + 0.12 * sin(2.6 * v);
+  /* things that stand up from the ground, seen from the side as the camera backs away past them:
+     t trees and undergrowth, m mountains and foothills, b desert rock, c city buildings */
+  const things = [];
+  for (let i = 0; i < 900; i++) { const v = -5 + R() * 10, u = 0.3 + R() * 7; if (Math.abs(v) < 0.3) continue; things.push({ kind: 't', u, v, h: 0.27 + R() * 0.15, w: 0.014 + R() * 0.013, r: 0.09 + R() * 0.06, k: R() }); }
+  for (let i = 0; i < 380; i++) { const v = -3 + R() * 6, u = 0.3 + R() * 6.6; if (Math.abs(v) < 0.16) continue; things.push({ kind: 't', u, v, h: 0.03 + R() * 0.04, w: 0, r: 0.05 + R() * 0.05, k: R() }); }   // undergrowth
+  const peaks = [];
+  for (let i = 0; i < 70; i++) { const v = -7.5 + R() * 15, u = 9.9 + R() * 4.6; if (Math.abs(v - PASS) < 0.95) continue; const h = 1.05 + R() * 1.2 + Math.min(1, Math.abs(v) / 6) * 0.35; peaks.push({ kind: 'm', u, v, h, w: h * (0.6 + R() * 0.25), k: R(), snow: h > 1.4 }); }
+  for (let i = 0; i < 36; i++) { const v = -7 + R() * 14, u = R() < 0.5 ? 9.2 + R() * 0.8 : 14.4 + R() * 0.9; if (Math.abs(v - PASS) < 0.6) continue; const h = 0.3 + R() * 0.4; peaks.push({ kind: 'm', u, v, h, w: h * (1 + R() * 0.5), k: R(), snow: false, hill: true }); }
+  things.push(...peaks);
+  for (let i = 0; i < 16; i++) { const v = -6 + R() * 12, u = 16.2 + R() * 5; if (Math.abs(v - 0.15) < 0.8) continue; things.push({ kind: 'b', u, v, h: 0.22 + R() * 0.4, w: 0.3 + R() * 0.45, k: R() }); }
+  /* the city stands on a grid of blocks; the camera leaves along its widest avenue. Towers are tallest in the middle. */
+  const BU0 = 22.6, BU = 0.42, BV0 = -5.75, BV = 0.46, towers = [];
+  for (let iu = 0; iu < 11; iu++) for (let iv = 0; iv < 26; iv++) {
+    const u = BU0 + iu * BU + (R() - 0.5) * 0.08, v = BV0 + iv * BV + (R() - 0.5) * 0.08; if (Math.abs(v - AVENUE) < 0.36 || R() < 0.1) continue;
+    const core = clamp(1 - Math.abs(u - 25.3) / 1.7) * clamp(1 - Math.abs(v - AVENUE) / 3.2);
+    towers.push({ kind: 'c', u, v, h: 0.12 + R() * 0.26 + core * (0.3 + R() * 0.8), w: 0.1 + R() * 0.07, k: R(), col: Math.floor(R() * 7) });
+  }
+  things.push(...towers); things.sort((a, b) => a.u - b.u);   // farthest from the retreating camera first
+  const FACADE = [[184, 196, 208], [159, 176, 194], [213, 205, 191], [201, 211, 220], [142, 163, 184], [224, 214, 196], [169, 183, 196]];
   const ground = document.createElement('canvas'); ground.width = TW; ground.height = TL;
   (function paintGround() {
     const c = ground.getContext('2d'), px = v => (v - V0) * PPU, py = u => (u - U0) * PPU;
     c.fillStyle = '#1d6b34'; c.fillRect(0, 0, TW, TL);
     const zone = (f, off, color) => { c.beginPath(); for (let v = V0; v <= -V0 + 0.01; v += 0.2) c.lineTo(px(v), py(f(v) + off)); c.lineTo(TW, TL); c.lineTo(0, TL); c.closePath(); c.fillStyle = color; c.fill(); };
     const across = (f, w, color) => { c.strokeStyle = color; c.lineWidth = w * PPU; c.lineCap = 'butt'; c.beginPath(); for (let v = V0 - 0.5; v <= -V0 + 0.5; v += 0.2) c.lineTo(px(v), py(f(v))); c.stroke(); };
+    /* meadow between the forest and the mountains, with a river */
     zone(eJungle, 0, '#8fcf62');
-    for (let i = 0; i < 520; i++) { const v = V0 + R() * 16, u = eJungle(v) + 0.2 + R() * (eDry(v) - eJungle(v) - 0.3); c.fillStyle = ['#b9e07a', '#7ecb5f', '#a6de7c', '#d3e58a', '#74c257'][Math.floor(R() * 5)]; c.fillRect(px(v) - 5, py(u) - 4, 9 + R() * 8, 7 + R() * 7); }
-    across(river1, 0.62, '#5dc9d6'); across(river1, 0.3, '#3f86c4');
+    for (let i = 0; i < 240; i++) { const v = V0 + R() * 16, u = eJungle(v) + 0.2 + R() * (eRock(v) - eJungle(v) - 0.3); c.fillStyle = ['#b9e07a', '#7ecb5f', '#a6de7c', '#d3e58a', '#74c257'][Math.floor(R() * 5)]; c.fillRect(px(v) - 5, py(u) - 4, 9 + R() * 8, 7 + R() * 7); }
+    across(river1, 0.5, '#5dc9d6'); across(river1, 0.24, '#3f86c4');
+    /* the mountains: grey-green rock, darker where each mountain stands, snow on the high ones, a stream down the pass */
+    zone(eRock, 0, '#93a07f'); zone(eRock, 0.5, '#8d968a');
+    c.lineCap = 'round';
+    for (let i = 0; i < 620; i++) { const v = V0 + R() * 16, u = eRock(v) + 0.5 + R() * (eDry(v) - eRock(v) - 0.7), a = R() * 3.14, len = (0.12 + R() * 0.4) * PPU; c.strokeStyle = R() < 0.5 ? '#79847a' : '#a5aea2'; c.lineWidth = 1.5 + R() * 2; c.beginPath(); c.moveTo(px(v), py(u)); c.lineTo(px(v) + Math.cos(a) * len, py(u) + sin(a) * len * 0.5); c.stroke(); }
+    peaks.forEach(m => {
+      const x = px(m.v), y = py(m.u), r = m.w * PPU, sh = c.createRadialGradient(x, y, 0, x, y, r); sh.addColorStop(0, m.hill ? 'rgba(96,124,78,.75)' : 'rgba(70,78,74,.7)'); sh.addColorStop(1, 'rgba(70,78,74,0)'); c.fillStyle = sh; c.fillRect(x - r, y - r, r * 2, r * 2);
+      if (m.snow) { const sn = c.createRadialGradient(x - r * 0.1, y, 0, x - r * 0.1, y, r * 0.5); sn.addColorStop(0, 'rgba(250,252,255,.95)'); sn.addColorStop(0.6, 'rgba(250,252,255,.6)'); sn.addColorStop(1, 'rgba(250,252,255,0)'); c.fillStyle = sn; c.fillRect(x - r, y - r, r * 2, r * 2); }
+    });
+    c.strokeStyle = '#5a9fcd'; c.lineWidth = 0.09 * PPU; c.beginPath(); for (let u = 9.2; u <= 15.6; u += 0.1) c.lineTo(px(PASS + 0.22 * sin(u * 1.5)), py(u)); c.stroke();
+    /* desert */
     zone(eDry, 0, '#c9b574'); zone(eDry, 1.3, '#dcc083');
     /* dunes: long curved ridges, a light side and a shaded side */
-    for (let i = 0; i < 260; i++) { const v = V0 + R() * 16, u = eDry(v) + 1.4 + R() * (eCoast(v) - eDry(v) - 1.8), len = 0.5 + R() * 1.4, bend = (R() - 0.5) * 0.5; for (const [dy, color, w] of [[0, '#ecd49a', 4], [3.5, '#c4a468', 3]]) { c.strokeStyle = color; c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); c.moveTo(px(v - len / 2), py(u) + dy); c.quadraticCurveTo(px(v), py(u + bend) + dy, px(v + len / 2), py(u) + dy); c.stroke(); } }
+    for (let i = 0; i < 260; i++) { const v = V0 + R() * 16, u = eDry(v) + 1.4 + R() * (eCity(v) - eDry(v) - 1.8), len = 0.5 + R() * 1.4, bend = (R() - 0.5) * 0.5; for (const [dy, color, w] of [[0, '#ecd49a', 4], [3.5, '#c4a468', 3]]) { c.strokeStyle = color; c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); c.moveTo(px(v - len / 2), py(u) + dy); c.quadraticCurveTo(px(v), py(u + bend) + dy, px(v + len / 2), py(u) + dy); c.stroke(); } }
     across(river2, 1.05, '#7fbf5a'); across(river2, 0.4, '#5dc9d6'); across(river2, 0.18, '#3f86c4');
+    /* the city: pale ground cut into blocks by streets, roofs where the buildings stand, a few parks */
+    zone(eCity, 0, '#b9bfc6');
+    c.save(); c.beginPath(); for (let v = V0; v <= -V0 + 0.01; v += 0.2) c.lineTo(px(v), py(eCity(v) + 0.15)); for (let v = -V0; v >= V0 - 0.01; v -= 0.2) c.lineTo(px(v), py(eCoast(v))); c.closePath(); c.clip();
+    for (let iu = -1; iu < 13; iu++) for (let iv = -6; iv < 32; iv++) { c.fillStyle = ['#c3c8ce', '#b4bbc3', '#cfd2d4', '#bfc6cc', '#aab2bb'][Math.floor(R() * 5)]; c.fillRect(px(BV0 + (iv - 0.5) * BV), py(BU0 + (iu - 0.5) * BU), BV * PPU, BU * PPU); }
+    for (let i = 0; i < 9; i++) { const iu = Math.floor(R() * 11), iv = Math.floor(R() * 26), x = px(BV0 + (iv - 0.5) * BV), y = py(BU0 + (iu - 0.5) * BU); c.fillStyle = '#86c46a'; c.fillRect(x, y, BV * PPU * (1 + Math.floor(R() * 2)), BU * PPU); }
+    c.fillStyle = '#626a73';
+    for (let iu = -1; iu < 13; iu++) c.fillRect(0, py(BU0 + (iu - 0.5) * BU) - 2.5, TW, 5);
+    for (let iv = -6; iv < 32; iv++) c.fillRect(px(BV0 + (iv - 0.5) * BV) - 2.5, 0, 5, TL);
+    c.fillStyle = '#565e67'; c.fillRect(px(AVENUE - 0.24), 0, 0.48 * PPU, TL);   // the avenue
+    c.fillStyle = '#e9e4c4'; for (let u = 21.6; u < 28.4; u += 0.3) c.fillRect(px(AVENUE) - 1, py(u), 2, 0.14 * PPU);
+    towers.forEach(b => { const col = FACADE[b.col], k = 0.78 + b.k * 0.2; c.fillStyle = `rgb(${Math.round(col[0] * k)},${Math.round(col[1] * k)},${Math.round(col[2] * k)})`; c.fillRect(px(b.v - b.w), py(b.u - b.w), b.w * 2 * PPU, b.w * 2 * PPU); });
+    c.restore();
+    /* the green shore, the beach, the sea */
     zone(eCoast, 0, '#a9cf72'); zone(eCoast, 0.5, '#7dc65b');
-    for (let i = 0; i < 420; i++) { const v = V0 + R() * 16, u = eCoast(v) + 0.3 + R() * (eBeach(v) - eCoast(v) - 0.35); c.fillStyle = R() < 0.5 ? '#3f9a4d' : '#57b05a'; c.beginPath(); c.arc(px(v), py(u), 2 + R() * 4, 0, 6.2832); c.fill(); }
+    for (let i = 0; i < 520; i++) { const v = V0 + R() * 16, u = eCoast(v) + 0.3 + R() * (eBeach(v) - eCoast(v) - 0.35); c.fillStyle = R() < 0.5 ? '#3f9a4d' : '#57b05a'; c.beginPath(); c.arc(px(v), py(u), 2 + R() * 4, 0, 6.2832); c.fill(); }
     zone(eBeach, 0, '#f3e6b4'); zone(eBeach, 0.34, '#f7fbfc'); zone(eBeach, 0.4, '#a5e6e6'); zone(eBeach, 0.9, '#5dc9d6'); zone(eBeach, 1.7, '#5aa9cf'); zone(eBeach, 3.2, SEA);
     c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 1.2; c.lineCap = 'round';
-    for (let i = 0; i < 700; i++) { const v = V0 + R() * 16, u = eBeach(v) + 0.7 + R() * 32, w = 4 + R() * 9; c.beginPath(); c.moveTo(px(v) - w, py(u)); c.quadraticCurveTo(px(v), py(u) - w * 0.35, px(v) + w, py(u)); c.stroke(); }
+    for (let i = 0; i < 700; i++) { const v = V0 + R() * 16, u = eBeach(v) + 0.7 + R() * 28, w = 4 + R() * 9; c.beginPath(); c.moveTo(px(v) - w, py(u)); c.quadraticCurveTo(px(v), py(u) - w * 0.35, px(v) + w, py(u)); c.stroke(); }
     /* the jungle from above: thousands of round crowns */
     const TREE = ['#1f7a3a', '#2a8c44', '#37a04f', '#4bb35a', '#5cc064'], LIGHT = ['#2f9149', '#3ba554', '#4dba62', '#63c96f', '#78d67f'], crowns = [];
     for (let i = 0; i < 6200; i++) { const v = V0 + R() * 16, u = U0 + R() * (eJungle(v) - U0 - 0.08); crowns.push([px(v), py(u), (0.09 + R() * 0.07) * PPU, Math.floor(R() * 5)]); }
@@ -3101,19 +3148,37 @@ function siteIntro() {
     };
     mottle(56, 0.6); mottle(14, 0.38); mottle(3, 0.22);
   })();
-  const baseColor = (u, v) => (u < eJungle(v) ? '#1d6b34' : u < eDry(v) ? '#8fcf62' : u < eCoast(v) ? '#dcc083' : u < eBeach(v) ? '#7dc65b' : u < eBeach(v) + 0.4 ? '#f3e6b4' : u < eBeach(v) + 1.7 ? '#5dc9d6' : SEA);
+  const baseColor = (u, v) => (u < eJungle(v) ? '#1d6b34' : u < eRock(v) ? '#8fcf62' : u < eDry(v) ? '#8d968a' : u < eCity(v) ? '#dcc083' : u < eCoast(v) ? '#b9bfc6' : u < eBeach(v) ? '#7dc65b' : u < eBeach(v) + 0.4 ? '#f3e6b4' : u < eBeach(v) + 1.7 ? '#5dc9d6' : SEA);
   /* clouds near the horizon: [sideways, height above the horizon, width (all in screen diagonals), puffs] */
   const CLOUDS = [[-0.34, 0.035, 0.07], [-0.08, 0.06, 0.05], [0.16, 0.03, 0.08], [0.4, 0.055, 0.06], [0.62, 0.028, 0.05], [-0.58, 0.05, 0.06]].map(cl => [...cl, [[-0.5, 0.12, 0.55], [0, 0, 0.75], [0.5, 0.1, 0.6], [0.15, -0.2, 0.5]]]);
-  /* trees that stand up, for the part of the journey spent inside and just above the forest */
-  const trees = [];
-  for (let i = 0; i < 900; i++) { const v = -5 + R() * 10, u = 0.3 + R() * 7; if (Math.abs(v) < 0.3) continue; trees.push({ u, v, h: 0.27 + R() * 0.15, w: 0.014 + R() * 0.013, r: 0.09 + R() * 0.06, k: R() }); }
-  for (let i = 0; i < 380; i++) { const v = -3 + R() * 6, u = 0.3 + R() * 6.6; if (Math.abs(v) < 0.16) continue; trees.push({ u, v, h: 0.03 + R() * 0.04, w: 0, r: 0.05 + R() * 0.05, k: R() }); }   // undergrowth
-  trees.sort((a, b) => a.u - b.u);   // farthest from the retreating camera first
+  /* how each kind of standing thing is drawn. x: where it stands on the screen; sc: pixels per unit at its distance;
+     yAt(z): the screen height of a point z above the ground there; tone(r, g, b): that colour, faded toward haze by distance */
+  function mountain(c, m, x, sc, yAt, tone) {
+    const lean = 1 + (m.k - 0.5) * 0.3, P = p => [x + p[0] * m.w * sc * (p[0] > 0 ? lean : 2 - lean), yAt(p[1] * m.h)];
+    const poly = (pts, color) => { c.fillStyle = color; c.beginPath(); pts.forEach((p, i) => { const q = P(p); if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); }); c.closePath(); c.fill(); };
+    poly([[-1, 0], [-0.62, 0.36], [-0.4, 0.5], [-0.22, 0.8], [-0.07, 0.92], [0, 1], [0.1, 0.88], [0.28, 0.62], [0.5, 0.44], [0.74, 0.2], [1, 0]], m.hill ? tone(98, 124, 80) : tone(92, 99, 108));
+    poly([[-1, 0], [-0.62, 0.36], [-0.4, 0.5], [-0.22, 0.8], [-0.07, 0.92], [0, 1], [0.03, 0.7], [-0.08, 0.45], [0.06, 0.2], [0, 0]], m.hill ? tone(132, 158, 98) : tone(138, 145, 150));   // the sunlit side
+    if (m.snow) {
+      poly([[-0.2, 0.82], [-0.07, 0.92], [0, 1], [0.1, 0.88], [0.22, 0.7], [0.12, 0.74], [0.05, 0.66], [-0.03, 0.75], [-0.1, 0.7]], tone(246, 249, 253));
+      poly([[0, 1], [0.1, 0.88], [0.22, 0.7], [0.12, 0.74], [0.05, 0.66], [0.02, 0.8]], tone(204, 217, 234));
+    }
+  }
+  function building(c, b, x, sc, yAt, tone) {
+    const w = b.w * sc, y0 = yAt(0), y1 = yAt(b.h), col = FACADE[b.col];
+    c.fillStyle = tone(col[0], col[1], col[2]); c.fillRect(x - w, y1, w * 2, y0 - y1);
+    c.fillStyle = tone(col[0] * 0.72, col[1] * 0.74, col[2] * 0.78); c.fillRect(x + w * 0.36, y1, w * 0.64, y0 - y1);   // the side away from the sun
+    if (w > 5) { const floors = Math.max(2, Math.round(b.h / 0.065)), fh = (y0 - y1) / floors; c.fillStyle = tone(col[0] * 0.48, col[1] * 0.58, col[2] * 0.7); for (let i = 0; i < floors; i++) c.fillRect(x - w * 0.86, y1 + fh * (i + 0.3), w * 1.72, fh * 0.38); }   // bands of windows
+    if (b.h > 0.6) { const yt = yAt(b.h + 0.05); c.fillStyle = tone(col[0] * 0.8, col[1] * 0.8, col[2] * 0.82); c.fillRect(x - w * 0.3, yt, w * 0.6, y1 - yt + 1); }
+  }
+  function butte(c, b, x, sc, yAt, tone) {
+    const w = b.w * sc, y0 = yAt(0), y1 = yAt(b.h), shape = (pts, color) => { c.fillStyle = color; c.beginPath(); pts.forEach((p, i) => (i ? c.lineTo(x + p[0] * w, p[1] ? y1 : y0) : c.moveTo(x + p[0] * w, p[1] ? y1 : y0))); c.closePath(); c.fill(); };
+    shape([[-1, 0], [-0.7, 1], [0.62, 1], [1, 0]], tone(170, 112, 70)); shape([[-1, 0], [-0.7, 1], [-0.1, 1], [-0.25, 0]], tone(208, 148, 94));
+  }
 
   function drawScene(cam) {
-    const c = lg, cx = D / 2, cy = D / 2, sp = sin(cam.pitch), cp = Math.cos(cam.pitch), STEP = 2;
+    const c = lg, cx = D / 2, cy = D / 2, sp = sin(cam.pitch), cp = Math.cos(cam.pitch), STEP = 2, Fz = F * (cam.zoom || 1);   // Fz: a wider view at speed
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const yh = cam.pitch > 1.35 ? -1 : cy - F * Math.tan(cam.pitch);
+    const yh = cam.pitch > 1.35 ? -1 : cy - Fz * Math.tan(cam.pitch);
     if (yh > 0) {
       const sky = c.createLinearGradient(0, yh - D * 0.7, 0, yh); sky.addColorStop(0, '#3f8fe0'); sky.addColorStop(0.7, '#9fd0f5'); sky.addColorStop(1, '#e3f3fd'); c.fillStyle = sky; c.fillRect(0, 0, D, Math.min(D, yh) + 1);
       /* a low sun ahead, with its light spread wide across the sky */
@@ -3127,8 +3192,8 @@ function siteIntro() {
     }
     /* the ground, one thin strip of the map for each row of the picture */
     for (let y = Math.max(0, Math.floor(yh) + 1); y < D; y += STEP) {
-      const s = (cy - (y + STEP / 2)) / F, dz = -sp + s * cp; if (dz > -0.0005) continue;
-      const t = cam.h / -dz, u = cam.u - t * (cp + s * sp), half = t * (D / 2) / F;
+      const s = (cy - (y + STEP / 2)) / Fz, dz = -sp + s * cp; if (dz > -0.0005) continue;
+      const t = cam.h / -dz, u = cam.u - t * (cp + s * sp), half = t * (D / 2) / Fz;
       c.fillStyle = baseColor(u, cam.v); c.fillRect(0, y, D, STEP);
       const ty = Math.floor((u - U0) * PPU); if (ty < 0 || ty >= TL) continue;
       const sx0 = (cam.v - half - V0) * PPU, sx1 = (cam.v + half - V0) * PPU, a = Math.max(0, sx0), b = Math.min(TW, sx1); if (b - a < 0.01) continue;
@@ -3140,14 +3205,17 @@ function siteIntro() {
     /* under the canopy the forest floor is in shade */
     const shade = clamp((0.36 - cam.h) / 0.2) * clamp((7.4 - cam.u) / 0.6);
     if (shade > 0 && yh < D) { c.fillStyle = `rgba(12,38,20,${0.72 * shade})`; c.fillRect(0, Math.max(0, yh), D, D); }
-    const standing = clamp(1 - (cam.h - 0.9) / 0.9);
+    const standing = clamp(1 - (cam.pitch - 0.45) / 0.5);   // they lie down out of sight as the camera tips to look straight at the ground
     if (standing > 0) {
       c.globalAlpha = standing;
-      for (const tr of trees) {
-        const du = cam.u - tr.u; if (du < 0.1 || du > 9) continue;
-        const dep = z => du * cp - (z - cam.h) * sp, depth = dep(0); if (depth < 0.1) continue;
-        const sc = F / depth, x = cx + (tr.v - cam.v) * sc; if (x < -200 || x > D + 200) continue;
-        const yAt = z => cy - F * (du * sp + (z - cam.h) * cp) / dep(z), far = clamp(depth / 7), tone = (r, g2, b) => `rgb(${Math.round(mix(r, 196, far * 0.62))},${Math.round(mix(g2, 226, far * 0.62))},${Math.round(mix(b, 214, far * 0.62))})`;
+      for (const tr of things) {
+        const du = cam.u - tr.u; if (du < 0.12 || du > (tr.kind === 'm' ? 17 : tr.kind === 'c' ? 11 : 9)) continue;
+        const dep = z => du * cp - (z - cam.h) * sp, depth = dep(0); if (depth < 0.12) continue;
+        const sc = Fz / depth, x = cx + (tr.v - cam.v) * sc, span = (tr.kind === 't' ? tr.r * 2 : tr.w * 1.4) * sc; if (x + span < -40 || x - span > D + 40) continue;
+        const yAt = z => cy - Fz * (du * sp + (z - cam.h) * cp) / dep(z), far = clamp(depth / (tr.kind === 'm' ? 15 : 7)), tone = (r, g2, b) => `rgb(${Math.round(mix(r, 196, far * 0.62))},${Math.round(mix(g2, 226, far * 0.62))},${Math.round(mix(b, 214, far * 0.62))})`;
+        if (tr.kind === 'm') { mountain(c, tr, x, sc, yAt, tone); continue; }
+        if (tr.kind === 'c') { building(c, tr, x, sc, yAt, tone); continue; }
+        if (tr.kind === 'b') { butte(c, tr, x, sc, yAt, tone); continue; }
         if (tr.w) {   // a trunk that narrows toward the top, lit on one side, with its shadow on the ground
           const y0 = yAt(0), y1 = yAt(tr.h * 0.8), w = Math.max(1, tr.w * sc), w1 = w * 0.62;
           if (sc > 60) { c.fillStyle = 'rgba(6,26,14,.22)'; c.beginPath(); c.ellipse(x + tr.r * sc * 0.5, y0, tr.r * sc * 1.1, Math.max(1, tr.r * sc * 0.16), 0, 0, 6.2832); c.fill(); }
@@ -3182,11 +3250,27 @@ function siteIntro() {
   }
   const show = alpha => { g.globalAlpha = alpha; g.drawImage(layer, (W - D) / 2, (H - D) / 2, D, D); g.globalAlpha = 1; };
 
-  /* The flight, in seconds. RUN: backwards along the ground and up. TIP: still backing away and climbing, the camera tips
-     down until it looks straight at the coast. OUT: straight up and away, until the whole turning Earth is in view. */
-  const CUT = 0.22, LEAD = CUT, RUN = 1.9, TIP = 0.7, OUT = 1.3, U_START = 6.55, U_END = 25.6, V_END = 0.25, H0 = 0.036, H1 = 1.6, HX = 6;
-  const runEase = p => 0.1 * p + 0.9 * Math.pow(p, 2.3), RUN_SLOPE = 0.1 + 0.9 * 2.3;   // not zero at the start: the camera is moving from the first frame
-  const tipShare = RUN_SLOPE * TIP / (2 * RUN), U1 = (U_END + U_START * tipShare) / (1 + tipShare), SPEED1 = (U1 - U_START) * RUN_SLOPE / RUN;
+  /* The flight, in seconds. RUN: backwards along the ground, place after place. TIP: still backing away and climbing, the
+     camera tips down until it looks straight at the coast. OUT: straight up and away, until the whole turning Earth is in view.
+     About eight seconds from the tap to the landing. */
+  const CUT = 0.22, LEAD = CUT, RUN = 5.6, TIP = 0.8, OUT = 1.4, U_START = 6.55, U_END = 30.1, V_END = 0.25, H0 = 0.036, H1 = 1.6, HX = 6, SPEED1 = 1.2, U1 = U_END - SPEED1 * TIP / 2;
+  /* a smooth line through a list of points that never overshoots them (so the camera never dips or backs up between two points) */
+  const curve = (ts, ys, m0, m1) => {
+    const n = ts.length, d = [], m = []; for (let i = 0; i < n - 1; i++) d.push((ys[i + 1] - ys[i]) / (ts[i + 1] - ts[i]));
+    m[0] = m0 === undefined ? d[0] : m0; m[n - 1] = m1 === undefined ? d[n - 2] : m1;
+    for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : 2 * d[i - 1] * d[i] / (d[i - 1] + d[i]);
+    return t => { let i = 0; while (i < n - 2 && t > ts[i + 1]) i++; const h = ts[i + 1] - ts[i], x = clamp((t - ts[i]) / h), x2 = x * x, x3 = x2 * x; return (2 * x3 - 3 * x2 + 1) * ys[i] + (x3 - 2 * x2 + x) * h * m[i] + (3 * x2 - 2 * x3) * ys[i + 1] + (x3 - x2) * h * m[i + 1]; };
+  };
+  /* The run, as the moments the camera passes each mark. It never stops: it crosses from place to place very fast, and slows
+     to about a quarter of that speed at each place, so the place can be seen.
+       0.0  in the forest          0.9  out of the trees      (fast)   1.35 into the mountain pass
+       2.25 out of the mountains   (fast)  2.65 over the desert        3.5  the desert's far side
+       (fast) 3.9  the middle of the city  4.8  the city's edge        (fast) 5.2  the shore     5.6  the beach */
+  const KT = [0, 0.9, 1.35, 2.25, 2.65, 3.5, 3.9, 4.8, 5.2, RUN];
+  const uAt = curve(KT, [U_START, 7.7, 12.4, 15.0, 19.6, 21.6, 25.4, 27.5, 29.2, U1], 0.5, SPEED1);
+  const hAt = curve(KT, [H0, 0.42, 1.05, 1.2, 0.7, 0.6, 0.62, 0.9, 1.2, H1], 0.02, 1.2);            // how high: low in the forest, up among the peaks, low over the sand and between the towers
+  const pitchAt = curve(KT, [0, 0.06, 0.1, 0.12, 0.13, 0.14, 0.15, 0.18, 0.21, 0.25], 0, 0.1);      // how far the camera looks down
+  const speedAt = t => (uAt(Math.min(RUN, t + 0.012)) - uAt(Math.max(0, t - 0.012))) / 0.024;
   /* The place the flight ends over is a real spot on the globe: the coast of Bangladesh, land to the north and the Bay of Bengal
      to the south. The last view of the ground is kept as a picture (the decal) that stays glued to that spot as the Earth shrinks and turns. */
   const LAT = 21.4 * Math.PI / 180, ZOOM = 6.8;   // ZOOM: how many screen-diagonals wide the Earth's radius is when the camera starts to leave
@@ -3240,10 +3324,11 @@ function siteIntro() {
       g.drawImage(pic, -DS / 2, -DS / 2); g.restore();
     }
   }
-  /* the wind of the flight is a recording (media/gale.mp3, built by tools/wind_make.py from the organiser's reference sound), fetched
-     while the title screen waits. If it has not arrived or cannot play, the site's own made wind plays instead. */
+  /* the sound of the flight is a recording (media/journey.mp3, built by tools/journey_make.py): the wind from the organiser's
+     reference sound, following the camera's speed and height, with each place's own sound quietly under it. It is fetched
+     while the title screen waits. If it has not arrived or cannot play, the site's own made version plays instead. */
   let windData = null;
-  try { const conn = navigator.connection; if (location.protocol !== 'file:' && !(conn && conn.saveData)) fetch('media/gale.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { windData = b; }).catch(() => {}); } catch (e) { /* no recording */ }
+  try { const conn = navigator.connection; if (location.protocol !== 'file:' && !(conn && conn.saveData)) fetch('media/journey.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { windData = b; }).catch(() => {}); } catch (e) { /* no recording */ }
   /* ---- the title screen: stars, the Earth with a glow round it, two satellites on their orbits, a pin on Dhaka ---- */
   const stars = []; for (let i = 0; i < 90; i++) stars.push([R(), R(), 0.5 + R() * 1.1, R() * 6.28, 0.6 + R() * 1.4]);
   const ORBITS = [{ rx: 1.46, ry: 0.4, tilt: -0.33, speed: 0.55, at: 0.6, color: '154,217,111' }, { rx: 1.78, ry: 0.56, tilt: 0.42, speed: -0.34, at: 3.4, color: '255,255,255' }];
@@ -3274,13 +3359,6 @@ function siteIntro() {
     const d = globe.at(DHAKA, gateRot);
     pin.style.transform = `translate(${(cx + d[0] * Rg).toFixed(1)}px,${(cy + d[1] * Rg).toFixed(1)}px)`; pin.style.opacity = d[2] > 0.25 ? '' : '0';
   }
-  const trailCv = document.createElement('canvas'), trailG = trailCv.getContext('2d'); let trailOn = false;
-  const trail = k => {   // k: how much of the last frame lingers, 0 to about 0.4
-    if (typeof window.__introT === 'number') return;   // frame-by-frame testing: every picture stands alone
-    if (trailCv.width !== cv.width || trailCv.height !== cv.height) { trailCv.width = cv.width; trailCv.height = cv.height; trailOn = false; }
-    if (trailOn && k > 0.01) { g.globalAlpha = k; g.drawImage(trailCv, 0, 0, W, H); g.globalAlpha = 1; }
-    trailG.globalCompositeOperation = 'copy'; trailG.drawImage(cv, 0, 0); trailOn = true;
-  };
   const WISPS = [[-0.9, -0.5, 0.0], [0.8, -0.7, 0.08], [-0.6, 0.8, 0.16], [0.95, 0.45, 0.22], [-0.1, -1, 0.3], [0.3, 0.95, 0.36]];
   const wisps = t => {   // thin cloud between the land and space: soft white shapes that swell and slide off the edges
     const t0 = RUN + TIP * 0.45;
@@ -3307,15 +3385,15 @@ function siteIntro() {
     }
     const t = clock - LEAD;
     if (t < RUN) {
-      /* on the forest floor, and already moving: faster and faster, backwards and up. The forest shrinks away ahead, then river, farmland and desert slide out from under the camera */
-      const p = t / RUN;
-      drawScene({ u: mix(U_START, U1, runEase(p)), v: V_END * p * p, h: H0 * Math.pow(H1 / H0, Math.pow(p, 1.2)), pitch: 0.25 * p * p });
-      show(t < 0.1 ? 1 : 1 - 0.45 * clamp(p * 1.4)); trail(0.34 * clamp(p * 2)); wash(1 - smooth(clamp(t / 0.38)));
+      /* on the forest floor, and already moving backwards. Then, place after place: out over the meadow, through the mountain pass, across the desert, down the city's avenue, out to the shore */
+      const p = t / RUN, fast = clamp((speedAt(t) - 3) / 8);   // fast: 0 at the slow passes, 1 at full speed
+      drawScene({ u: uAt(t), v: V_END * p * p, h: hAt(t), pitch: pitchAt(t), zoom: 1 - 0.1 * fast });
+      show(t < 0.1 ? 1 : 0.9 - 0.42 * fast); wash(1 - smooth(clamp(t / 0.38)));   // at speed each picture keeps part of the one before: the land streaks
     } else if (t < RUN + TIP) {
       /* over the coast, still backing away and climbing, the camera tips down until it looks straight at the ground. It does not turn. */
       const q = (t - RUN) / TIP;
       drawScene({ u: U1 + SPEED1 * TIP * (q - q * q / 2), v: V_END, h: H1 * Math.pow(HX / H1, q), pitch: mix(0.25, Math.PI / 2, smooth(q)) });
-      show(0.55 + 0.45 * q); trail(0.34 * (1 - q * 0.6)); wisps(t);
+      show(0.8 + 0.2 * q); wisps(t);
     } else {
       /* straight up and away. The ground stays on the Earth and shrinks with it; the Earth's edge closes in; the Earth turns. */
       const r = clamp((t - RUN - TIP) / OUT);
