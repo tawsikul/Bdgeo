@@ -376,7 +376,12 @@ details.qa p{padding:0 0 14px;max-width:62ch}
 .form{display:grid;gap:16px}
 .form-2{display:grid;gap:16px}
 @media(min-width:640px){.form-2{grid-template-columns:1fr 1fr}}
-.field{display:grid;gap:6px;min-width:0}
+/* align-content:start keeps a box its own height when the box beside it is taller, so two boxes in a row sit level */
+.field{display:grid;gap:6px;min-width:0;align-content:start}
+.form-2{align-items:start}
+.form-1{display:grid}
+.field input,.field select{height:48px}
+.field input[type=checkbox],.field input[type=radio],.field input[type=file]{height:auto}
 .field label{font-weight:600;font-size:.96rem}
 .field input,.field select,.field textarea{width:100%;min-height:46px;padding:10px 14px;border-radius:10px;border:1px solid #b6c6dc;background:#fff;color:var(--ink);font:inherit}
 .field textarea{resize:vertical}
@@ -2384,6 +2389,10 @@ const PAY_METHODS = ['bKash', 'Nagad', 'Rocket', 'Bank'];
 const taka = n => '৳' + Number(n || 0).toLocaleString('en-IN');
 const SHIRTS = ['S', 'M', 'L', 'XL', 'XXL'];
 
+/* the version a student studies in; older accounts may hold another word, which is shown as it is */
+const VERSIONS = [['Bangla version', 'Bangla Version'], ['English version', 'English Version']];
+const versionName = m => { const v = VERSIONS.find(x => x[0] === m); return v ? v[1] : (m || ''); };
+
 /* ---------- the data layer ----------
    Every page reads and writes through Store. In this preview the data lives in the
    browser. For the real site the same functions will talk to the online database,
@@ -4362,11 +4371,11 @@ const smallPrint = (title, lead, parts) => ({ html: `<div class="wrap">${pageHea
   <section class="sheet prose">${parts.map(([h, ps]) => `<h2>${h}</h2>${ps.map(x => `<p>${x}</p>`).join('')}`).join('')}
     <p class="muted">Last updated 28 November 2026. Questions: <a href="mailto:${ORG.email}">${ORG.email}</a></p></section></div>` });
 PAGES.privacy = () => smallPrint('Privacy Policy', 'What this website keeps about you, and why.', [
-  ['What we keep', ['When you register: your full name, date of birth, school or college, class, a parent\'s contact number, your email, your division and district, and, if you give it, your own contact number. Your password is kept in a scrambled form that nobody, including the organisers, can read.', 'When you sit the E-Regional exam: your answers, your score and the time you took.', 'When you write to the organisers through this website: your message.']],
+  ['What we keep', ['When you register: your full name, date of birth, school or college, class, version (Bangla or English), your email, your division and district, and, if you give it, your contact number. Your password is kept in a scrambled form that nobody, including the organisers, can read.', 'When you sit the E-Regional exam: your answers, your score and the time you took.', 'When you write to the organisers through this website: your message.']],
   ['Why we keep it', ['To run the olympiad: your registration card and admit card, the online exam, attendance on exam day, results, and emails about notices and selection.']],
   ['Who can see it', ['The organisers of the Bangladesh Geography Olympiad, through their admin accounts.', 'Result lists published on this website show the details the organisers choose to publish, such as a name and school.']],
   ['Where it is kept', ['In an online database run for us by Supabase. Emails are sent through Brevo.']],
-  ['Visitor statistics', ['This website loads Google Tag Manager, a tool from Google that the organisers use to count visits and see which pages are opened. Google may set cookies in your browser and receives technical details such as your browser, your device and the pages you open.', 'This website does not send your registration details to it. This website has no adverts.']],
+  ['Visitor statistics', ['This website loads Google Tag Manager and Google Analytics, tools from Google that the organisers use to count visits and see which pages are opened. Google may set cookies in your browser and receives technical details such as your browser, your device and the pages you open.', 'This website does not send your registration details to it. This website has no adverts.']],
   ['Your choices', [`To see, correct or delete your details, write to <a href="mailto:${ORG.email}">${ORG.email}</a> from the email you registered with.`, 'If you are under 18, ask a parent or guardian before you register.']],
 ]);
 PAGES.terms = () => smallPrint('Terms of Use', 'The rules for using this website.', [
@@ -4522,37 +4531,29 @@ async function checkEmail(raw, skipTypo) {
 PAGES.register = () => {
   if (Store.me()) return Store.me().role === 'admin' ? simplePage('You are logged in', 'This is an admin account.', '#admin', 'Open the admin portal') : simplePage('You are logged in', 'Your exams, resources and admit card are in your dashboard.', '#dashboard', 'Open my dashboard');
   if (!Store.db.settings.regOpen) return simplePage('Registration is closed', 'Registration is not open right now. Watch the Notices page for the next dates.', '#notices', 'See notices');
-  /* The organisers' list. Required: name, date of birth, institute, class, a parent's contact number, email, division,
-     district, password. Optional: the student's own number. A red star marks what must be filled in.
+  /* The organisers' list, in rows of two so the boxes sit level. Required: name, date of birth, institution, class, version,
+     division, district, email, password (typed twice). Optional: a contact number.
      (Class is not on their list, but the site needs it: it decides the student's category.) */
   const year = new Date().getFullYear();
-  const groups = [
-    ['About you', [
-      { key: 'name', label: 'Full name', required: true, auto: 'name', help: 'In English, as it should be printed on your certificate.' },
-      { key: 'dob', label: 'Date of birth', type: 'date', required: true, auto: 'bday', min: `${year - 25}-01-01`, max: `${year - 5}-12-31` },
-      { key: 'institution', label: 'Institute (school or college)', required: true },
-      { key: 'klass', label: 'Class', type: 'select', required: true, options: [['', 'Choose your class'], ...CLASSES.map(c => [c, 'Class ' + c])] },
-    ]],
-    ['Contact', [
-      { key: 'guardianPhone', label: "Parent's contact number", type: 'tel', required: true },
-      { key: 'phone', label: 'Your own contact number', type: 'tel', auto: 'tel', help: 'You can leave this empty.' },
-      { key: 'email', label: 'Email', type: 'email', required: true, auto: 'email', help: 'Notices and selection emails go to this address.' },
-    ]],
-    ['Where you live', [
-      { key: 'region', label: 'Division', type: 'select', required: true, options: [['', 'Choose your division'], ...DIVISIONS] },
-      { key: 'district', label: 'District', type: 'select', required: true, options: [['', 'Choose your division first']] },
-    ]],
-    ['Your account', [
-      { key: 'password', label: 'Password', type: 'password', required: true, auto: 'new-password', help: 'At least 8 characters. You log in with your registration number or email, and this password.' },
-    ]],
+  const rows = [
+    [{ key: 'name', label: 'Full Name', required: true, auto: 'name', placeholder: 'In English, as on your certificate' },
+      { key: 'dob', label: 'Date of Birth', type: 'date', required: true, auto: 'bday', min: `${year - 25}-01-01`, max: `${year - 5}-12-31` }],
+    [{ key: 'institution', label: 'Institution', required: true },
+      { key: 'klass', label: 'Class', type: 'select', required: true, options: [['', 'Choose your class'], ...CLASSES.map(c => [c, 'Class ' + c])] }],
+    [{ key: 'medium', label: 'Version', type: 'select', required: true, options: [['', 'Choose your version'], ...VERSIONS] },
+      { key: 'phone', label: 'Contact Number', type: 'tel', auto: 'tel', placeholder: 'Optional' }],
+    [{ key: 'region', label: 'Division', type: 'select', required: true, options: [['', 'Choose your division'], ...DIVISIONS] },
+      { key: 'district', label: 'District', type: 'select', required: true, options: [['', 'Choose your division first']] }],
+    [{ key: 'email', label: 'Email', type: 'email', required: true, auto: 'email', placeholder: 'Notices and selection emails go here' }],
+    [{ key: 'password', label: 'Password', type: 'password', required: true, auto: 'new-password', placeholder: 'At least 8 characters' },
+      { key: 'password2', label: 'Re-enter Password', type: 'password', required: true, auto: 'new-password', placeholder: 'Type it once more' }],
   ];
-  const fields = groups.flatMap(g => g[1]);
+  const fields = rows.flat();
   const previewNote = CLOUD ? '' : '<p class="note">Preview: accounts made here are saved in this browser only. Real sign-up starts when the online database is connected.</p>';
   return {
-    html: `<div class="wrap">${pageHead('Register', 'Fill this in once. Your registration card is ready as soon as you finish.')}
+    html: `<div class="wrap">${pageHead('1st Bangladesh Geography Olympiad 2027', 'Registration Form')}
       <section class="sheet"><form class="form marks" id="reg-form" novalidate>
-        <p class="muted formkey"><span class="req">*</span> must be filled in.</p>
-        ${groups.map(([title, fs]) => `<fieldset class="fset"><legend>${title}</legend><div class="form-2">${fs.map(f => fieldHtml(f, '', 'rg')).join('')}</div></fieldset>`).join('')}
+        ${rows.map(r => `<div class="${r.length > 1 ? 'form-2' : 'form-1'}">${r.map(f => fieldHtml(f, '', 'rg')).join('')}</div>`).join('')}
         <p class="note" id="fee-hint" role="status" hidden></p>
         <div class="note" id="mail-hint" role="alert" hidden></div>
         <p class="err" role="alert" hidden></p>${previewNote}
@@ -4567,7 +4568,7 @@ PAGES.register = () => {
       form.addEventListener('change', showFee);
       form.addEventListener('input', e => { const box = e.target.closest('.bad'); if (box) box.classList.remove('bad'); });
       form.addEventListener('submit', async e => {
-        e.preventDefault(); const vals = readForm(form, fields), btn = $('button[type=submit]', form); vals.password = form.elements.password.value;
+        e.preventDefault(); const vals = readForm(form, fields), btn = $('button[type=submit]', form); vals.password = form.elements.password.value; vals.password2 = form.elements.password2.value;
         const miss = missing(fields, vals); btn.disabled = true;
         const hint = $('#mail-hint', form), label = btn.textContent; let r;
         hint.hidden = true; err.hidden = true;
@@ -4575,6 +4576,8 @@ PAGES.register = () => {
         const flag = key => { const el = form.elements[key], box = el && el.closest('.field, .check'); if (box) { box.classList.add('bad'); el.focus({ preventScroll: true }); box.scrollIntoView({ block: 'center' }); } };
         if (miss) { r = { error: `Please fill in "${miss.label}".` }; flag(miss.key); }
         else if (dobProblem(vals.dob)) { r = { error: dobProblem(vals.dob) }; flag('dob'); }
+        else if (vals.password.length < 8) { r = { error: 'Choose a password with at least 8 characters.' }; flag('password'); }
+        else if (vals.password !== vals.password2) { r = { error: 'The two passwords are not the same. Type the password again in both boxes.' }; flag('password2'); }
         else {
           btn.textContent = 'Checking your email…';
           const chk = await checkEmail(vals.email, form.dataset.keepEmail === vals.email.toLowerCase());
@@ -4829,7 +4832,7 @@ DASH['dashboard-pay'] = () => {
     if (st === 'pending') return `<section class="sheet" data-round="${r}">${head}<p style="margin-top:8px">You sent the details of your <b>${taka(p.amount)}</b> payment on ${fmtDateTime(p.at)}. The organisers are checking it. This usually takes up to a day.</p>
       <dl class="kv" style="margin-top:12px"><dt>Paid by</dt><dd>${esc(p.method)}</dd><dt>From</dt><dd>${esc(p.sender)}</dd><dt>Transaction ID</dt><dd>${esc(p.trx)}</dd></dl>
       <p class="note" style="margin-top:12px">Your ${name} admit card unlocks as soon as the payment is approved. You get a notice here when that happens.</p></section>`;
-    const fields = (nat ? natFields : []).concat(payFields), vals = { certName: u.name, emergency: u.guardianPhone || '', ...(p && p.info ? p.info : {}) };
+    const fields = (nat ? natFields : []).concat(payFields), vals = { certName: u.name, emergency: u.guardianPhone || u.phone || '', ...(p && p.info ? p.info : {}) };
     return `<section class="sheet" data-round="${r}">${head}
       ${st === 'rejected' ? `<div class="note note-bad" style="margin-top:10px"><b>Your last payment was not accepted.</b> ${esc(p.note || 'The organisers could not find it.')} Check the transaction ID and send the details again.</div>` : ''}
       <p style="margin-top:8px">${nat ? `You are selected for the National round. To take your place, fill in this form and pay the fee of <b>${taka(fee)}</b>.` : `Students of ${esc(cardDistrictWords())} sit the Regional round in person. The fee is <b>${taka(fee)}</b>. Your admit card unlocks after it is paid.`}</p>
@@ -4865,16 +4868,17 @@ DASH['dashboard-me'] = () => {
   const u = Store.me();
   return {
     html: `<div class="wrap narrow">${pageHead('My details', 'These details are printed on your admit card.')}
-      ${!u.dob || !u.guardianPhone ? '<div class="note" style="margin-bottom:14px"><b>Some details are missing.</b> Tap Edit details and add your date of birth and a parent\'s contact number.</div>' : ''}
-      <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Registration number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Own contact</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>Institute</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Division</dt><dd>${esc(u.region || 'Not given')}</dd><dt>District</dt><dd>${esc(u.district || 'Not chosen yet')}</dd><dt>Date of birth</dt><dd>${esc(fmtDay(u.dob) || 'Not given')}</dd><dt>Parent's contact</dt><dd>${esc(u.guardianPhone || 'Not given')}</dd><dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
+      ${!u.dob || !u.medium ? '<div class="note" style="margin-bottom:14px"><b>Some details are missing.</b> Tap Edit details and add your date of birth and your version.</div>' : ''}
+      <section class="sheet"><dl class="kv"><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Registration number</dt><dd>${esc(u.regNo)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Contact number</dt><dd>${esc(u.phone || 'Not given')}</dd><dt>Institution</dt><dd>${esc(u.institution)}</dd><dt>Class</dt><dd>Class ${esc(u.klass)} (${esc(u.category)})</dd><dt>Version</dt><dd>${esc(versionName(u.medium) || 'Not given')}</dd><dt>Division</dt><dd>${esc(u.region || 'Not given')}</dd><dt>District</dt><dd>${esc(u.district || 'Not chosen yet')}</dd><dt>Date of birth</dt><dd>${esc(fmtDay(u.dob) || 'Not given')}</dd>${u.guardianPhone ? `<dt>Parent's contact</dt><dd>${esc(u.guardianPhone)}</dd>` : ''}<dt>Registered</dt><dd>${fmtDate(u.createdAt)}</dd></dl>
         <div style="margin-top:16px"><button type="button" class="btn btn-ocean" id="edit-me">${icon('edit', 18)} Edit details</button></div></section>
       <section class="sheet"><h2>Payment</h2>${Store.fees().on ? `<p class="muted" style="margin-top:8px">Fees and your payments are on the Payment page.</p><div style="margin-top:12px"><a class="btn btn-quiet btn-sm" href="#dashboard-pay">${icon('wallet', 16)} Open Payment</a></div>` : '<p class="muted" style="margin-top:8px">There is nothing to pay right now. The organisers will announce any fee in Notices.</p>'}</section>
     </div>`,
     mount(v) {
       $('#edit-me', v).onclick = async () => {
-        const fields = [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Your own contact number', type: 'tel' }, { key: 'institution', label: 'Institute (school or college)', required: true },
+        const fields = [{ key: 'name', label: 'Full Name', required: true }, { key: 'phone', label: 'Contact Number', type: 'tel', placeholder: 'Optional' }, { key: 'institution', label: 'Institution', required: true },
           { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) },
-          { key: 'dob', label: 'Date of birth', type: 'date', required: true }, { key: 'guardianPhone', label: "Parent's contact number", type: 'tel', required: true }]
+          { key: 'medium', label: 'Version', type: 'select', required: true, options: [['', 'Choose your version'], ...VERSIONS] },
+          { key: 'dob', label: 'Date of Birth', type: 'date', required: true }]
           /* the district is chosen once: after that it and its division are fixed, and only the organisers can change them */
           .concat(u.district ? [] : [{ key: 'region', label: 'Division', type: 'select', required: true, options: [['', 'Choose your division'], ...DIVISIONS] }, { key: 'district', label: 'District', type: 'select', required: true, options: districtOptions(u.region), help: 'This can only be set once.' }]);
         const vals = await formDialog({ title: 'Edit my details', fields, values: u, submit: 'Save changes', mount: linkDistrict, intro: u.district ? `Your district is ${u.district}. To change it, write to the organisers.` : '' });
@@ -5127,7 +5131,7 @@ function selectDialog(ids, after) {
 function personDialog(p, after) {
   const tries = Store.all('attempts').filter(a => a.userId === p.id && a.submittedAt);
   const d = openDialog({ title: p.name, html: `
-    <dl class="kv"><dt>Registration no.</dt><dd>${esc(p.regNo)}</dd><dt>Email</dt><dd>${esc(p.email)}</dd><dt>Own contact</dt><dd>${esc(p.phone || 'Not given')}</dd><dt>Parent's contact</dt><dd>${esc(p.guardianPhone || 'Not given')}</dd><dt>School</dt><dd>${esc(p.institution)}</dd>
+    <dl class="kv"><dt>Registration no.</dt><dd>${esc(p.regNo)}</dd><dt>Email</dt><dd>${esc(p.email)}</dd><dt>Contact number</dt><dd>${esc(p.phone || 'Not given')}</dd>${p.guardianPhone ? `<dt>Parent's contact</dt><dd>${esc(p.guardianPhone)}</dd>` : ''}<dt>Institution</dt><dd>${esc(p.institution)}</dd><dt>Version</dt><dd>${esc(versionName(p.medium) || 'Not given')}</dd>
       <dt>Class</dt><dd>Class ${esc(p.klass)} (${esc(p.category)})</dd><dt>Division</dt><dd>${esc(p.region || 'Not given')}</dd><dt>District</dt><dd>${esc(p.district || 'Not chosen yet')}</dd><dt>Date of birth</dt><dd>${esc(fmtDay(p.dob) || 'Not given')}</dd><dt>Registered</dt><dd>${fmtDateTime(p.createdAt)}</dd>
       <dt>Selected for</dt><dd>${(p.selected || []).map(s => esc(s.round)).join(', ') || 'Nothing yet'}</dd>
       <dt>Fees</dt><dd id="pd-fee"></dd>
@@ -5157,7 +5161,7 @@ function personDialog(p, after) {
   $('[data-ed]', d).onclick = async () => {
     const v = await formDialog({ title: 'Edit ' + p.name, submit: 'Save changes', values: p, mount: linkDistrict, fields: [{ key: 'name', label: 'Full name', required: true }, { key: 'phone', label: 'Mobile number', type: 'tel' }, { key: 'institution', label: 'School or college', required: true },
       { key: 'klass', label: 'Class', type: 'select', options: CLASSES.map(c => [c, 'Class ' + c]) }, { key: 'region', label: 'Division', type: 'select', options: DIVISIONS }, { key: 'district', label: 'District', type: 'select', options: districtOptions(p.region, p.district) },
-      { key: 'dob', label: 'Date of birth', type: 'date' }, { key: 'guardianPhone', label: "Parent's contact number", type: 'tel' }] });
+      { key: 'dob', label: 'Date of birth', type: 'date' }, { key: 'medium', label: 'Version', type: 'select', options: [['', 'Not given'], ...VERSIONS, ...(p.medium && !VERSIONS.some(x => x[0] === p.medium) ? [[p.medium, p.medium]] : [])] }] });
     if (v) busy(null, async () => { await Store.updateUser(p.id, v); d.close(); toast('Changes saved', 'good'); after(); });
   };
   const un = $('[data-unsel]', d); if (un) un.onclick = () => busy(un, async () => { for (const s of (p.selected || []).slice()) await Store.unselect([p.id], s.round); d.close(); toast('Selection cleared'); after(); });
@@ -5203,8 +5207,8 @@ ADMIN['admin-people'] = main => {
   $('#p-mark', main).onclick = () => selectDialog([...picked], () => { picked.clear(); draw(); });
   $('#p-csv', main).onclick = () => {
     const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
-    const lines = [['Registration no', 'Name', 'Email', 'Own contact', 'School', 'Class', 'Category', 'Region', 'District', 'Date of birth', 'Parent contact', 'Registered', 'Selected for', 'Regional fee', 'National fee'].map(q).join(',')]
-      .concat(shown().map(p => [p.regNo, p.name, p.email, p.phone, p.institution, p.klass, p.category, p.region, p.district || '', p.dob || '', p.guardianPhone || '', fmtDateTime(p.createdAt), (p.selected || []).map(s => s.round).join('; '), feeWord(p, 'regional'), feeWord(p, 'national')].map(q).join(',')));
+    const lines = [['Registration no', 'Name', 'Email', 'Contact number', 'Institution', 'Class', 'Version', 'Category', 'Region', 'District', 'Date of birth', 'Parent contact', 'Registered', 'Selected for', 'Regional fee', 'National fee'].map(q).join(',')]
+      .concat(shown().map(p => [p.regNo, p.name, p.email, p.phone, p.institution, p.klass, versionName(p.medium), p.category, p.region, p.district || '', p.dob || '', p.guardianPhone || '', fmtDateTime(p.createdAt), (p.selected || []).map(s => s.round).join('; '), feeWord(p, 'regional'), feeWord(p, 'national')].map(q).join(',')));
     saveAndTell('bgeo-participants.csv', new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv' }));
   };
   draw();
