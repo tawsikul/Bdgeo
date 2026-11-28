@@ -588,12 +588,6 @@ pre.eg{margin:0;padding:12px;border-radius:12px;background:var(--foam);font:.86r
 @media(max-height:520px){.gate{bottom:22px;gap:8px;grid-auto-flow:column;justify-content:center;align-items:center}.gate-ring{width:34px;height:34px}.gate-ring::before{inset:10px}.gate-title{top:16px;width:min(40vw,30vh,240px)}}
 .intro.skipping{opacity:0;pointer-events:none;transition:opacity .22s}
 .intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-/* the filmed flight sits under the canvas: the title screen fades off it, and the canvas comes back for the landing */
-.intro video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none}
-.intro.video video{opacity:1}
-.intro.video canvas{opacity:0;transition:opacity .22s linear}
-.intro.video.out canvas{opacity:1;transition:none}
-.intro.video.out video{opacity:0}
 .intro-skip{position:absolute;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.72);font-size:.9rem;font-weight:500;pointer-events:none;transition:opacity .2s}
 .intro.landing .intro-skip,.intro:not(.going) .intro-skip{opacity:0}
 body.intro-on{overflow:hidden}
@@ -2250,35 +2244,16 @@ const Sound = (() => {
     bad(now) { tone(now, { f: 233, f2: 150, t: 0.24, g: 0.18, type: 'triangle', attack: 0.004 }); tone(now, { f: 466, f2: 300, t: 0.2, g: 0.07, attack: 0.004 }); },
     tick(now) { air(now, { t: 0.03, f: 3200, q: 4, g: 0.16, peak: 0 }); },
     win(now) { [523, 659, 784].forEach((f, i) => tone(now, { f, t: 0.26, g: 0.16, at: i * 0.1, attack: 0.004 })); bell(now, { f: 1047, t: 0.7, g: 0.18, depth: 500, at: 0.3 }); },
-    /* The opening, 4.1 seconds, in step with the picture. Its weight sits between 300 and 3000 Hz, where a phone's speaker
-       is strong; the deep notes underneath are for headphones and bigger speakers.
-       0.0   the tap: a soft pop, and a breath of air as the screen cuts to the forest
-       0.2   on the forest floor: leaves rustle, birds call
-       0.2 to 2.1   the flight out: wind builds as the land streams away, with a note rising under it
-       2.1 to 4.1   the climb to space: the wind thins and falls away, a clear high note rises toward the landing chime */
+    /* The opening: 4.1 seconds of hard, steady wind, as heard from something moving very fast. No sweeps and no whooshes:
+       the wind is there from the tap, gusts a little, and only thins out as the Earth settles. Layers of noise:
+       a broad roar (the body of the wind), a low rumble (for bigger speakers), a thin high whistle that wavers, and hiss.
+       The recorded wind (media/wind.mp3) plays on top of this when it has loaded. */
     opening(now) {
-      tone(now, { f: 620, f2: 240, t: 0.12, g: 0.24, attack: 0.003 }); air(now, { t: 0.05, f: 1400, q: 1, g: 0.14, peak: 0 });
-      air(now, { t: 0.28, f: 4200, f2: 700, q: 0.8, g: 0.16, peak: 0.6 });
-      air(now, { t: 1.4, f: 5200, f2: 4400, q: 0.6, g: 0.035, at: 0.2, peak: 0.2 });
-      bird(now, 0.32, 2500, 3, 0.07); bird(now, 0.74, 3100, 2, 0.055); bird(now, 1.14, 2250, 2, 0.045);
-      /* the wind of the flight, as one breath: rising with the speed, held while the camera tips, thinning on the way to space */
-      path(now, { q: 0.6, pts: [[0.2, 0, 480], [0.34, 0.03, 520], [1.0, 0.08, 900], [1.9, 0.2, 2300], [2.7, 0.17, 2000], [3.3, 0.07, 1000], [4.1, 0, 320]] });
-      path(now, { wave: 'triangle', pts: [[0.2, 0, 196], [0.34, 0.02, 196], [1.9, 0.07, 392], [2.7, 0.06, 392], [3.4, 0.025, 262], [4.1, 0, 196]] });
-      path(now, { wave: 'sine', pts: [[0.2, 0, 73], [0.34, 0.03, 73], [1.9, 0.1, 147], [2.7, 0.09, 147], [4.1, 0, 49]] });
-      /* a clear note rising toward the landing chime */
-      path(now, { wave: 'sine', pts: [[2.82, 0, 660], [3.0, 0.012, 680], [3.85, 0.05, 960], [4.12, 0, 988]] });
-    },
-    /* what the site adds to the recorded wind of the filmed opening: the tap's pop and breath, two bird calls in the forest,
-       a whoosh as each place rushes past (the passes, centred on 0.97 and 1.57 s), a longer rush for the roll into cloud
-       (from 2.2 s), and a clear note rising toward the landing chime */
-    enter(now) {
-      tone(now, { f: 620, f2: 240, t: 0.12, g: 0.24, attack: 0.003 }); air(now, { t: 0.05, f: 1400, q: 1, g: 0.14, peak: 0 });
-      air(now, { t: 0.28, f: 4200, f2: 700, q: 0.8, g: 0.16, peak: 0.6 });
-      air(now, { t: 0.7, f: 5200, f2: 4400, q: 0.6, g: 0.04, at: 0.1, peak: 0.2 });
-      bird(now, 0.22, 2500, 3, 0.08); bird(now, 0.56, 3100, 2, 0.06);
-      [0.97, 1.57].forEach((t, i) => { air(now, { t: 0.4, f: 480 + i * 80, f2: 3800 + i * 400, q: 0.9, g: 0.2, at: t - 0.2, peak: 0.5 }); tone(now, { f: 240, f2: 90, t: 0.3, g: 0.11, at: t - 0.12, peak: 0.35 }); });
-      air(now, { t: 0.7, f: 700, f2: 4600, q: 0.8, g: 0.17, at: 2.2, peak: 0.75 });
-      path(now, { wave: 'sine', pts: [[2.8, 0, 660], [3.0, 0.012, 680], [3.6, 0.05, 960], [3.87, 0, 988]] });
+      tone(now, { f: 520, f2: 200, t: 0.09, g: 0.16, attack: 0.003 });   // the tap itself
+      path(now, { q: 0.5, pts: [[0, 0.02, 700], [0.12, 0.2, 800], [0.5, 0.17, 950], [0.9, 0.22, 780], [1.35, 0.18, 1050], [1.8, 0.23, 880], [2.3, 0.2, 1150], [2.8, 0.22, 900], [3.3, 0.15, 800], [3.75, 0.06, 620], [4.15, 0, 420]] });
+      path(now, { q: 0.6, pts: [[0, 0.02, 190], [0.15, 0.22, 210], [0.8, 0.18, 240], [1.6, 0.23, 200], [2.5, 0.2, 250], [3.3, 0.14, 210], [4.1, 0, 150]] });
+      path(now, { q: 7, pts: [[0.05, 0, 1500], [0.3, 0.05, 1650], [0.8, 0.035, 1500], [1.3, 0.06, 1850], [1.9, 0.04, 1600], [2.5, 0.06, 2000], [3.1, 0.035, 1700], [3.8, 0, 1400]] });
+      path(now, { q: 0.8, pts: [[0.05, 0, 3600], [0.3, 0.07, 3900], [1.5, 0.09, 4300], [2.8, 0.07, 3800], [3.7, 0, 3200]] });
     },
     /* a tsunami: a deep surge that swells, breaks and hisses away */
     wave(now) { air(now, { t: 1.05, f: 180, fm: 1300, f2: 300, q: 0.9, g: 0.2, type: 'lowpass', peak: 0.45 }); air(now, { t: 0.7, f: 2400, f2: 5200, q: 0.9, g: 0.06, at: 0.38, peak: 0.25 }); tone(now, { f: 58, f2: 40, t: 0.9, g: 0.16, peak: 0.3 }); },
@@ -2287,7 +2262,7 @@ const Sound = (() => {
   };
   function play(name) { if (!on || !ctx || !lib[name]) return; try { if (ctx.state === 'suspended') ctx.resume().catch(() => {}); lib[name](ctx.currentTime + 0.005); } catch (e) { /* never let a sound break the page */ } }
   function toggle() { on = !on; try { localStorage.setItem('bgeo-sound', on ? 'on' : 'off'); } catch (e) {} if (on && ensure()) play('pick'); return on; }
-  /* a recorded sound (the wind of the filmed opening). `data` is the file's bytes, fetched ahead of time; it is unpacked and
+  /* a recorded sound (the wind of the opening). `data` is the file's bytes, fetched ahead of time; it is unpacked and
      started here, skipping however long the unpacking took so it stays in step with the picture. */
   async function clip(data, g = 0.7) {
     if (!on || !ctx || !data) return; const t0 = performance.now();
@@ -3046,14 +3021,8 @@ function paintEarth(g, W, H) {
 /* ---------- entry animations ----------
    Opening the site: a title screen first. The Earth turns in the middle with a pin on Dhaka, satellites circle it, the
    olympiad's lettering sits above and "Tap to enter" below. A tap cuts straight to the forest: no zoom into the globe.
-   The flight itself is a short film (media/intro-wide.mp4, or intro-tall.mp4 on an upright screen), cut by
-   tools/film_edit.py. The camera only ever travels: a level, backward run through the forest; the forest slides away
-   in a streak of speed and farmland comes in from behind the camera; the same again into the desert coast; then one
-   unbroken stretch along the coast and out over the sea; then a roll to the left into cloud. In the cloud the film hands over to
-   the site's own Earth, which finishes the roll, pulls away, turns, and settles into its place on the page. The film's
-   wind is media/intro.mp3.
-   If the film has not loaded by the time of the tap (or cannot play), the same journey is drawn instead:
-   the camera starts inside a forest, a few feet above the ground, looking
+   The flight is drawn by the site itself (a filmed version was tried and taken out: it looked machine-made).
+   The camera starts inside a forest, a few feet above the ground, looking
    straight down a path between the trunks, and it is already moving. In one unbroken movement
    it flies backwards and up, so everything streams away in front of it: the forest shrinks,
    then a river, farmland, desert and a coast slide out from under the camera. It never turns
@@ -3074,12 +3043,12 @@ function siteIntro() {
   /* The title screen waits for a tap; the tap is also what lets the browser play sound. Then a quick wash of leaf-light
      cuts to the forest floor and the flight out begins. */
   const el = document.createElement('div'); el.className = 'intro';
-  el.innerHTML = `<video muted playsinline preload="auto" aria-hidden="true" tabindex="-1" disablepictureinpicture></video><canvas aria-hidden="true"></canvas><div class="gate-ui"><div class="gate-title" aria-hidden="true">${heroMark('gm', 'gate-mark')}</div>
+  el.innerHTML = `<canvas aria-hidden="true"></canvas><div class="gate-ui"><div class="gate-title" aria-hidden="true">${heroMark('gm', 'gate-mark')}</div>
     <div class="gate-pin" aria-hidden="true"><i></i><span><b>Dhaka</b>23.8° N, 90.4° E</span></div>
     <i class="gate-corner tl"></i><i class="gate-corner tr"></i><i class="gate-corner bl"></i><i class="gate-corner br"></i>
     <p class="gate" role="button" tabindex="0"><i class="gate-ring" aria-hidden="true"></i>Tap to enter</p></div><p class="intro-skip">Tap to skip</p>`;
   document.body.appendChild(el); document.body.classList.add('intro-on', 'intro-globe');
-  const cv = el.querySelector('canvas'), vid = el.querySelector('video'), gate = el.querySelector('.gate'), gateUi = el.querySelector('.gate-ui'), pin = el.querySelector('.gate-pin'), g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+  const cv = el.querySelector('canvas'), gate = el.querySelector('.gate'), gateUi = el.querySelector('.gate-ui'), pin = el.querySelector('.gate-pin'), g = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 1.25);
   /* the ground is drawn on a square sheet as wide as the screen's diagonal, then laid onto the screen */
   const layer = document.createElement('canvas'), lg = layer.getContext('2d'), decal = document.createElement('canvas');
   let W = 0, H = 0, D = 0, F = 0, DS = 0;
@@ -3115,8 +3084,17 @@ function siteIntro() {
     for (let i = 0; i < 6200; i++) { const v = V0 + R() * 16, u = U0 + R() * (eJungle(v) - U0 - 0.08); crowns.push([px(v), py(u), (0.09 + R() * 0.07) * PPU, Math.floor(R() * 5)]); }
     crowns.forEach(t => { c.fillStyle = TREE[t[3]]; c.beginPath(); c.arc(t[0], t[1], t[2], 0, 6.2832); c.fill(); });
     crowns.forEach(t => { c.fillStyle = LIGHT[t[3]]; c.beginPath(); c.arc(t[0] - t[2] * 0.25, t[1] - t[2] * 0.28, t[2] * 0.5, 0, 6.2832); c.fill(); });
+    /* real land is never one flat colour: broad patches of lighter and darker ground, then a fine grain, laid softly over everything */
+    const mottle = (cell, strength) => {
+      const n = document.createElement('canvas'); n.width = Math.ceil(TW / cell); n.height = Math.ceil(TL / cell); const nc = n.getContext('2d'), im = nc.createImageData(n.width, n.height);
+      for (let i = 0; i < im.data.length; i += 4) { const k = 90 + Math.floor(R() * 150); im.data[i] = k; im.data[i + 1] = k; im.data[i + 2] = k; im.data[i + 3] = 255; }
+      nc.putImageData(im, 0, 0); c.save(); c.globalCompositeOperation = 'soft-light'; c.globalAlpha = strength; c.imageSmoothingEnabled = true; c.drawImage(n, 0, 0, TW, TL); c.restore();
+    };
+    mottle(56, 0.6); mottle(14, 0.38); mottle(3, 0.22);
   })();
   const baseColor = (u, v) => (u < eJungle(v) ? '#1d6b34' : u < eDry(v) ? '#8fcf62' : u < eCoast(v) ? '#dcc083' : u < eBeach(v) ? '#7dc65b' : u < eBeach(v) + 0.4 ? '#f3e6b4' : u < eBeach(v) + 1.7 ? '#5dc9d6' : SEA);
+  /* clouds near the horizon: [sideways, height above the horizon, width (all in screen diagonals), puffs] */
+  const CLOUDS = [[-0.34, 0.035, 0.07], [-0.08, 0.06, 0.05], [0.16, 0.03, 0.08], [0.4, 0.055, 0.06], [0.62, 0.028, 0.05], [-0.58, 0.05, 0.06]].map(cl => [...cl, [[-0.5, 0.12, 0.55], [0, 0, 0.75], [0.5, 0.1, 0.6], [0.15, -0.2, 0.5]]]);
   /* trees that stand up, for the part of the journey spent inside and just above the forest */
   const trees = [];
   for (let i = 0; i < 900; i++) { const v = -5 + R() * 10, u = 0.3 + R() * 7; if (Math.abs(v) < 0.3) continue; trees.push({ u, v, h: 0.27 + R() * 0.15, w: 0.014 + R() * 0.013, r: 0.09 + R() * 0.06, k: R() }); }
@@ -3132,6 +3110,11 @@ function siteIntro() {
       /* a low sun ahead, with its light spread wide across the sky */
       const sx = cx - D * 0.17, sy = yh - D * 0.045, sun = c.createRadialGradient(sx, sy, 0, sx, sy, D * 0.44); sun.addColorStop(0, 'rgba(255,252,236,.98)'); sun.addColorStop(0.07, 'rgba(255,244,208,.7)'); sun.addColorStop(0.3, 'rgba(255,238,196,.22)'); sun.addColorStop(1, 'rgba(255,238,196,0)');
       c.fillStyle = sun; c.fillRect(0, 0, D, Math.min(D, yh) + 1);
+      /* a few soft clouds lying low over the horizon; they slide sideways a little as the camera drifts */
+      for (const cl of CLOUDS) {
+        const x = cx + (cl[0] - cam.v * 0.02) * D, y = yh - cl[1] * D, w = cl[2] * D;
+        for (const [ox, oy, k] of cl[3]) { const r = w * k, cg = c.createRadialGradient(x + ox * w, y + oy * w, 0, x + ox * w, y + oy * w, r); cg.addColorStop(0, 'rgba(255,255,255,.75)'); cg.addColorStop(0.6, 'rgba(255,255,255,.28)'); cg.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = cg; c.fillRect(x + ox * w - r, y + oy * w - r, r * 2, r * 2); }
+      }
     }
     /* the ground, one thin strip of the map for each row of the picture */
     for (let y = Math.max(0, Math.floor(yh) + 1); y < D; y += STEP) {
@@ -3143,7 +3126,7 @@ function siteIntro() {
       const k = D / (sx1 - sx0); c.drawImage(ground, a, ty, b - a, 1, (a - sx0) * k, y, (b - a) * k, STEP);
     }
     if (yh > 0 && yh < D) {
-      const fog = clamp(1 - cam.pitch / 0.9), hz = c.createLinearGradient(0, yh, 0, yh + D * 0.17); hz.addColorStop(0, `rgba(218,238,250,${0.92 * fog})`); hz.addColorStop(1, 'rgba(218,238,250,0)'); c.fillStyle = hz; c.fillRect(0, yh, D, D * 0.17);
+      const fog = clamp(1 - cam.pitch / 0.9), hz = c.createLinearGradient(0, yh, 0, yh + D * 0.3); hz.addColorStop(0, `rgba(218,238,250,${0.94 * fog})`); hz.addColorStop(0.4, `rgba(218,238,250,${0.42 * fog})`); hz.addColorStop(1, 'rgba(218,238,250,0)'); c.fillStyle = hz; c.fillRect(0, yh, D, D * 0.3);   // air thickens with distance
     }
     /* under the canopy the forest floor is in shade */
     const shade = clamp((0.36 - cam.h) / 0.2) * clamp((7.4 - cam.u) / 0.6);
@@ -3156,12 +3139,14 @@ function siteIntro() {
         const dep = z => du * cp - (z - cam.h) * sp, depth = dep(0); if (depth < 0.1) continue;
         const sc = F / depth, x = cx + (tr.v - cam.v) * sc; if (x < -200 || x > D + 200) continue;
         const yAt = z => cy - F * (du * sp + (z - cam.h) * cp) / dep(z), far = clamp(depth / 7), tone = (r, g2, b) => `rgb(${Math.round(mix(r, 196, far * 0.62))},${Math.round(mix(g2, 226, far * 0.62))},${Math.round(mix(b, 214, far * 0.62))})`;
-        if (tr.w) {   // a trunk that narrows toward the top, lit on one side
+        if (tr.w) {   // a trunk that narrows toward the top, lit on one side, with its shadow on the ground
           const y0 = yAt(0), y1 = yAt(tr.h * 0.8), w = Math.max(1, tr.w * sc), w1 = w * 0.62;
+          if (sc > 60) { c.fillStyle = 'rgba(6,26,14,.22)'; c.beginPath(); c.ellipse(x + tr.r * sc * 0.5, y0, tr.r * sc * 1.1, Math.max(1, tr.r * sc * 0.16), 0, 0, 6.2832); c.fill(); }
           c.fillStyle = tone(70, 50, 34); c.beginPath(); c.moveTo(x - w / 2, y0); c.lineTo(x + w / 2, y0); c.lineTo(x + w1 / 2, y1); c.lineTo(x - w1 / 2, y1); c.closePath(); c.fill();
           c.fillStyle = tone(104, 78, 52); c.beginPath(); c.moveTo(x - w / 2, y0); c.lineTo(x - w * 0.18, y0); c.lineTo(x - w1 * 0.18, y1); c.lineTo(x - w1 / 2, y1); c.closePath(); c.fill();
         }
         const yc = yAt(tr.h), r = tr.r * sc, dark = tr.w ? [24 + tr.k * 22, 104 + tr.k * 36, 50] : [34, 124 + tr.k * 30, 58];
+        c.fillStyle = tone(dark[0] * 0.62, dark[1] * 0.7, dark[2] * 0.7); c.beginPath(); c.arc(x + r * 0.08, yc + r * 0.42, r * 0.92, 0, 6.2832); c.fill();   // the shaded underside of the crown
         c.fillStyle = tone(dark[0], dark[1], dark[2]); for (const [ox, oy, k] of [[-0.55, 0.25, 0.8], [0.6, 0.2, 0.85], [0, -0.2, 1]]) { c.beginPath(); c.arc(x + r * ox, yc + r * oy, r * k, 0, 6.2832); c.fill(); }
         c.fillStyle = tone(dark[0] + 26, dark[1] + 34, dark[2] + 24); c.beginPath(); c.arc(x - r * 0.2, yc - r * 0.42, r * 0.55, 0, 6.2832); c.fill();
       }
@@ -3169,7 +3154,17 @@ function siteIntro() {
     }
     /* leaves overhead while the camera is still below the treetops */
     const roof = clamp((0.3 - cam.h) / 0.14);
-    if (roof > 0) { const top = cy - D * 0.5, rg = c.createLinearGradient(0, top, 0, cy - D * 0.08); rg.addColorStop(0, `rgba(10,44,22,${0.9 * roof})`); rg.addColorStop(1, 'rgba(10,44,22,0)'); c.fillStyle = rg; c.fillRect(0, 0, D, cy); }
+    if (roof > 0) {
+      const top = cy - D * 0.5, rg = c.createLinearGradient(0, top, 0, cy - D * 0.08); rg.addColorStop(0, `rgba(10,44,22,${0.9 * roof})`); rg.addColorStop(1, 'rgba(10,44,22,0)'); c.fillStyle = rg; c.fillRect(0, 0, D, cy);
+      /* sunlight slanting down between the trunks */
+      for (const [bx, bw] of [[-0.2, 0.05], [0.02, 0.035], [0.2, 0.045]]) {
+        /* each shaft is three soft layers, widest and faintest first, so it has no hard edge */
+        for (const [grow, al] of [[1.9, 0.035], [1.3, 0.045], [0.7, 0.05]]) {
+          const w = bw * grow * D, x0 = cx + bx * D - (w - bw * D) / 2, sg = c.createLinearGradient(0, cy - D * 0.36, 0, cy + D * 0.16); sg.addColorStop(0, `rgba(255,250,214,${al * roof})`); sg.addColorStop(0.7, `rgba(255,250,214,${al * 0.5 * roof})`); sg.addColorStop(1, 'rgba(255,250,214,0)');
+          c.fillStyle = sg; c.beginPath(); c.moveTo(x0, cy - D * 0.42); c.lineTo(x0 + w, cy - D * 0.42); c.lineTo(x0 + w + 0.1 * D, cy + D * 0.16); c.lineTo(x0 + 0.1 * D, cy + D * 0.16); c.closePath(); c.fill();
+        }
+      }
+    }
   }
   function drawSky(a) {
     if (a <= 0) return;
@@ -3236,23 +3231,9 @@ function siteIntro() {
       g.drawImage(pic, -DS / 2, -DS / 2); g.restore();
     }
   }
-  /* ---- the film. It is fetched whole while the title screen waits, so that it starts the instant the screen is tapped.
-          VCUT: the moment in the film when the picture has gone to cloud-white. V_R0: how far into its pull-away the site's
-          own Earth is when it appears out of that cloud. ---- */
-  const VCUT = 2.84, V_R0 = 0.34, V_ROLL = 0.5, MEDIA = 'media/';   // V_ROLL: seconds the site's Earth takes to finish the film's roll
-  let vidOK = false, mode = 'canvas', vOut = false, washT = 0, windData = null, lastVt = -1, stall = 0;
-  (function loadFilm() {
-    const conn = navigator.connection; if (conn && conn.saveData) return;   // the visitor asked to save data: draw the journey instead
-    const file = MEDIA + (window.innerWidth / window.innerHeight < 0.8 ? 'intro-tall.mp4' : 'intro-wide.mp4');
-    const direct = () => { try { vid.addEventListener('canplaythrough', () => { vidOK = true; }, { once: true }); vid.src = file; vid.load(); } catch (e) { /* no film */ } };
-    try {
-      vid.muted = true;
-      if (location.protocol === 'file:') { direct(); return; }   // opened straight from a folder: fetching is not allowed there
-      fetch(file).then(r => { if (!r.ok) throw 0; return r.blob(); }).then(b => { vid.addEventListener('loadeddata', () => { vidOK = true; }, { once: true }); vid.src = URL.createObjectURL(b); vid.load(); }).catch(direct);
-      fetch(MEDIA + 'intro.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { windData = b; }).catch(() => {});
-    } catch (e) { direct(); }
-  })();
-  const toDrawn = () => { if (mode !== 'video' || vOut || finished) return; mode = 'canvas'; clock = 0; el.classList.remove('video'); Sound.hush(); Sound.play('opening'); };
+  /* the wind of the flight is a recording (media/wind.mp3), fetched while the title screen waits. Without it the site's own made wind still plays. */
+  let windData = null;
+  try { const conn = navigator.connection; if (location.protocol !== 'file:' && !(conn && conn.saveData)) fetch('media/wind.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { windData = b; }).catch(() => {}); } catch (e) { /* no recording */ }
   /* ---- the title screen: stars, the Earth with a glow round it, two satellites on their orbits, a pin on Dhaka ---- */
   const stars = []; for (let i = 0; i < 90; i++) stars.push([R(), R(), 0.5 + R() * 1.1, R() * 6.28, 0.6 + R() * 1.4]);
   const ORBITS = [{ rx: 1.46, ry: 0.4, tilt: -0.33, speed: 0.55, at: 0.6, color: '154,217,111' }, { rx: 1.78, ry: 0.56, tilt: 0.42, speed: -0.34, at: 3.4, color: '255,255,255' }];
@@ -3283,6 +3264,22 @@ function siteIntro() {
     const d = globe.at(DHAKA, gateRot);
     pin.style.transform = `translate(${(cx + d[0] * Rg).toFixed(1)}px,${(cy + d[1] * Rg).toFixed(1)}px)`; pin.style.opacity = d[2] > 0.25 ? '' : '0';
   }
+  const trailCv = document.createElement('canvas'), trailG = trailCv.getContext('2d'); let trailOn = false;
+  const trail = k => {   // k: how much of the last frame lingers, 0 to about 0.4
+    if (typeof window.__introT === 'number') return;   // frame-by-frame testing: every picture stands alone
+    if (trailCv.width !== cv.width || trailCv.height !== cv.height) { trailCv.width = cv.width; trailCv.height = cv.height; trailOn = false; }
+    if (trailOn && k > 0.01) { g.globalAlpha = k; g.drawImage(trailCv, 0, 0, W, H); g.globalAlpha = 1; }
+    trailG.globalCompositeOperation = 'copy'; trailG.drawImage(cv, 0, 0); trailOn = true;
+  };
+  const WISPS = [[-0.9, -0.5, 0.0], [0.8, -0.7, 0.08], [-0.6, 0.8, 0.16], [0.95, 0.45, 0.22], [-0.1, -1, 0.3], [0.3, 0.95, 0.36]];
+  const wisps = t => {   // thin cloud between the land and space: soft white shapes that swell and slide off the edges
+    const t0 = RUN + TIP * 0.45;
+    for (const [dx, dy, late] of WISPS) {
+      const p = (t - t0 - late) / 0.62; if (p <= 0 || p >= 1) continue;
+      const x = W / 2 + dx * W * (0.12 + 0.75 * p), y = H / 2 + dy * H * (0.12 + 0.75 * p), r = Math.max(W, H) * (0.16 + 0.5 * p), a = 0.5 * sin(Math.PI * p);
+      const cg = g.createRadialGradient(x, y, 0, x, y, r); cg.addColorStop(0, `rgba(255,255,255,${a})`); cg.addColorStop(0.55, `rgba(255,255,255,${a * 0.4})`); cg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = cg; g.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+  };
   const wash = a => { if (a > 0) { g.fillStyle = `rgba(226,244,206,${a})`; g.fillRect(0, 0, W, H); } };   // the light between the leaves
   function frame(now) {
     if (finished) return; raf = requestAnimationFrame(frame);
@@ -3294,12 +3291,6 @@ function siteIntro() {
       idle += dt; gateRot = -0.5 + 0.26 * sin(idle * 0.45);
       drawGate(); return;
     }
-    if (mode === 'video' && !vOut) {
-      /* the film is playing under the canvas. When it reaches the cloud (or stops for any reason) the site's Earth takes over. */
-      const vt = vid.currentTime; stall = vt === lastVt ? stall + dt : 0; lastVt = vt;
-      if (vt >= VCUT || vid.ended || stall > 0.9) { vOut = true; el.classList.add('out'); clock = LEAD + RUN + TIP + OUT * V_R0; } else return;
-    }
-    if (vOut) { washT += dt; const k = 1 - smooth(clamp(washT / V_ROLL)); cv.style.transform = k > 0.001 ? `rotate(${(-16 * k).toFixed(2)}deg) scale(${(1 + 0.62 * k).toFixed(3)})` : ''; }
     if (clock < CUT) {
       /* the cut: a quick wash of light, and the forest is there */
       drawGate(); wash(smooth(clock / CUT)); return;
@@ -3309,12 +3300,12 @@ function siteIntro() {
       /* on the forest floor, and already moving: faster and faster, backwards and up. The forest shrinks away ahead, then river, farmland and desert slide out from under the camera */
       const p = t / RUN;
       drawScene({ u: mix(U_START, U1, runEase(p)), v: V_END * p * p, h: H0 * Math.pow(H1 / H0, Math.pow(p, 1.2)), pitch: 0.25 * p * p });
-      show(t < 0.1 ? 1 : 1 - 0.45 * clamp(p * 1.4)); wash(1 - smooth(clamp(t / 0.38)));
+      show(t < 0.1 ? 1 : 1 - 0.45 * clamp(p * 1.4)); trail(0.34 * clamp(p * 2)); wash(1 - smooth(clamp(t / 0.38)));
     } else if (t < RUN + TIP) {
       /* over the coast, still backing away and climbing, the camera tips down until it looks straight at the ground. It does not turn. */
       const q = (t - RUN) / TIP;
       drawScene({ u: U1 + SPEED1 * TIP * (q - q * q / 2), v: V_END, h: H1 * Math.pow(HX / H1, q), pitch: mix(0.25, Math.PI / 2, smooth(q)) });
-      show(0.55 + 0.45 * q);
+      show(0.55 + 0.45 * q); trail(0.34 * (1 - q * 0.6)); wisps(t);
     } else {
       /* straight up and away. The ground stays on the Earth and shrinks with it; the Earth's edge closes in; the Earth turns. */
       const r = clamp((t - RUN - TIP) / OUT);
@@ -3326,8 +3317,8 @@ function siteIntro() {
       else { spin += (2.4 - spin) * Math.min(1, dt * 2); extra += dt * spin; rot = TURN[64] + extra; }
       /* the camera follows the place it left, then lets go and the globe moves to its place on the page */
       const go = target ? smooth(clamp((r - 0.5) / 0.5)) * b : 0, bx = target ? mix(W / 2, target.x, go) : W / 2, by = target ? mix(H / 2, target.y, go) : H / 2;
-      drawOrbit(Rg, rot, bx, by, 1 - smooth(clamp(r / 0.6)), 1 - Math.min(smooth(clamp((r - 0.72) / 0.28)), b), vOut ? null : decal, 1);
-      if (vOut) { const a = 1 - smooth(clamp(washT / 0.6)); if (a > 0) { g.fillStyle = `rgba(238,243,246,${a})`; g.fillRect(0, 0, W, H); } }   // out of the cloud
+      drawOrbit(Rg, rot, bx, by, 1 - smooth(clamp(r / 0.6)), 1 - Math.min(smooth(clamp((r - 0.72) / 0.28)), b), decal, 1);
+      wisps(t);
       if (landed && r > 0.8) reveal();
       if (r >= 1 && landed && landT >= 1) { end(); return; }
       return;
@@ -3342,16 +3333,11 @@ function siteIntro() {
     /* the landing: the chime, and one ring of light leaving the globe as it settles */
     if (!skipped) { Sound.play('land'); const st = document.querySelector('#stage'); if (st && target) { st.classList.add('landed'); setTimeout(() => st.classList.remove('landed'), 900); } }
   }
-  const quit = () => { el.classList.add('skipping'); Sound.hush(); try { vid.pause(); } catch (e) {} setTimeout(end, 240); };
+  const quit = () => { el.classList.add('skipping'); Sound.hush(); setTimeout(end, 240); };
   const skip = () => { if (skipped || finished || revealed) return; skipped = true; if (landed) quit(); };
   function begin() {
     if (started) return; started = true; el.classList.add('going'); gate.classList.add('gone'); setTimeout(() => gateUi.remove(), 400);
-    Sound.unlock();
-    if (vidOK && typeof window.__introT !== 'number') {
-      mode = 'video'; el.classList.add('video');
-      try { vid.currentTime = 0; const p = vid.play(); if (p && p.catch) p.catch(toDrawn); } catch (e) { toDrawn(); return; }
-      Sound.play('enter'); Sound.clip(windData, 0.7);
-    } else Sound.play('opening');
+    Sound.unlock(); Sound.play('opening'); Sound.clip(windData, 0.8);
   }
   const press = () => (started ? skip() : begin());
   el.addEventListener('click', press);
